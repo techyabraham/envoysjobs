@@ -1,0 +1,11 @@
+﻿{
+  "name": "@envoysjobs/config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "eslint.cjs",
+    "prettier.cjs",
+    "tsconfig.base.json"
+  ]
+}

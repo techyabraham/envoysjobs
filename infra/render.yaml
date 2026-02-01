@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: envoysjobs-api
+    env: docker
+    dockerfilePath: apps/api/Dockerfile
+    plan: starter
+  - type: web
+    name: envoysjobs-web
+    env: docker
+    dockerfilePath: apps/web/Dockerfile
+    plan: starter

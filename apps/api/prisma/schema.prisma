@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ENVOY
+  HIRER
+  ADMIN
+}
+
+enum HirerType {
+  INDIVIDUAL
+  BUSINESS
+}
+
+enum JobLocationType {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+enum ApplicationStatus {
+  APPLIED
+  IN_REVIEW
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+}
+
+enum StewardStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum JobStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  passwordHash       String
+  firstName          String
+  lastName           String
+  phone              String?
+  role               Role
+  stewardStatus      StewardStatus? @default(PENDING)
+  stewardDepartment  String?
+  stewardMatricNumber String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  envoyProfile EnvoyProfile?
+  hirerProfile HirerProfile?
+  skills       UserSkill[]
+  jobs         Job[]        @relation("HirerJobs")
+  applications Application[] @relation("EnvoyApplications")
+  messages     Message[]
+  refreshTokens RefreshToken[]
+  notifications Notification[]
+  reports      Report[]
+  auditLogs    AdminAuditLog[]
+  participants ConversationParticipant[]
+}
+
+model EnvoyProfile {
+  id         String @id @default(cuid())
+  userId     String @unique
+  bio        String?
+  location   String?
+  availability String?
+  portfolioLinks String?
+  rating     Float  @default(0)
+  verified   Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model HirerProfile {
+  id         String @id @default(cuid())
+  userId     String @unique
+  type       HirerType @default(INDIVIDUAL)
+  businessName String?
+  rating     Float @default(0)
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Skill {
+  id   String @id @default(cuid())
+  name String @unique
+  users UserSkill[]
+}
+
+model UserSkill {
+  id     String @id @default(cuid())
+  userId String
+  skillId String
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId])
+}
+
+model JobCategory {
+  id   String @id @default(cuid())
+  name String @unique
+  jobs Job[]
+}
+
+model Job {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  categoryId  String?
+  locationType JobLocationType
+  location    String?
+  salaryMin   Int?
+  salaryMax   Int?
+  urgency     String?
+  status      JobStatus @default(DRAFT)
+  hirerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category JobCategory? @relation(fields: [categoryId], references: [id])
+  hirer   User @relation("HirerJobs", fields: [hirerId], references: [id])
+  applications Application[]
+  conversations Conversation[]
+}
+
+model Application {
+  id      String @id @default(cuid())
+  jobId   String
+  envoyId String
+  status  ApplicationStatus @default(APPLIED)
+  createdAt DateTime @default(now())
+
+  job   Job  @relation(fields: [jobId], references: [id])
+  envoy User @relation("EnvoyApplications", fields: [envoyId], references: [id])
+}
+
+model Conversation {
+  id      String @id @default(cuid())
+  jobId   String
+  createdAt DateTime @default(now())
+
+  job Job @relation(fields: [jobId], references: [id])
+  messages Message[]
+  participants ConversationParticipant[]
+}
+
+model ConversationParticipant {
+  id             String @id @default(cuid())
+  conversationId String
+  userId         String
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String @id @default(cuid())
+  conversationId String
+  senderId       String
+  text           String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User @relation(fields: [senderId], references: [id])
+  attachments  Attachment[]
+}
+
+model Attachment {
+  id        String @id @default(cuid())
+  messageId String
+  url       String
+  type      String
+
+  message Message @relation(fields: [messageId], references: [id])
+}
+
+model AutoMessageTemplate {
+  id          String @id @default(cuid())
+  key         String @unique
+  text        String
+  audience    String
+  quickReplies String[]
+  triggerRules Json
+}
+
+model Verification {
+  id      String @id @default(cuid())
+  phone   String @unique
+  status  VerificationStatus @default(PENDING)
+  otpCode String?
+}
+
+model Review {
+  id      String @id @default(cuid())
+  jobId   String
+  reviewerId String
+  revieweeId String
+  rating  Int
+  text    String?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id      String @id @default(cuid())
+  userId  String
+  title   String
+  body    String
+  read    Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Report {
+  id      String @id @default(cuid())
+  reporterId String
+  reason  String
+  createdAt DateTime @default(now())
+
+  reporter User @relation(fields: [reporterId], references: [id])
+}
+
+model AdminAuditLog {
+  id      String @id @default(cuid())
+  adminId String
+  action  String
+  createdAt DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id])
+}
+
+model RefreshToken {
+  id      String @id @default(cuid())
+  token   String @unique
+  userId  String
+  role    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
