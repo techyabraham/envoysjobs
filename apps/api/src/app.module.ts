@@ -14,6 +14,7 @@ import { AdminModule } from "./modules/admin/admin.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { VerificationModule } from "./modules/verification/verification.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
+import { ReportsModule } from "./modules/reports/reports.module";
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { ReviewsModule } from "./modules/reviews/reviews.module";
     AdminModule,
     NotificationsModule,
     VerificationModule,
-    ReviewsModule
+    ReviewsModule,
+    ReportsModule
   ],
   controllers: [AppController],
   providers: [AppService]

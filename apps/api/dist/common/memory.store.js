@@ -11,7 +11,9 @@ exports.memoryStore = {
     messages: [],
     notifications: [],
     refreshTokens: [],
-    reviews: []
+    reviews: [],
+    savedJobs: [],
+    reports: []
 };
 const createId = () => (0, crypto_1.randomUUID)();
 exports.createId = createId;

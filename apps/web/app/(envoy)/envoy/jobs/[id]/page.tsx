@@ -5,12 +5,14 @@ import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useJob } from "@/lib/jobs";
 import { useApi } from "@/lib/useApi";
+import { useSaveJob } from "@/lib/savedJobs";
 
 export default function Page() {
   const params = useParams();
   const jobId = params?.id as string;
   const { data: job, isLoading, error } = useJob(jobId);
   const api = useApi();
+  const saveJob = useSaveJob();
 
   const handleApply = async () => {
     if (!jobId) return;
@@ -35,9 +37,14 @@ export default function Page() {
             <div className="text-sm text-foreground-tertiary">
               Salary: {job.salaryMin ?? 0} - {job.salaryMax ?? 0}
             </div>
-            <button onClick={handleApply} className="px-4 py-2 rounded-lg bg-emerald-green text-white">
-              Apply
-            </button>
+            <div className="flex gap-3">
+              <button onClick={handleApply} className="px-4 py-2 rounded-lg bg-emerald-green text-white">
+                Apply
+              </button>
+              <button onClick={() => saveJob.mutate(job.id)} className="btn-secondary">
+                Save job
+              </button>
+            </div>
           </div>
         ) : null}
       </PageShell>

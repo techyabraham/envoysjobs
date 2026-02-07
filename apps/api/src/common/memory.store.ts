@@ -56,6 +56,13 @@ export type MemoryNotification = {
   createdAt: Date;
 };
 
+export type MemorySavedJob = {
+  id: string;
+  userId: string;
+  jobId: string;
+  createdAt: Date;
+};
+
 export type MemoryRefreshToken = {
   token: string;
   userId: string;
@@ -81,7 +88,9 @@ export const memoryStore = {
   messages: [] as MemoryMessage[],
   notifications: [] as MemoryNotification[],
   refreshTokens: [] as MemoryRefreshToken[],
-  reviews: [] as MemoryReview[]
+  reviews: [] as MemoryReview[],
+  savedJobs: [] as MemorySavedJob[],
+  reports: [] as any[]
 };
 
 export const createId = () => randomUUID();

@@ -37,9 +37,11 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-green to-soft-gold rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">E</span>
-              </div>
+              <img
+                src="/envoysjobs.com-logo.png"
+                alt="EnvoysJobs"
+                className="h-8 w-auto"
+              />
               <span className="text-xl font-bold">EnvoysJobs</span>
             </div>
             <p className="text-white/80 mb-6 max-w-sm">

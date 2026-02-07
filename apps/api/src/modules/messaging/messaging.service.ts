@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { NotificationsService } from "../notifications/notifications.service";
 import { sanitizeMessage } from "@envoysjobs/utils";
 import { createId, memoryStore, seedMemory, useMemory } from "../../common/memory.store";
 
 @Injectable()
 export class MessagingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private notifications: NotificationsService) {}
 
   listConversations(userId: string) {
     if (!useMemory()) {
@@ -110,6 +111,20 @@ export class MessagingService {
           senderId,
           text: sanitizeMessage(text)
         }
+      }).then(async (message) => {
+        const convo = await this.prisma.conversation.findUnique({
+          where: { id: conversationId },
+          include: { participants: true }
+        });
+        if (convo) {
+          const recipients = convo.participants.filter((p) => p.userId !== senderId);
+          await Promise.all(
+            recipients.map((p) =>
+              this.notifications.create(p.userId, "New message", "You received a new message.")
+            )
+          );
+        }
+        return message;
       });
     }
     seedMemory();
@@ -130,6 +145,12 @@ export class MessagingService {
           createdAt: new Date()
         };
         memoryStore.messages.push(message);
+        const convo = memoryStore.conversations.find((c) => c.id === conversationId);
+        if (convo) {
+          convo.participants
+            .filter((id) => id !== senderId)
+            .forEach((id) => this.notifications.create(id, "New message", "You received a new message."));
+        }
         return message as any;
       });
   }

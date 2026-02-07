@@ -51,6 +51,15 @@ let JobsController = class JobsController {
     close(id) {
         return this.jobsService.close(id);
     }
+    saved(req) {
+        return this.jobsService.listSavedJobs(req.user?.id || "");
+    }
+    save(req, id) {
+        return this.jobsService.saveJob(req.user?.id || "", id);
+    }
+    unsave(req, id) {
+        return this.jobsService.unsaveJob(req.user?.id || "", id);
+    }
 };
 exports.JobsController = JobsController;
 __decorate([
@@ -101,6 +110,32 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], JobsController.prototype, "close", null);
+__decorate([
+    (0, common_1.Get)("saved"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], JobsController.prototype, "saved", null);
+__decorate([
+    (0, common_1.Post)(":id/save"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], JobsController.prototype, "save", null);
+__decorate([
+    (0, common_1.Delete)(":id/save"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], JobsController.prototype, "unsave", null);
 exports.JobsController = JobsController = __decorate([
     (0, common_1.Controller)("jobs"),
     __metadata("design:paramtypes", [jobs_service_1.JobsService])

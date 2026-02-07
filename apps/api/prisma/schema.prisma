@@ -76,6 +76,8 @@ model User {
   reports      Report[]
   auditLogs    AdminAuditLog[]
   participants ConversationParticipant[]
+  savedJobs   SavedJob[]
+  verification Verification?
 }
 
 model EnvoyProfile {
@@ -143,6 +145,19 @@ model Job {
   hirer   User @relation("HirerJobs", fields: [hirerId], references: [id])
   applications Application[]
   conversations Conversation[]
+  savedBy     SavedJob[]
+}
+
+model SavedJob {
+  id        String @id @default(cuid())
+  userId    String
+  jobId     String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  job  Job  @relation(fields: [jobId], references: [id])
+
+  @@unique([userId, jobId])
 }
 
 model Application {
@@ -212,6 +227,12 @@ model Verification {
   phone   String @unique
   status  VerificationStatus @default(PENDING)
   otpCode String?
+  userId  String? @unique
+  documentUrl  String?
+  documentType String?
+  updatedAt DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id])
 }
 
 model Review {

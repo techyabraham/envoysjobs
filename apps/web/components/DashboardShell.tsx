@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { usePathname, useRouter } from "next/navigation";
 import { DashboardLayout } from "@envoysjobs/ui";
@@ -6,12 +6,17 @@ import { DashboardLayout } from "@envoysjobs/ui";
 const pageMap: Record<string, string> = {
   "/envoy/dashboard": "dashboard",
   "/envoy/jobs": "jobs",
+  "/envoy/services": "services",
+  "/envoy/gigs": "gigs",
+  "/envoy/notifications": "notifications",
   "/envoy/messages": "messages",
   "/envoy/profile": "profile",
+  "/envoy/settings": "settings",
   "/hirer/dashboard": "dashboard",
   "/hirer/jobs": "jobs",
-  "/hirer/messages": "messages",
-  "/hirer/profile": "profile"
+  "/hirer/notifications": "notifications",
+  "/hirer/profile": "profile",
+  "/hirer/settings": "settings"
 };
 
 export default function DashboardShell({
@@ -30,14 +35,32 @@ export default function DashboardShell({
       activePage={activePage}
       userName={userName}
       onNavigate={(page) => {
+        if (page === "home") {
+          router.push("/");
+          return;
+        }
+        if (page === "messages") {
+          router.push("/messages");
+          return;
+        }
         if (pathname.startsWith("/envoy")) {
-          const route = page === "dashboard" ? "/envoy/dashboard" : `/envoy/${page}`;
-          router.push(route);
+          if (page === "dashboard") {
+            router.push("/envoy/dashboard");
+            return;
+          }
+          router.push(`/envoy/${page}`);
           return;
         }
         if (pathname.startsWith("/hirer")) {
-          const route = page === "dashboard" ? "/hirer/dashboard" : `/hirer/${page}`;
-          router.push(route);
+          if (page === "dashboard") {
+            router.push("/hirer/dashboard");
+            return;
+          }
+          if (page === "services" || page === "gigs") {
+            router.push("/hirer/dashboard");
+            return;
+          }
+          router.push(`/hirer/${page}`);
           return;
         }
         router.push("/");

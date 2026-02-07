@@ -28,9 +28,11 @@ export function Header({ onNavigate }: HeaderProps) {
               onClick={() => onNavigate?.('home')}
               className="flex items-center gap-2 text-deep-blue hover:text-deep-blue-dark transition-colors"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-deep-blue to-emerald-green rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">E</span>
-              </div>
+              <img
+                src="/envoysjobs.com-logo.png"
+                alt="EnvoysJobs"
+                className="h-8 w-auto"
+              />
               <span className="text-xl font-bold">EnvoysJobs</span>
             </button>
           </div>

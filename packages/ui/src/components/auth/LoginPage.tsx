@@ -57,9 +57,11 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-deep-blue to-emerald-green rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-2xl">E</span>
-              </div>
+              <img
+                src="/envoysjobs.com-logo.png"
+                alt="EnvoysJobs"
+                className="h-10 w-auto"
+              />
               <span className="text-2xl font-bold text-foreground">EnvoysJobs</span>
             </div>
             <h1 className="text-3xl mb-2">Welcome Back</h1>

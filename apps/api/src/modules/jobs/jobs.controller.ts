@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
@@ -56,5 +56,23 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   close(@Param("id") id: string) {
     return this.jobsService.close(id);
+  }
+
+  @Get("saved")
+  @UseGuards(JwtAuthGuard)
+  saved(@Req() req: any) {
+    return this.jobsService.listSavedJobs(req.user?.id || "");
+  }
+
+  @Post(":id/save")
+  @UseGuards(JwtAuthGuard)
+  save(@Req() req: any, @Param("id") id: string) {
+    return this.jobsService.saveJob(req.user?.id || "", id);
+  }
+
+  @Delete(":id/save")
+  @UseGuards(JwtAuthGuard)
+  unsave(@Req() req: any, @Param("id") id: string) {
+    return this.jobsService.unsaveJob(req.user?.id || "", id);
   }
 }

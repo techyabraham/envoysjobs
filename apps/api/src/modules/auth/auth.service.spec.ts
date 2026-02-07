@@ -1,5 +1,6 @@
 import { Test } from "@nestjs/testing";
 import { AuthService } from "./auth.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 
 const prismaMock = {
@@ -11,13 +12,17 @@ const prismaMock = {
   }
 };
 
+const jwtMock = {
+  sign: jest.fn(() => "access-token")
+};
+
 describe("AuthService", () => {
   it("issues tokens on signup", async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         AuthService,
-        JwtService,
-        { provide: "PrismaService", useValue: prismaMock }
+        { provide: JwtService, useValue: jwtMock },
+        { provide: PrismaService, useValue: prismaMock }
       ]
     }).compile();
 

@@ -40,9 +40,11 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
         <div className="flex flex-col flex-1 min-h-0">
           {/* Logo */}
           <div className="flex items-center gap-2 px-6 py-6 border-b border-border">
-            <div className="w-10 h-10 bg-gradient-to-br from-deep-blue to-emerald-green rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">E</span>
-            </div>
+            <img
+              src="/envoysjobs.com-logo.png"
+              alt="EnvoysJobs"
+              className="h-8 w-auto"
+            />
             <span className="text-xl font-bold text-foreground">EnvoysJobs</span>
           </div>
 
@@ -99,9 +101,11 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
               {/* Logo */}
               <div className="flex items-center justify-between px-6 py-6 border-b border-border">
                 <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 bg-gradient-to-br from-deep-blue to-emerald-green rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">E</span>
-                  </div>
+                  <img
+                    src="/envoysjobs.com-logo.png"
+                    alt="EnvoysJobs"
+                    className="h-8 w-auto"
+                  />
                   <span className="text-xl font-bold text-foreground">EnvoysJobs</span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)}>

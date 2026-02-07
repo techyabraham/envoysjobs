@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
 import { UsersService } from "./users.service";
 
@@ -18,8 +18,8 @@ export class UsersController {
   }
 
   @Get("envoy/profile")
-  getEnvoy(@Req() req: any) {
-    return this.usersService.getEnvoyProfile(req.user?.id || "");
+  getEnvoy(@Req() req: any, @Query("userId") userId?: string) {
+    return this.usersService.getEnvoyProfile(userId || req.user?.id || "");
   }
 
   @Put("envoy/profile")

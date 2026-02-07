@@ -58,4 +58,44 @@ export class JobsService {
   close(id: string) {
     return this.update(id, { status: "CLOSED" });
   }
+
+  async saveJob(userId: string, jobId: string) {
+    if (!useMemory()) {
+      return this.prisma.savedJob.upsert({
+        where: { userId_jobId: { userId, jobId } },
+        update: {},
+        create: { userId, jobId }
+      });
+    }
+    seedMemory();
+    const existing = memoryStore.savedJobs.find((s) => s.userId === userId && s.jobId === jobId);
+    if (existing) return existing as any;
+    const saved = { id: createId(), userId, jobId, createdAt: new Date() };
+    memoryStore.savedJobs.push(saved);
+    return saved as any;
+  }
+
+  async unsaveJob(userId: string, jobId: string) {
+    if (!useMemory()) {
+      return this.prisma.savedJob.delete({
+        where: { userId_jobId: { userId, jobId } }
+      });
+    }
+    seedMemory();
+    memoryStore.savedJobs = memoryStore.savedJobs.filter((s) => !(s.userId === userId && s.jobId === jobId));
+    return { success: true };
+  }
+
+  async listSavedJobs(userId: string) {
+    if (!useMemory()) {
+      const saved = await this.prisma.savedJob.findMany({
+        where: { userId },
+        include: { job: true }
+      });
+      return saved.map((s) => s.job);
+    }
+    seedMemory();
+    const saved = memoryStore.savedJobs.filter((s) => s.userId === userId);
+    return saved.map((s) => memoryStore.jobs.find((j) => j.id === s.jobId)).filter(Boolean);
+  }
 }

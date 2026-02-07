@@ -70,6 +70,44 @@ let JobsService = class JobsService {
     close(id) {
         return this.update(id, { status: "CLOSED" });
     }
+    async saveJob(userId, jobId) {
+        if (!(0, memory_store_1.useMemory)()) {
+            return this.prisma.savedJob.upsert({
+                where: { userId_jobId: { userId, jobId } },
+                update: {},
+                create: { userId, jobId }
+            });
+        }
+        (0, memory_store_1.seedMemory)();
+        const existing = memory_store_1.memoryStore.savedJobs.find((s) => s.userId === userId && s.jobId === jobId);
+        if (existing)
+            return existing;
+        const saved = { id: (0, memory_store_1.createId)(), userId, jobId, createdAt: new Date() };
+        memory_store_1.memoryStore.savedJobs.push(saved);
+        return saved;
+    }
+    async unsaveJob(userId, jobId) {
+        if (!(0, memory_store_1.useMemory)()) {
+            return this.prisma.savedJob.delete({
+                where: { userId_jobId: { userId, jobId } }
+            });
+        }
+        (0, memory_store_1.seedMemory)();
+        memory_store_1.memoryStore.savedJobs = memory_store_1.memoryStore.savedJobs.filter((s) => !(s.userId === userId && s.jobId === jobId));
+        return { success: true };
+    }
+    async listSavedJobs(userId) {
+        if (!(0, memory_store_1.useMemory)()) {
+            const saved = await this.prisma.savedJob.findMany({
+                where: { userId },
+                include: { job: true }
+            });
+            return saved.map((s) => s.job);
+        }
+        (0, memory_store_1.seedMemory)();
+        const saved = memory_store_1.memoryStore.savedJobs.filter((s) => s.userId === userId);
+        return saved.map((s) => memory_store_1.memoryStore.jobs.find((j) => j.id === s.jobId)).filter(Boolean);
+    }
 };
 exports.JobsService = JobsService;
 exports.JobsService = JobsService = __decorate([

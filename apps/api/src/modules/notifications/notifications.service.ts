@@ -6,6 +6,26 @@ import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
+  create(userId: string, title: string, body: string) {
+    if (!userId) return null;
+    if (!useMemory()) {
+      return this.prisma.notification.create({
+        data: { userId, title, body }
+      });
+    }
+    seedMemory();
+    const notification = {
+      id: `${Date.now()}-${Math.random()}`,
+      userId,
+      title,
+      body,
+      read: false,
+      createdAt: new Date()
+    };
+    memoryStore.notifications.push(notification);
+    return notification as any;
+  }
+
   list(userId: string) {
     if (!useMemory()) {
       return this.prisma.notification.findMany({

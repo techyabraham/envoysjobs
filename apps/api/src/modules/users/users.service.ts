@@ -26,7 +26,12 @@ export class UsersService {
   }
 
   getEnvoyProfile(userId: string) {
-    if (!useMemory()) return this.prisma.envoyProfile.findUnique({ where: { userId } });
+    if (!useMemory()) {
+      return this.prisma.envoyProfile.findUnique({
+        where: { userId },
+        include: { user: true }
+      });
+    }
     return this.prisma.envoyProfile.findUnique({ where: { userId } }).catch(() => {
       return {
         userId,
@@ -35,7 +40,8 @@ export class UsersService {
         availability: "Full-time",
         portfolioLinks: "",
         rating: 4.8,
-        verified: false
+        verified: false,
+        user: memoryStore.users.find((u) => u.id === userId)
       } as any;
     });
   }
@@ -58,13 +64,19 @@ export class UsersService {
   }
 
   getHirerProfile(userId: string) {
-    if (!useMemory()) return this.prisma.hirerProfile.findUnique({ where: { userId } });
+    if (!useMemory()) {
+      return this.prisma.hirerProfile.findUnique({
+        where: { userId },
+        include: { user: true }
+      });
+    }
     return this.prisma.hirerProfile.findUnique({ where: { userId } }).catch(() => {
       return {
         userId,
         type: "INDIVIDUAL",
         businessName: null,
-        rating: 4.5
+        rating: 4.5,
+        user: memoryStore.users.find((u) => u.id === userId)
       } as any;
     });
   }

@@ -17,6 +17,26 @@ let NotificationsService = class NotificationsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    create(userId, title, body) {
+        if (!userId)
+            return null;
+        if (!(0, memory_store_1.useMemory)()) {
+            return this.prisma.notification.create({
+                data: { userId, title, body }
+            });
+        }
+        (0, memory_store_1.seedMemory)();
+        const notification = {
+            id: `${Date.now()}-${Math.random()}`,
+            userId,
+            title,
+            body,
+            read: false,
+            createdAt: new Date()
+        };
+        memory_store_1.memoryStore.notifications.push(notification);
+        return notification;
+    }
     list(userId) {
         if (!(0, memory_store_1.useMemory)()) {
             return this.prisma.notification.findMany({

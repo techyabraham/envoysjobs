@@ -1,34 +1,40 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useApi } from "@/lib/useApi";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
 
-const stewardDepartments = [
-  "CHOIR",
-  "MEDIA",
-  "PROTOCOL",
-  "USHERING",
-  "CHILDREN",
-  "OTHER"
-];
+const stewardDepartments = ["CHOIR", "MEDIA", "PROTOCOL", "USHERING", "CHILDREN", "OTHER"];
 
-const envoySchema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  phone: z.string().min(6),
-  location: z.string().min(2),
-  skills: z.string().min(2),
-  steward: z.enum(["yes", "no"]),
-  stewardDepartment: z.string().optional(),
-  stewardMatricNumber: z.string().optional()
-});
+const envoySchema = z
+  .object({
+    firstName: z.string().min(2),
+    lastName: z.string().min(2),
+    phone: z.string().min(6),
+    location: z.string().min(2),
+    skills: z.string().min(2),
+    steward: z.enum(["yes", "no"]),
+    stewardDepartment: z.string().optional(),
+    stewardMatricNumber: z.string().optional()
+  })
+  .refine(
+    (val) => (val.steward === "yes" ? Boolean(val.stewardDepartment && val.stewardMatricNumber) : true),
+    { message: "Steward department and matric number are required." }
+  );
 
 type EnvoyValues = z.infer<typeof envoySchema>;
 
 export default function EnvoyOnboardingForm() {
+  const router = useRouter();
+  const api = useApi();
+  const { data: session } = useSession();
   const [step, setStep] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<EnvoyValues>({
     resolver: zodResolver(envoySchema),
     defaultValues: {
@@ -44,8 +50,45 @@ export default function EnvoyOnboardingForm() {
     setStep((s) => Math.min(s + 1, 2));
   };
 
+  const onSubmit = async (values: EnvoyValues) => {
+    setError(null);
+    const resMe = await api("/me", {
+      method: "PUT",
+      body: JSON.stringify({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phone,
+        stewardStatus: values.steward === "yes" ? "PENDING" : null,
+        stewardDepartment: values.steward === "yes" ? values.stewardDepartment : null,
+        stewardMatricNumber: values.steward === "yes" ? values.stewardMatricNumber : null
+      })
+    });
+    if (resMe.error) {
+      setError("Failed to update user details.");
+      return;
+    }
+
+    const resProfile = await api("/envoy/profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        location: values.location,
+        bio: "",
+        availability: "",
+        portfolioLinks: "",
+        skills: values.skills
+      })
+    });
+
+    if (resProfile.error) {
+      setError("Failed to save envoy profile.");
+      return;
+    }
+
+    router.push("/envoy/dashboard");
+  };
+
   return (
-    <form className="space-y-6">
+    <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
       {step === 0 && (
         <div className="grid gap-4">
           <div className="grid gap-2">
@@ -107,14 +150,14 @@ export default function EnvoyOnboardingForm() {
 
       {step === 2 && (
         <div className="space-y-4">
-          <p className="text-foreground-secondary">
-            Review your details and complete onboarding.
-          </p>
+          <p className="text-foreground-secondary">Review your details and complete onboarding.</p>
           <div className="bg-background-secondary rounded-xl p-4">
             <pre className="text-sm">{JSON.stringify(form.getValues(), null, 2)}</pre>
           </div>
         </div>
       )}
+
+      {error && <p className="text-destructive">{error}</p>}
 
       <div className="flex items-center gap-4">
         {step > 0 && (

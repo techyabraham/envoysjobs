@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
 const auth_service_1 = require("./auth.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 const jwt_1 = require("@nestjs/jwt");
 const prismaMock = {
     user: {
@@ -11,13 +12,16 @@ const prismaMock = {
         create: jest.fn()
     }
 };
+const jwtMock = {
+    sign: jest.fn(() => "access-token")
+};
 describe("AuthService", () => {
     it("issues tokens on signup", async () => {
         const moduleRef = await testing_1.Test.createTestingModule({
             providers: [
                 auth_service_1.AuthService,
-                jwt_1.JwtService,
-                { provide: "PrismaService", useValue: prismaMock }
+                { provide: jwt_1.JwtService, useValue: jwtMock },
+                { provide: prisma_service_1.PrismaService, useValue: prismaMock }
             ]
         }).compile();
         const service = moduleRef.get(auth_service_1.AuthService);

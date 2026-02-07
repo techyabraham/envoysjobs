@@ -26,8 +26,8 @@ let UsersController = class UsersController {
     updateMe(req, body) {
         return this.usersService.updateUser(req.user?.id || "", body);
     }
-    getEnvoy(req) {
-        return this.usersService.getEnvoyProfile(req.user?.id || "");
+    getEnvoy(req, userId) {
+        return this.usersService.getEnvoyProfile(userId || req.user?.id || "");
     }
     updateEnvoy(req, body) {
         return this.usersService.updateEnvoyProfile(req.user?.id || "", body);
@@ -58,8 +58,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)("envoy/profile"),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)("userId")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getEnvoy", null);
 __decorate([

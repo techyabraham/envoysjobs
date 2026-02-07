@@ -13,10 +13,12 @@ exports.ApplicationsService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../prisma/prisma.service");
+const notifications_service_1 = require("../notifications/notifications.service");
 const memory_store_1 = require("../../common/memory.store");
 let ApplicationsService = class ApplicationsService {
-    constructor(prisma) {
+    constructor(prisma, notifications) {
         this.prisma = prisma;
+        this.notifications = notifications;
     }
     apply(jobId, userId) {
         if (!(0, memory_store_1.useMemory)()) {
@@ -26,6 +28,12 @@ let ApplicationsService = class ApplicationsService {
                     envoyId: userId,
                     status: client_1.ApplicationStatus.APPLIED
                 }
+            }).then(async (app) => {
+                const job = await this.prisma.job.findUnique({ where: { id: jobId } });
+                if (job?.hirerId) {
+                    await this.notifications.create(job.hirerId, "New application", "You received a new application.");
+                }
+                return app;
             });
         }
         (0, memory_store_1.seedMemory)();
@@ -46,6 +54,10 @@ let ApplicationsService = class ApplicationsService {
                 createdAt: new Date()
             };
             memory_store_1.memoryStore.applications.push(application);
+            const job = memory_store_1.memoryStore.jobs.find((j) => j.id === jobId);
+            if (job?.hirerId) {
+                this.notifications.create(job.hirerId, "New application", "You received a new application.");
+            }
             return application;
         });
     }
@@ -74,14 +86,20 @@ let ApplicationsService = class ApplicationsService {
         });
     }
     updateStatus(id, status) {
-        if (!(0, memory_store_1.useMemory)())
-            return this.prisma.application.update({ where: { id }, data: { status } });
+        if (!(0, memory_store_1.useMemory)()) {
+            return this.prisma.application.update({ where: { id }, data: { status } }).then(async (app) => {
+                await this.notifications.create(app.envoyId, "Application update", `Your application is now ${status}.`);
+                return app;
+            });
+        }
         (0, memory_store_1.seedMemory)();
         return this.prisma.application.update({ where: { id }, data: { status } }).catch(() => {
             const index = memory_store_1.memoryStore.applications.findIndex((app) => app.id === id);
             if (index === -1)
                 return null;
             memory_store_1.memoryStore.applications[index] = { ...memory_store_1.memoryStore.applications[index], status };
+            const app = memory_store_1.memoryStore.applications[index];
+            this.notifications.create(app.envoyId, "Application update", `Your application is now ${status}.`);
             return memory_store_1.memoryStore.applications[index];
         });
     }
@@ -89,5 +107,5 @@ let ApplicationsService = class ApplicationsService {
 exports.ApplicationsService = ApplicationsService;
 exports.ApplicationsService = ApplicationsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, notifications_service_1.NotificationsService])
 ], ApplicationsService);
