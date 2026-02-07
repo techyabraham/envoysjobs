@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
+import { JwtAuthGuard } from "../../common/jwt-auth.guard";
 import { MessagingService } from "./messaging.service";
 
 const conversationSchema = z.object({
@@ -11,17 +12,17 @@ const conversationSchema = z.object({
 });
 
 const messageSchema = z.object({
-  senderId: z.string(),
   text: z.string().min(1)
 });
 
 @Controller()
+@UseGuards(JwtAuthGuard)
 export class MessagingController {
   constructor(private messagingService: MessagingService) {}
 
   @Get("conversations")
-  listConversations(@Query("userId") userId: string) {
-    return this.messagingService.listConversations(userId);
+  listConversations(@Req() req: any, @Query("userId") userId?: string) {
+    return this.messagingService.listConversations(userId || req.user?.id || "");
   }
 
   @Post("conversations")
@@ -38,8 +39,9 @@ export class MessagingController {
   @Post("conversations/:id/messages")
   sendMessage(
     @Param("id") id: string,
+    @Req() req: any,
     @Body(new ZodValidationPipe(messageSchema)) body: z.infer<typeof messageSchema>
   ) {
-    return this.messagingService.sendMessage(id, body.senderId, body.text);
+    return this.messagingService.sendMessage(id, req.user?.id || "", body.text);
   }
 }

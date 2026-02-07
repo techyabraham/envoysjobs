@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { 
   Camera, Mail, Phone, MapPin, Briefcase, Award, 
   Edit, Save, X, Plus 
@@ -283,4 +285,5 @@ export function ProfilePage({ userName, userEmail }: ProfilePageProps) {
     </div>
   );
 }
+
 

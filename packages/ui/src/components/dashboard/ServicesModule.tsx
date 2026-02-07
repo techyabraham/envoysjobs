@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { Star, MessageCircle, Eye, TrendingUp, Edit, Plus } from 'lucide-react';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
@@ -328,4 +330,5 @@ export function ServicesModule() {
     </div>
   );
 }
+
 

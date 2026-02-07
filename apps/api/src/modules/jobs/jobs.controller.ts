@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
+import { JwtAuthGuard } from "../../common/jwt-auth.guard";
 import { JobsService } from "./jobs.service";
 
-const jobSchema = z.object({
+const jobCreateSchema = z.object({
   title: z.string().min(2),
   description: z.string().min(2),
   locationType: z.enum(["ONSITE", "REMOTE", "HYBRID"]),
@@ -11,17 +12,19 @@ const jobSchema = z.object({
   salaryMin: z.number().optional(),
   salaryMax: z.number().optional(),
   urgency: z.string().optional(),
-  status: z.enum(["DRAFT", "PUBLISHED", "CLOSED"]).optional(),
-  hirerId: z.string()
+  status: z.enum(["DRAFT", "PUBLISHED", "CLOSED"]).optional()
 });
+
+const jobUpdateSchema = jobCreateSchema.partial();
 
 @Controller("jobs")
 export class JobsController {
   constructor(private jobsService: JobsService) {}
 
   @Post()
-  create(@Body(new ZodValidationPipe(jobSchema)) body: z.infer<typeof jobSchema>) {
-    return this.jobsService.create(body);
+  @UseGuards(JwtAuthGuard)
+  create(@Req() req: any, @Body(new ZodValidationPipe(jobCreateSchema)) body: z.infer<typeof jobCreateSchema>) {
+    return this.jobsService.create({ ...body, hirerId: req.user?.id || "" });
   }
 
   @Get()
@@ -35,19 +38,22 @@ export class JobsController {
   }
 
   @Put(":id")
+  @UseGuards(JwtAuthGuard)
   update(
     @Param("id") id: string,
-    @Body(new ZodValidationPipe(jobSchema.partial())) body: z.infer<typeof jobSchema.partial()>
+    @Body(new ZodValidationPipe(jobUpdateSchema)) body: z.infer<typeof jobUpdateSchema>
   ) {
     return this.jobsService.update(id, body);
   }
 
   @Post(":id/publish")
+  @UseGuards(JwtAuthGuard)
   publish(@Param("id") id: string) {
     return this.jobsService.publish(id);
   }
 
   @Post(":id/close")
+  @UseGuards(JwtAuthGuard)
   close(@Param("id") id: string) {
     return this.jobsService.close(id);
   }

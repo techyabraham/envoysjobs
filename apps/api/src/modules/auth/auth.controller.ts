@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from "@nestjs/common";\nimport { Throttle } from "@nestjs/throttler";
-import { ZodValidationPipe } from "../../common/zod-validation.pipe";
+import { Body, Controller, Post } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
 import { z } from "zod";
+import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { AuthService } from "./auth.service";
 
 const signupSchema = z.object({
@@ -8,7 +9,7 @@ const signupSchema = z.object({
   password: z.string().min(8),
   firstName: z.string().min(2),
   lastName: z.string().min(2),
-  role: z.enum(["ENVOY", "HIRER", "ADMIN"]) 
+  role: z.enum(["ENVOY", "HIRER", "ADMIN"])
 });
 
 const loginSchema = z.object({
@@ -20,12 +21,14 @@ const loginSchema = z.object({
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Throttle({ default: { limit: 5, ttl: 60000 } })\n  @Post("signup")
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post("signup")
   signup(@Body(new ZodValidationPipe(signupSchema)) body: z.infer<typeof signupSchema>) {
     return this.authService.signup(body);
   }
 
-  @Throttle({ default: { limit: 5, ttl: 60000 } })\n  @Post("login")
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post("login")
   login(@Body(new ZodValidationPipe(loginSchema)) body: z.infer<typeof loginSchema>) {
     return this.authService.login(body.email, body.password);
   }
@@ -50,4 +53,3 @@ export class AuthController {
     return this.authService.verifyOtp(body.phone, body.code);
   }
 }
-

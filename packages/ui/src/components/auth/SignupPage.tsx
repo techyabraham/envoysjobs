@@ -1,11 +1,13 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 
 interface SignupPageProps {
   onNavigate?: (page: string) => void;
-  onSignup?: (data: { firstName: string; lastName: string; email: string }) => void;
+  onSignup?: (data: { firstName: string; lastName: string; email: string; password: string }) => void;
 }
 
 export function SignupPage({ onNavigate, onSignup }: SignupPageProps) {
@@ -72,7 +74,8 @@ export function SignupPage({ onNavigate, onSignup }: SignupPageProps) {
     onSignup?.({
       firstName: formData.firstName,
       lastName: formData.lastName,
-      email: formData.email
+      email: formData.email,
+      password: formData.password
     });
   };
 
@@ -249,4 +252,5 @@ export function SignupPage({ onNavigate, onSignup }: SignupPageProps) {
     </div>
   );
 }
+
 

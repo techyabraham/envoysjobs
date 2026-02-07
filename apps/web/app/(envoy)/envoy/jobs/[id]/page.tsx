@@ -1,16 +1,45 @@
-﻿import DashboardShell from "@/components/DashboardShell";
+"use client";
+
+import { useParams } from "next/navigation";
+import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
+import { useJob } from "@/lib/jobs";
+import { useApi } from "@/lib/useApi";
 
 export default function Page() {
+  const params = useParams();
+  const jobId = params?.id as string;
+  const { data: job, isLoading, error } = useJob(jobId);
+  const api = useApi();
+
+  const handleApply = async () => {
+    if (!jobId) return;
+    const res = await api(`/jobs/${jobId}/apply`, { method: "POST" });
+    if (res.error) {
+      alert("Failed to apply.");
+      return;
+    }
+    alert("Application sent.");
+  };
+
   return (
     <DashboardShell userName="Grace">
-      <PageShell title="Job Details" description="Senior Software Engineer">
-        <div className="bg-white border border-border rounded-2xl p-6 space-y-4">
-          <p>
-            We are looking for a senior engineer to build trusted community platforms.
-          </p>
-          <button className="cta">Apply now</button>
-        </div>
+      <PageShell title={job?.title ?? "Job Details"} description={job?.description}>
+        {isLoading && <p className="text-foreground-secondary">Loading job...</p>}
+        {error && <p className="text-destructive">Failed to load job.</p>}
+        {job ? (
+          <div className="bg-white border border-border rounded-2xl p-5 space-y-4">
+            <div className="text-sm text-foreground-tertiary">
+              {job.locationType} ? {job.location ?? "Remote"}
+            </div>
+            <div className="text-sm text-foreground-tertiary">
+              Salary: {job.salaryMin ?? 0} - {job.salaryMax ?? 0}
+            </div>
+            <button onClick={handleApply} className="px-4 py-2 rounded-lg bg-emerald-green text-white">
+              Apply
+            </button>
+          </div>
+        ) : null}
       </PageShell>
     </DashboardShell>
   );

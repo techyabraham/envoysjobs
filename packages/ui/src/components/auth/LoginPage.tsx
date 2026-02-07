@@ -1,11 +1,13 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
 
 interface LoginPageProps {
   onNavigate?: (page: string) => void;
-  onLogin?: (email: string) => void;
+  onLogin?: (email: string, password: string) => void;
 }
 
 export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
@@ -33,7 +35,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     }
 
     // Mock login
-    onLogin?.(email);
+    onLogin?.(email, password);
   };
 
   return (
@@ -126,4 +128,5 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     </div>
   );
 }
+
 

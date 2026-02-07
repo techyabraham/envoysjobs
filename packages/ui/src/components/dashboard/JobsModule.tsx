@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { MapPin, DollarSign, Clock, Eye, Bookmark, Calendar, CheckCircle } from 'lucide-react';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
@@ -250,4 +252,5 @@ export function JobsModule() {
     </div>
   );
 }
+
 

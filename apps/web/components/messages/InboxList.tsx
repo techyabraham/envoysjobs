@@ -1,30 +1,23 @@
-﻿import Link from "next/link";
+"use client";
 
-const conversations = [
-  {
-    id: "convo-1",
-    name: "Helio Labs",
-    job: "Senior Product Designer",
-    lastMessage: "We would love to schedule a call.",
-    updatedAt: "2h ago"
-  },
-  {
-    id: "convo-2",
-    name: "Pastor James",
-    job: "Event Setup Assistant",
-    lastMessage: "I honour you",
-    updatedAt: "1d ago"
-  }
-];
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useConversations } from "@/lib/messaging";
 
 export default function InboxList() {
+  const { data: session } = useSession();
+  const userId = (session as any)?.user?.id as string | undefined;
+  const { data, isLoading, error } = useConversations(userId);
+
   return (
     <div className="bg-white rounded-2xl border border-border">
       <div className="px-4 py-3 border-b border-border">
         <h3 className="font-semibold">Inbox</h3>
       </div>
+      {isLoading && <p className="px-4 py-4 text-foreground-secondary">Loading conversations...</p>}
+      {error && <p className="px-4 py-4 text-destructive">Failed to load conversations.</p>}
       <div className="divide-y divide-border">
-        {conversations.map((item) => (
+        {data?.map((item) => (
           <Link
             key={item.id}
             href={`/messages/${item.id}`}
@@ -32,12 +25,12 @@ export default function InboxList() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-foreground">{item.name}</p>
-                <p className="text-sm text-foreground-secondary">{item.job}</p>
+                <p className="font-medium text-foreground">Conversation</p>
+                <p className="text-sm text-foreground-secondary">{item.job?.title ?? "Job"}</p>
               </div>
-              <span className="text-xs text-foreground-tertiary">{item.updatedAt}</span>
+              <span className="text-xs text-foreground-tertiary">{item.messages?.[0]?.createdAt ?? ""}</span>
             </div>
-            <p className="text-sm text-foreground-secondary mt-2">{item.lastMessage}</p>
+            <p className="text-sm text-foreground-secondary mt-2">{item.messages?.[0]?.text ?? "No messages"}</p>
           </Link>
         ))}
       </div>

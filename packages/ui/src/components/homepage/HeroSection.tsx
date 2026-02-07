@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { Search, Briefcase, Wrench, Zap } from 'lucide-react';
 import { Button } from '../Button';
 
@@ -93,4 +95,5 @@ export function HeroSection() {
     </section>
   );
 }
+
 

@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { MapPin, Calendar, Clock, DollarSign, AlertCircle, CheckCircle, Play } from 'lucide-react';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
@@ -313,4 +315,5 @@ export function GigsModule() {
     </div>
   );
 }
+
 

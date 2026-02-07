@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+﻿import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { AppController } from "./modules/app/app.controller";
@@ -13,11 +13,17 @@ import { AutoMessagesModule } from "./modules/auto-messages/auto-messages.module
 import { AdminModule } from "./modules/admin/admin.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { VerificationModule } from "./modules/verification/verification.module";
+import { ReviewsModule } from "./modules/reviews/reviews.module";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot({ ttl: 60_000, limit: 20 }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [".env.local", ".env", "apps/api/.env.local", "apps/api/.env"]
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60, limit: 20 }]
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -27,7 +33,8 @@ import { VerificationModule } from "./modules/verification/verification.module";
     AutoMessagesModule,
     AdminModule,
     NotificationsModule,
-    VerificationModule
+    VerificationModule,
+    ReviewsModule
   ],
   controllers: [AppController],
   providers: [AppService]

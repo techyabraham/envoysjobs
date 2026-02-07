@@ -1,4 +1,6 @@
-﻿import React, { useEffect } from 'react';
+﻿"use client";
+
+import React, { useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
 
 interface ToastProps {
@@ -67,4 +69,5 @@ export function useToast() {
 
   return { showToast, ToastComponent };
 }
+
 

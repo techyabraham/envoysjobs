@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Patch, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
+import { JwtAuthGuard } from "../../common/jwt-auth.guard";
 import { ApplicationsService } from "./applications.service";
 
 const statusSchema = z.object({
@@ -8,6 +9,7 @@ const statusSchema = z.object({
 });
 
 @Controller()
+@UseGuards(JwtAuthGuard)
 export class ApplicationsController {
   constructor(private applicationsService: ApplicationsService) {}
 

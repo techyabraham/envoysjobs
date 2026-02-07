@@ -4,22 +4,22 @@ import { Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-react';
 export function Footer() {
   const footerLinks = {
     platform: [
-      { name: 'Find Jobs', href: '#' },
-      { name: 'Browse Services', href: '#' },
-      { name: 'Available Gigs', href: '#' },
-      { name: 'Post Opportunity', href: '#' }
+      { name: 'Find Jobs', href: '/envoy/jobs' },
+      { name: 'Browse Services', href: '/envoy/jobs' },
+      { name: 'Available Gigs', href: '/envoy/jobs' },
+      { name: 'Post Opportunity', href: '/hirer/jobs/new' }
     ],
     company: [
-      { name: 'About Us', href: '#' },
-      { name: 'Our Mission', href: '#' },
-      { name: 'Contact', href: '#' },
-      { name: 'Support', href: '#' }
+      { name: 'About Us', href: '/trust-safety' },
+      { name: 'Our Mission', href: '/trust-safety' },
+      { name: 'Contact', href: '/trust-safety' },
+      { name: 'Support', href: '/trust-safety' }
     ],
     resources: [
-      { name: 'Help Center', href: '#' },
-      { name: 'Community Guidelines', href: '#' },
-      { name: 'Terms of Service', href: '#' },
-      { name: 'Privacy Policy', href: '#' }
+      { name: 'Help Center', href: '/trust-safety' },
+      { name: 'Community Guidelines', href: '/trust-safety' },
+      { name: 'Terms of Service', href: '/trust-safety' },
+      { name: 'Privacy Policy', href: '/trust-safety' }
     ]
   };
 
@@ -109,7 +109,7 @@ export function Footer() {
         <div className="pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-white/60 text-sm">
-              Â© 2026 EnvoysJobs. Built exclusively for RCCG The Envoys.
+              (c) 2026 EnvoysJobs. Built exclusively for RCCG The Envoys.
             </p>
             <div className="flex items-center gap-2 text-white/60 text-sm">
               <Mail className="w-4 h-4" />

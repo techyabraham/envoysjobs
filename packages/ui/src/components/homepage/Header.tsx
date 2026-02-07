@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { Menu, X, User } from 'lucide-react';
 import { Button } from '../Button';
 
@@ -120,4 +122,5 @@ export function Header({ onNavigate }: HeaderProps) {
     </header>
   );
 }
+
 

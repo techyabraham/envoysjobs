@@ -1,5 +1,5 @@
-﻿import { Homepage } from "@envoysjobs/ui";
+import HomeClient from "../components/HomeClient";
 
 export default function Page() {
-  return <Homepage />;
+  return <HomeClient />;
 }

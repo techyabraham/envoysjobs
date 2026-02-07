@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { 
   CheckCircle, XCircle, AlertTriangle, Eye, Users, 
   Briefcase, Wrench, Flag, Search, Filter 
@@ -303,4 +305,5 @@ export function AdminDashboard() {
     </div>
   );
 }
+
 

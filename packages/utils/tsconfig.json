@@ -1,10 +1,12 @@
-﻿{
+{
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2019",
     "declaration": true,
-    "emitDeclarationOnly": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "noEmit": false
   },
   "include": ["src"]
 }

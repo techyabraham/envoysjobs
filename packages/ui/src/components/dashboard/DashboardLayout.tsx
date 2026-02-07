@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { 
   Home, Briefcase, Wrench, Zap, MessageCircle, User, 
   Bell, Search, Menu, X, Settings, LogOut 
@@ -277,4 +279,5 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
     </div>
   );
 }
+
 

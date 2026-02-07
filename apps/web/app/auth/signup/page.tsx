@@ -1,5 +1,5 @@
-﻿import { SignupPage } from "@envoysjobs/ui";
+import SignupClient from "../../../components/auth/SignupClient";
 
 export default function Page() {
-  return <SignupPage />;
+  return <SignupClient />;
 }

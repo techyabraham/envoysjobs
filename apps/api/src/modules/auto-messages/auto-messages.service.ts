@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { seedMemory, useMemory } from "../../common/memory.store";
 
 const templates = [
   {
@@ -11,7 +12,7 @@ const templates = [
   },
   {
     key: "interest",
-    text: "Hello, I’m interested in this opportunity",
+    text: "Hello, Iâ€™m interested in this opportunity",
     audience: "BOTH",
     quickReplies: ["May we discuss the details?"],
     triggerRules: {}
@@ -20,12 +21,12 @@ const templates = [
     key: "thanks",
     text: "Thank you for reaching out",
     audience: "BOTH",
-    quickReplies: ["I’m available to proceed"],
+    quickReplies: ["Iâ€™m available to proceed"],
     triggerRules: {}
   },
   {
     key: "available",
-    text: "I’m available to proceed",
+    text: "Iâ€™m available to proceed",
     audience: "BOTH",
     quickReplies: ["Looking forward to working together"],
     triggerRules: {}
@@ -51,11 +52,19 @@ export class AutoMessagesService {
   constructor(private prisma: PrismaService) {}
 
   list() {
-    return this.prisma.autoMessageTemplate.findMany();
+    seedMemory();
+    if (!useMemory()) return this.prisma.autoMessageTemplate.findMany();
+    return this.prisma.autoMessageTemplate.findMany().catch(() => templates);
   }
 
   async seed() {
-    await this.prisma.autoMessageTemplate.deleteMany();
-    return this.prisma.autoMessageTemplate.createMany({ data: templates });
+    if (!useMemory()) {
+      await this.prisma.autoMessageTemplate.deleteMany();
+      return this.prisma.autoMessageTemplate.createMany({ data: templates });
+    }
+    return this.prisma.autoMessageTemplate
+      .deleteMany()
+      .then(() => this.prisma.autoMessageTemplate.createMany({ data: templates }))
+      .catch(() => ({ count: templates.length }));
   }
 }

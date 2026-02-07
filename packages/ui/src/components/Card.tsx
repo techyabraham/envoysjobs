@@ -1,4 +1,6 @@
-﻿import React from 'react';
+﻿"use client";
+
+import React from 'react';
 
 interface CardProps {
   children: React.ReactNode;
@@ -19,4 +21,5 @@ export function Card({ children, className = '', hover = false, onClick }: CardP
     </div>
   );
 }
+
 

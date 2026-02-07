@@ -1,4 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿"use client";
+
+import React, { useState } from 'react';
 import { Send, Paperclip, Search, MoreVertical, CheckCheck } from 'lucide-react';
 import { Card } from '../Card';
 import { Button } from '../Button';
@@ -288,4 +290,5 @@ export function MessagingModule() {
     </div>
   );
 }
+
 

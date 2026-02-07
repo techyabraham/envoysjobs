@@ -7,6 +7,10 @@ import { GigCard } from './GigCard';
 import { StatsSection } from './StatsSection';
 import { Button } from '../Button';
 
+interface HomepageProps {
+  onNavigate?: (page: string) => void;
+}
+
 // Mock data
 const featuredJobs = [
   {
@@ -117,7 +121,7 @@ const featuredGigs = [
   }
 ];
 
-export function Homepage() {
+export function Homepage({ onNavigate }: HomepageProps) {
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
@@ -130,7 +134,7 @@ export function Homepage() {
               <h2 className="text-3xl sm:text-4xl mb-2">Highlighted Jobs</h2>
               <p className="text-foreground-secondary">Opportunities from our trusted members</p>
             </div>
-            <Button variant="ghost" className="hidden sm:flex">
+            <Button variant="ghost" className="hidden sm:flex" onClick={() => onNavigate?.('jobs')}>
               View All
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -143,7 +147,7 @@ export function Homepage() {
           </div>
 
           <div className="mt-8 sm:hidden">
-            <Button variant="ghost" className="w-full">
+            <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('jobs')}>
               View All Jobs
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -159,7 +163,7 @@ export function Homepage() {
               <h2 className="text-3xl sm:text-4xl mb-2">Services Directory</h2>
               <p className="text-foreground-secondary">Connect with skilled Envoys offering professional services</p>
             </div>
-            <Button variant="ghost" className="hidden sm:flex">
+            <Button variant="ghost" className="hidden sm:flex" onClick={() => onNavigate?.('services')}>
               Browse All
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -172,7 +176,7 @@ export function Homepage() {
           </div>
 
           <div className="mt-8 sm:hidden">
-            <Button variant="ghost" className="w-full">
+            <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('services')}>
               Browse All Services
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -188,7 +192,7 @@ export function Homepage() {
               <h2 className="text-3xl sm:text-4xl mb-2">Featured Gigs</h2>
               <p className="text-foreground-secondary">Quick opportunities for immediate work</p>
             </div>
-            <Button variant="ghost" className="hidden sm:flex">
+            <Button variant="ghost" className="hidden sm:flex" onClick={() => onNavigate?.('gigs')}>
               See All Gigs
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -201,7 +205,7 @@ export function Homepage() {
           </div>
 
           <div className="mt-8 sm:hidden">
-            <Button variant="ghost" className="w-full">
+            <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('gigs')}>
               See All Gigs
               <ChevronRight className="w-5 h-5" />
             </Button>
@@ -222,10 +226,15 @@ export function Homepage() {
             Join EnvoysJobs today and be part of a trusted network built on honour and excellence.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="success" size="lg">
+            <Button variant="success" size="lg" onClick={() => onNavigate?.('signup')}>
               Get Started Today
             </Button>
-            <Button variant="outline" size="lg" className="bg-white/10 border-white text-white hover:bg-white hover:text-deep-blue">
+            <Button
+              variant="outline"
+              size="lg"
+              className="bg-white/10 border-white text-white hover:bg-white hover:text-deep-blue"
+              onClick={() => onNavigate?.('about')}
+            >
               Learn More
             </Button>
           </div>

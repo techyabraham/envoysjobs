@@ -1,19 +1,37 @@
-﻿import PageShell from "@/components/PageShell";
+"use client";
+
+import PageShell from "@/components/PageShell";
+import { useAdminVerifications, useUpdateVerificationStatus } from "@/lib/admin";
 
 export default function Page() {
+  const { data, isLoading, error } = useAdminVerifications();
+  const updateVerification = useUpdateVerificationStatus();
+
   return (
-    <PageShell title="Verifications" description="Approve or reject stewardship verification.">
-      <div className="bg-white border border-border rounded-2xl p-6 space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">Grace Nwosu</p>
-            <p className="text-sm text-foreground-secondary">Media Department</p>
+    <PageShell title="Admin Verifications" description="Review verification requests.">
+      {isLoading && <p className="text-foreground-secondary">Loading verifications...</p>}
+      {error && <p className="text-destructive">Failed to load verifications.</p>}
+      <div className="grid gap-4">
+        {data?.map((verification) => (
+          <div key={verification.id} className="bg-white border border-border rounded-2xl p-5 space-y-2">
+            <p className="font-semibold">{verification.phone}</p>
+            <p className="text-sm text-foreground-tertiary">Status: {verification.status}</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className="btn-secondary"
+                onClick={() => updateVerification.mutate({ id: verification.id, status: "VERIFIED" })}
+              >
+                Approve
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => updateVerification.mutate({ id: verification.id, status: "REJECTED" })}
+              >
+                Reject
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <button className="ghost">Reject</button>
-            <button className="cta">Approve</button>
-          </div>
-        </div>
+        ))}
       </div>
     </PageShell>
   );

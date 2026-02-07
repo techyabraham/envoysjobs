@@ -1,4 +1,6 @@
-﻿import React from 'react';
+﻿"use client";
+
+import React from 'react';
 import { 
   Briefcase, Eye, MessageCircle, TrendingUp, 
   Plus, Award, AlertCircle, CheckCircle 
@@ -266,4 +268,5 @@ export function DashboardOverview({ userName, onNavigate }: DashboardOverviewPro
     </div>
   );
 }
+
 
