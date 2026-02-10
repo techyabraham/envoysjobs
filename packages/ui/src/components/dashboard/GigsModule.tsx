@@ -26,7 +26,7 @@ const mockGigs = {
     {
       id: '1',
       title: 'Event Setup Assistant',
-      amount: 'â‚¦15,000',
+      amount: '₦15,000',
       location: 'Lagos',
       duration: '1 day',
       postedBy: 'Pastor James',
@@ -36,7 +36,7 @@ const mockGigs = {
     {
       id: '2',
       title: 'Data Entry Specialist',
-      amount: 'â‚¦25,000',
+      amount: '₦25,000',
       location: 'Remote',
       duration: '3 days',
       postedBy: 'Sister Mary',
@@ -47,7 +47,7 @@ const mockGigs = {
     {
       id: '3',
       title: 'Social Media Manager',
-      amount: 'â‚¦40,000',
+      amount: '₦40,000',
       location: 'Abuja',
       duration: '1 week',
       postedBy: 'Brother John',
@@ -59,7 +59,7 @@ const mockGigs = {
     {
       id: '4',
       title: 'Moving Helper Needed',
-      amount: 'â‚¦20,000',
+      amount: '₦20,000',
       location: 'Ikeja',
       duration: '2 days',
       postedBy: 'You',
@@ -71,7 +71,7 @@ const mockGigs = {
     {
       id: '5',
       title: 'Website Content Update',
-      amount: 'â‚¦30,000',
+      amount: '₦30,000',
       location: 'Remote',
       duration: '5 days',
       postedBy: 'Sister Ruth',
@@ -83,7 +83,7 @@ const mockGigs = {
     {
       id: '6',
       title: 'Photography for Church Event',
-      amount: 'â‚¦50,000',
+      amount: '₦50,000',
       location: 'Lagos',
       duration: '1 day',
       postedBy: 'Pastor David',
@@ -93,7 +93,7 @@ const mockGigs = {
     {
       id: '7',
       title: 'Logo Design',
-      amount: 'â‚¦35,000',
+      amount: '₦35,000',
       location: 'Remote',
       duration: '3 days',
       postedBy: 'Brother Michael',
@@ -103,15 +103,40 @@ const mockGigs = {
   ]
 };
 
-export function GigsModule() {
+interface GigsModuleProps {
+  onCreate?: () => void;
+  availableGigs?: Gig[];
+  postedGigs?: Gig[];
+  appliedGigs?: Gig[];
+  ongoingGigs?: Gig[];
+  completedGigs?: Gig[];
+  onApply?: (gigId: string) => void;
+}
+
+export function GigsModule({
+  onCreate,
+  availableGigs,
+  postedGigs,
+  appliedGigs,
+  ongoingGigs,
+  completedGigs,
+  onApply
+}: GigsModuleProps) {
   const [activeTab, setActiveTab] = useState<'available' | 'applied' | 'posted' | 'ongoing' | 'completed'>('available');
 
+  const resolvedAvailable = availableGigs ?? mockGigs.available;
+  const resolvedPosted = postedGigs ?? mockGigs.posted;
+
+  const resolvedApplied = appliedGigs ?? mockGigs.applied;
+  const resolvedOngoing = ongoingGigs ?? mockGigs.ongoing;
+  const resolvedCompleted = completedGigs ?? mockGigs.completed;
+
   const tabs = [
-    { id: 'available', label: 'Available', count: mockGigs.available.length },
-    { id: 'applied', label: 'Applied', count: mockGigs.applied.length },
-    { id: 'posted', label: 'Posted', count: mockGigs.posted.length },
-    { id: 'ongoing', label: 'Ongoing', count: mockGigs.ongoing.length },
-    { id: 'completed', label: 'Completed', count: mockGigs.completed.length }
+    { id: 'available', label: 'Available', count: resolvedAvailable.length },
+    { id: 'applied', label: 'Applied', count: resolvedApplied.length },
+    { id: 'posted', label: 'Posted', count: resolvedPosted.length },
+    { id: 'ongoing', label: 'Ongoing', count: resolvedOngoing.length },
+    { id: 'completed', label: 'Completed', count: resolvedCompleted.length }
   ];
 
   const renderGigCard = (gig: Gig) => (
@@ -185,7 +210,7 @@ export function GigsModule() {
 
         <div className="flex gap-2">
           {activeTab === 'available' ? (
-            <Button variant="success" size="sm" className="w-full">
+            <Button variant="success" size="sm" className="w-full" onClick={() => onApply?.(gig.id)}>
               Apply for Gig
             </Button>
           ) : activeTab === 'posted' ? (
@@ -215,15 +240,28 @@ export function GigsModule() {
     </Card>
   );
 
-  const currentGigs = mockGigs[activeTab];
+  const currentGigs = activeTab === 'available'
+    ? resolvedAvailable
+    : activeTab === 'posted'
+    ? resolvedPosted
+    : activeTab === 'applied'
+    ? resolvedApplied
+    : activeTab === 'ongoing'
+    ? resolvedOngoing
+    : resolvedCompleted;
 
   return (
     <div className="p-4 lg:p-8 pb-24 lg:pb-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-semibold text-foreground mb-2">Gigs</h1>
-          <p className="text-foreground-secondary">Quick opportunities for immediate work</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold text-foreground mb-2">Gigs</h1>
+            <p className="text-foreground-secondary">Quick opportunities for immediate work</p>
+          </div>
+          <Button variant="success" size="sm" className="hidden sm:flex" onClick={onCreate}>
+            Post a Gig
+          </Button>
         </div>
 
         {/* Tabs */}
@@ -266,7 +304,7 @@ export function GigsModule() {
             <Card className="bg-soft-gold/5 border-soft-gold/20">
               <div className="text-center">
                 <div className="text-3xl font-bold text-foreground mb-1">
-                  â‚¦85,000
+                  ₦85,000
                 </div>
                 <div className="text-sm text-foreground-secondary">
                   Total Earned
@@ -304,7 +342,7 @@ export function GigsModule() {
             icon={<Clock className="w-16 h-16" />}
             action={
               activeTab === 'posted' ? (
-                <Button variant="success">
+                <Button variant="success" onClick={onCreate}>
                   Post a Gig
                 </Button>
               ) : undefined

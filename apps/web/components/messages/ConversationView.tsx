@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { defaultQuickReplies, isHonourMessage } from "@/lib/autoMessages";
-import { useConversationMessages, useSendMessage } from "@/lib/messaging";
+import { useConversationMessages, useSendAttachment, useSendMessage } from "@/lib/messaging";
+import { API_BASE_URL } from "@/lib/api";
 
 export default function ConversationView() {
   const params = useParams();
@@ -13,7 +14,9 @@ export default function ConversationView() {
   const userId = (session as any)?.user?.id as string | undefined;
   const { data: messages, isLoading } = useConversationMessages(conversationId);
   const sendMessage = useSendMessage();
+  const sendAttachment = useSendAttachment();
   const [text, setText] = useState("");
+  const fileRef = useRef<HTMLInputElement | null>(null);
 
   const lastReceived = messages?.slice().reverse().find((m) => m.senderId !== userId);
 
@@ -22,9 +25,9 @@ export default function ConversationView() {
       return ["you are amazing", ...defaultQuickReplies];
     }
     return [
-      "Hello, I?m interested in this opportunity",
+      "Hello, I'm interested in this opportunity",
       "Thank you for reaching out",
-      "I?m available to proceed"
+      "I'm available to proceed"
     ];
   }, [lastReceived]);
 
@@ -32,6 +35,13 @@ export default function ConversationView() {
     if (!conversationId || !userId || !value.trim()) return;
     await sendMessage.mutateAsync({ conversationId, text: value.trim() });
     setText("");
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !conversationId || !userId) return;
+    await sendAttachment.mutateAsync({ conversationId, file });
+    event.target.value = "";
   };
 
   return (
@@ -52,6 +62,21 @@ export default function ConversationView() {
               }`}
             >
               {message.text}
+              {message.attachments?.length ? (
+                <div className={`mt-2 text-xs ${mine ? "text-white/80" : "text-foreground-secondary"}`}>
+                  {message.attachments.map((attachment) => (
+                    <a
+                      key={attachment.url}
+                      href={`${API_BASE_URL}${attachment.url}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline"
+                    >
+                      {attachment.type}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
             </div>
           );
         })}
@@ -75,6 +100,14 @@ export default function ConversationView() {
             value={text}
             onChange={(event) => setText(event.target.value)}
           />
+          <input ref={fileRef} type="file" className="hidden" onChange={handleFileSelect} />
+          <button
+            className="px-3 py-2 rounded-lg border border-border text-sm"
+            onClick={() => fileRef.current?.click()}
+            type="button"
+          >
+            Attach
+          </button>
           <button className="px-4 py-2 rounded-lg bg-emerald-green text-white" onClick={() => handleSend(text)}>
             Send
           </button>

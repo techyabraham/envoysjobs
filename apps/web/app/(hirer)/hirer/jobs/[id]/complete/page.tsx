@@ -4,6 +4,7 @@ import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Page() {
@@ -30,6 +31,13 @@ export default function Page() {
   return (
     <DashboardShell userName="Daniel">
       <PageShell title="Complete Job" description="Mark this job as completed.">
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/hirer/jobs/${jobId}/review`} className="btn-secondary">Leave Review</Link>
+            <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
+          </div>
+        </div>
         <div className="bg-white border border-border rounded-2xl p-6 space-y-4">
           <p className="text-foreground-secondary">When the job is complete, close it to proceed to review.</p>
           {error && <p className="text-destructive">{error}</p>}

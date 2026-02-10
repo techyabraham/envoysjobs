@@ -52,4 +52,9 @@ export class AuthController {
   verifyOtp(@Body() body: { phone: string; code: string }) {
     return this.authService.verifyOtp(body.phone, body.code);
   }
+
+  @Post("forgot-password")
+  forgotPassword(@Body() body: { email: string }) {
+    return this.authService.forgotPassword(body.email);
+  }
 }

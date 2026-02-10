@@ -12,6 +12,13 @@ export default function Page() {
   return (
     <DashboardShell userName="Grace">
       <PageShell title="Saved Jobs" description="Opportunities you've bookmarked.">
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/envoy/jobs" className="btn-secondary">Browse Jobs</Link>
+            <Link href="/envoy/applications" className="btn-secondary">Applications</Link>
+          </div>
+        </div>
         {isLoading && <p className="text-foreground-secondary">Loading saved jobs...</p>}
         {error && <p className="text-destructive">Failed to load saved jobs.</p>}
         {!isLoading && data?.length === 0 && (

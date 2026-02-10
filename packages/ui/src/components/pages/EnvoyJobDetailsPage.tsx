@@ -7,7 +7,7 @@ export function EnvoyJobDetailsPage() {
         <h1 className="text-2xl font-semibold text-foreground">Job Details</h1>
         <p className="mt-2 text-foreground-secondary">Senior Developer - Lagos (Hybrid)</p>
         <div className="mt-4 space-y-2 text-sm text-foreground-secondary">
-          <p>Budget: ?400k - ?600k</p>
+          <p>Budget: ₦400k - ₦600k</p>
           <p>Posted 2 days ago ? 12 applicants</p>
         </div>
       </Card>

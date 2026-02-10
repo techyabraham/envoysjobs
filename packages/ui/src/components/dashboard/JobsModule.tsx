@@ -27,7 +27,7 @@ const mockJobs = {
       title: 'Senior Full Stack Developer',
       company: 'Tech Solutions Ltd',
       location: 'Lagos, Nigeria',
-      pay: 'â‚¦600,000 - â‚¦900,000/month',
+      pay: '₦600,000 - ₦900,000/month',
       type: 'Full-time',
       postedTime: '1 day ago'
     },
@@ -36,7 +36,7 @@ const mockJobs = {
       title: 'Product Designer',
       company: 'Creative Studio',
       location: 'Remote',
-      pay: 'â‚¦400,000 - â‚¦650,000/month',
+      pay: '₦400,000 - ₦650,000/month',
       type: 'Full-time',
       postedTime: '3 days ago'
     },
@@ -45,7 +45,7 @@ const mockJobs = {
       title: 'Marketing Coordinator',
       company: 'Growth Agency',
       location: 'Abuja, Nigeria',
-      pay: 'â‚¦300,000 - â‚¦450,000/month',
+      pay: '₦300,000 - ₦450,000/month',
       type: 'Contract',
       postedTime: '5 days ago'
     }
@@ -56,7 +56,7 @@ const mockJobs = {
       title: 'Marketing Manager',
       company: 'Creative Agency',
       location: 'Abuja, Nigeria',
-      pay: 'â‚¦350,000 - â‚¦500,000/month',
+      pay: '₦350,000 - ₦500,000/month',
       type: 'Full-time',
       postedTime: '1 week ago',
       status: 'viewed' as const,
@@ -67,7 +67,7 @@ const mockJobs = {
       title: 'Project Manager',
       company: 'Construction Co.',
       location: 'Ibadan, Nigeria',
-      pay: 'â‚¦400,000 - â‚¦600,000/month',
+      pay: '₦400,000 - ₦600,000/month',
       type: 'Full-time',
       postedTime: '2 weeks ago',
       status: 'applied' as const,
@@ -80,7 +80,7 @@ const mockJobs = {
       title: 'UX Researcher',
       company: 'Design Firm',
       location: 'Lagos, Nigeria',
-      pay: 'â‚¦450,000 - â‚¦700,000/month',
+      pay: '₦450,000 - ₦700,000/month',
       type: 'Full-time',
       postedTime: '4 days ago'
     }
@@ -91,7 +91,7 @@ const mockJobs = {
       title: 'Senior Software Engineer',
       company: 'Tech Solutions Ltd',
       location: 'Lagos, Nigeria',
-      pay: 'â‚¦500,000 - â‚¦800,000/month',
+      pay: '₦500,000 - ₦800,000/month',
       type: 'Full-time',
       postedTime: '2 weeks ago',
       status: 'interview' as const,

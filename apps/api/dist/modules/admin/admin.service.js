@@ -87,6 +87,53 @@ let AdminService = class AdminService {
             return [user, { id: "audit", action: `Steward ${userId} -> ${status}` }];
         });
     }
+    updateJobStatus(id, status) {
+        if (!(0, memory_store_1.useMemory)()) {
+            return this.prisma.$transaction([
+                this.prisma.job.update({ where: { id }, data: { status } }),
+                this.prisma.adminAuditLog.create({
+                    data: { adminId: "system", action: `Job ${id} -> ${status}` }
+                })
+            ]);
+        }
+        (0, memory_store_1.seedMemory)();
+        return this.prisma
+            .$transaction([
+            this.prisma.job.update({ where: { id }, data: { status } }),
+            this.prisma.adminAuditLog.create({
+                data: { adminId: "system", action: `Job ${id} -> ${status}` }
+            })
+        ])
+            .catch(() => {
+            const job = memory_store_1.memoryStore.jobs.find((j) => j.id === id);
+            if (job)
+                job.status = status;
+            return [job, { id: "audit", action: `Job ${id} -> ${status}` }];
+        });
+    }
+    resolveReport(id) {
+        if (!(0, memory_store_1.useMemory)()) {
+            return this.prisma.$transaction([
+                this.prisma.report.delete({ where: { id } }),
+                this.prisma.adminAuditLog.create({
+                    data: { adminId: "system", action: `Report ${id} resolved` }
+                })
+            ]);
+        }
+        (0, memory_store_1.seedMemory)();
+        return this.prisma
+            .$transaction([
+            this.prisma.report.delete({ where: { id } }),
+            this.prisma.adminAuditLog.create({
+                data: { adminId: "system", action: `Report ${id} resolved` }
+            })
+        ])
+            .catch(() => {
+            const idx = memory_store_1.memoryStore.reports.findIndex((r) => r.id === id);
+            const removed = idx >= 0 ? memory_store_1.memoryStore.reports.splice(idx, 1)[0] : null;
+            return [removed, { id: "audit", action: `Report ${id} resolved` }];
+        });
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([

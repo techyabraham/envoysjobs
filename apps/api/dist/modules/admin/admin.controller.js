@@ -27,6 +27,9 @@ const verificationSchema = zod_1.z.object({
 const stewardSchema = zod_1.z.object({
     status: zod_1.z.nativeEnum(client_1.StewardStatus)
 });
+const jobStatusSchema = zod_1.z.object({
+    status: zod_1.z.nativeEnum(client_1.JobStatus)
+});
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -48,6 +51,12 @@ let AdminController = class AdminController {
     }
     updateSteward(userId, body) {
         return this.adminService.updateSteward(userId, body.status);
+    }
+    updateJobStatus(id, body) {
+        return this.adminService.updateJobStatus(id, body.status);
+    }
+    resolveReport(id) {
+        return this.adminService.resolveReport(id);
     }
 };
 exports.AdminController = AdminController;
@@ -91,6 +100,21 @@ __decorate([
     __metadata("design:paramtypes", [String, void 0]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateSteward", null);
+__decorate([
+    (0, common_1.Patch)("jobs/:id/status"),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(jobStatusSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, void 0]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "updateJobStatus", null);
+__decorate([
+    (0, common_1.Delete)("reports/:id"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "resolveReport", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)("admin"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

@@ -4,10 +4,11 @@
 export type ApiResult<T> = { data: T; error?: string };
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<ApiResult<T>> {
+  const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(init?.headers || {})
     }
   });

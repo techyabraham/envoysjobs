@@ -8,8 +8,9 @@ export function useApi() {
   const accessToken = (data as any)?.accessToken;
 
   return async function authedFetch<T>(path: string, init?: RequestInit) {
+    const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(init?.headers ? (init.headers as Record<string, string>) : {})
     };
 

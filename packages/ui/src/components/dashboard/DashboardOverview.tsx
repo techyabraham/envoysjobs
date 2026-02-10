@@ -9,22 +9,54 @@ import { Card } from '../Card';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
 
+interface DashboardStat {
+  label: string;
+  value: string;
+  icon: typeof Briefcase;
+  change: string;
+}
+
+interface Recommendation {
+  type: 'job' | 'gig';
+  title: string;
+  company: string;
+  match: string;
+  badge: string;
+}
+
+interface ActivityItem {
+  title: string;
+  meta: string;
+  icon: typeof CheckCircle;
+  tone: 'success' | 'info' | 'accent';
+}
+
 interface DashboardOverviewProps {
   userName: string;
   onNavigate?: (page: string) => void;
+  profileCompletion?: number;
+  stats?: DashboardStat[];
+  recommendations?: Recommendation[];
+  activity?: ActivityItem[];
 }
 
-export function DashboardOverview({ userName, onNavigate }: DashboardOverviewProps) {
-  const profileCompletion = 75;
+export function DashboardOverview({
+  userName,
+  onNavigate,
+  profileCompletion = 75,
+  stats,
+  recommendations,
+  activity
+}: DashboardOverviewProps) {
   
-  const stats = [
+  const statItems = stats ?? [
     { label: 'Applications Sent', value: '12', icon: Briefcase, change: '+3 this week' },
     { label: 'Profile Views', value: '48', icon: Eye, change: '+12 this week' },
     { label: 'New Messages', value: '5', icon: MessageCircle, change: '2 unread' },
     { label: 'Success Rate', value: '85%', icon: TrendingUp, change: '+5% this month' }
   ];
 
-  const recommendations = [
+  const recommendedItems = recommendations ?? [
     {
       type: 'job',
       title: 'Senior Developer Position',
@@ -136,10 +168,10 @@ export function DashboardOverview({ userName, onNavigate }: DashboardOverviewPro
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={index}>
+            {statItems.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <Card key={index}>
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 rounded-full bg-deep-blue/10 flex items-center justify-center">
                     <Icon className="w-6 h-6 text-deep-blue" />
@@ -190,7 +222,7 @@ export function DashboardOverview({ userName, onNavigate }: DashboardOverviewPro
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {recommendations.map((rec, index) => (
+            {recommendedItems.map((rec, index) => (
               <Card key={index} hover>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
@@ -227,41 +259,47 @@ export function DashboardOverview({ userName, onNavigate }: DashboardOverviewPro
         <div>
           <h2 className="text-2xl font-semibold text-foreground mb-6">Recent Activity</h2>
           <div className="space-y-4">
-            <Card>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-emerald-green/10 flex items-center justify-center shrink-0">
-                  <CheckCircle className="w-5 h-5 text-emerald-green" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-foreground mb-1">Your application was viewed</p>
-                  <p className="text-sm text-foreground-tertiary">Marketing Manager at Creative Agency â€¢ 2 hours ago</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-deep-blue/10 flex items-center justify-center shrink-0">
-                  <MessageCircle className="w-5 h-5 text-deep-blue" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-foreground mb-1">New message from Sarah Adeyemi</p>
-                  <p className="text-sm text-foreground-tertiary">Regarding: Web Development Project â€¢ 5 hours ago</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-soft-gold/10 flex items-center justify-center shrink-0">
-                  <Award className="w-5 h-5 text-soft-gold" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-foreground mb-1">Profile completion increased to 75%</p>
-                  <p className="text-sm text-foreground-tertiary">You're almost there! â€¢ 1 day ago</p>
-                </div>
-              </div>
-            </Card>
+            {(activity ?? [
+              {
+                title: "Your application was viewed",
+                meta: "Marketing Manager at Creative Agency • 2 hours ago",
+                icon: CheckCircle,
+                tone: "success"
+              },
+              {
+                title: "New message from Sarah Adeyemi",
+                meta: "Regarding: Web Development Project • 5 hours ago",
+                icon: MessageCircle,
+                tone: "info"
+              },
+              {
+                title: "Profile completion increased to 75%",
+                meta: "You're almost there! • 1 day ago",
+                icon: Award,
+                tone: "accent"
+              }
+            ]).map((item, index) => {
+              const Icon = item.icon;
+              const toneClass =
+                item.tone === "success"
+                  ? "bg-emerald-green/10 text-emerald-green"
+                  : item.tone === "info"
+                  ? "bg-deep-blue/10 text-deep-blue"
+                  : "bg-soft-gold/10 text-soft-gold";
+              return (
+                <Card key={index}>
+                  <div className="flex items-start gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${toneClass}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-foreground mb-1">{item.title}</p>
+                      <p className="text-sm text-foreground-tertiary">{item.meta}</p>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         </div>
       </div>

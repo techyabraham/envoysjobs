@@ -68,6 +68,39 @@ export function useAdminReports() {
   });
 }
 
+export function useUpdateAdminJobStatus() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: { id: string; status: "DRAFT" | "PUBLISHED" | "CLOSED" }) => {
+      const res = await api(`/admin/jobs/${params.id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: params.status })
+      });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-jobs"] });
+    }
+  });
+}
+
+export function useResolveReport() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (reportId: string) => {
+      const res = await api(`/admin/reports/${reportId}`, { method: "DELETE" });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+    }
+  });
+}
+
 export function useAdminVerifications() {
   const api = useApi();
   return useQuery({

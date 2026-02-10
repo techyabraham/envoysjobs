@@ -4,19 +4,27 @@ import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useApplications, useUpdateApplicationStatus } from "@/lib/applications";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
   const params = useParams();
   const router = useRouter();
   const jobId = params?.id as string;
-  const { data, isLoading, error } = useApplications();
+  const { data, isLoading, error } = useApplications(jobId);
   const updateStatus = useUpdateApplicationStatus();
 
-  const applications = data?.filter((app) => app.jobId === jobId) ?? [];
+  const applications = data ?? [];
 
   return (
     <DashboardShell userName="Daniel">
       <PageShell title="Hire an Envoy" description="Select the best envoy for this job.">
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/hirer/jobs/${jobId}/applicants`} className="btn-secondary">Applicants</Link>
+            <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
+          </div>
+        </div>
         {isLoading && <p className="text-foreground-secondary">Loading applicants...</p>}
         {error && <p className="text-destructive">Failed to load applicants.</p>}
         {!isLoading && applications.length === 0 && (
@@ -28,7 +36,9 @@ export default function Page() {
           {applications.map((app) => (
             <div key={app.id} className="bg-white border border-border rounded-2xl p-5 space-y-3">
               <div>
-                <p className="text-sm text-foreground-tertiary">Envoy ID: {app.envoyId}</p>
+                <p className="text-sm text-foreground-tertiary">
+                  Envoy: {app.envoy ? `${app.envoy.firstName} ${app.envoy.lastName}` : app.envoyId}
+                </p>
                 <p className="text-sm text-foreground-tertiary">Status: {app.status}</p>
               </div>
               <div className="flex flex-wrap gap-3">

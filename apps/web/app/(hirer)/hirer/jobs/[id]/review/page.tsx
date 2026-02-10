@@ -5,6 +5,7 @@ import PageShell from "@/components/PageShell";
 import { useApplications } from "@/lib/applications";
 import { useApi } from "@/lib/useApi";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Page() {
@@ -12,7 +13,7 @@ export default function Page() {
   const router = useRouter();
   const api = useApi();
   const jobId = params?.id as string;
-  const { data: applications } = useApplications();
+  const { data: applications } = useApplications(jobId);
   const hired = applications?.find((app) => app.jobId === jobId && app.status === "HIRED");
   const [rating, setRating] = useState("5");
   const [text, setText] = useState("");
@@ -47,6 +48,12 @@ export default function Page() {
   return (
     <DashboardShell userName="Daniel">
       <PageShell title="Leave a Review" description="Share your feedback on the envoy.">
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
+          </div>
+        </div>
         <form onSubmit={handleSubmit} className="bg-white border border-border rounded-2xl p-6 space-y-4">
           <div>
             <label className="block text-sm text-foreground-secondary mb-1">Rating (1-5)</label>

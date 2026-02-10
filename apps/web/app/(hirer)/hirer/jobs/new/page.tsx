@@ -4,6 +4,7 @@ import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Page() {
@@ -50,6 +51,12 @@ export default function Page() {
   return (
     <DashboardShell userName="Daniel">
       <PageShell title="Post a new job" description="Share a trusted opportunity with Envoys.">
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
+          </div>
+        </div>
         <form onSubmit={handleSubmit} className="bg-white border border-border rounded-2xl p-6 space-y-4">
           <input
             className="input"

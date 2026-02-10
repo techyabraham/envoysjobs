@@ -35,7 +35,16 @@ export default function SignupClient() {
       })
     });
     if (!res.ok) {
-      alert("Signup failed.");
+      let message = "Signup failed.";
+      try {
+        const payload = await res.json();
+        if (payload?.message) {
+          message = Array.isArray(payload.message) ? payload.message.join(", ") : String(payload.message);
+        }
+      } catch (err) {
+        // ignore parsing errors
+      }
+      alert(message);
       return;
     }
 

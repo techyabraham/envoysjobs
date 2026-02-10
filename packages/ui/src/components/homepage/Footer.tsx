@@ -4,22 +4,23 @@ import { Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-react';
 export function Footer() {
   const footerLinks = {
     platform: [
-      { name: 'Find Jobs', href: '/envoy/jobs' },
-      { name: 'Browse Services', href: '/envoy/jobs' },
-      { name: 'Available Gigs', href: '/envoy/jobs' },
+      { name: 'Find Jobs', href: '/jobs' },
+      { name: 'Recommended Jobs', href: '/jobs/recommended' },
+      { name: 'Filter Jobs', href: '/jobs/filters' },
       { name: 'Post Opportunity', href: '/hirer/jobs/new' }
     ],
     company: [
       { name: 'About Us', href: '/trust-safety' },
-      { name: 'Our Mission', href: '/trust-safety' },
-      { name: 'Contact', href: '/trust-safety' },
-      { name: 'Support', href: '/trust-safety' }
+      { name: 'Pricing', href: '/pricing' },
+      { name: 'Verification', href: '/verification' },
+      { name: 'Contact', href: '/trust-safety' }
     ],
     resources: [
       { name: 'Help Center', href: '/trust-safety' },
       { name: 'Community Guidelines', href: '/trust-safety' },
-      { name: 'Terms of Service', href: '/trust-safety' },
-      { name: 'Privacy Policy', href: '/trust-safety' }
+      { name: 'Badge Guide', href: '/verification/badge' },
+      { name: 'Notification Preferences', href: '/notifications/preferences' },
+      { name: 'Admin Login', href: '/admin/login' }
     ]
   };
 

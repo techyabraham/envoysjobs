@@ -61,11 +61,16 @@ let ApplicationsService = class ApplicationsService {
             return application;
         });
     }
-    list(userId) {
+    list(userId, jobId) {
         if (!(0, memory_store_1.useMemory)()) {
             return this.prisma.application.findMany({
                 where: {
-                    OR: [{ envoyId: userId }, { job: { hirerId: userId } }]
+                    OR: [{ envoyId: userId }, { job: { hirerId: userId } }],
+                    ...(jobId ? { jobId } : {})
+                },
+                include: {
+                    job: true,
+                    envoy: true
                 }
             });
         }
@@ -73,7 +78,12 @@ let ApplicationsService = class ApplicationsService {
         return this.prisma.application
             .findMany({
             where: {
-                OR: [{ envoyId: userId }, { job: { hirerId: userId } }]
+                OR: [{ envoyId: userId }, { job: { hirerId: userId } }],
+                ...(jobId ? { jobId } : {})
+            },
+            include: {
+                job: true,
+                envoy: true
             }
         })
             .catch(() => {
@@ -82,6 +92,11 @@ let ApplicationsService = class ApplicationsService {
                     return true;
                 const job = memory_store_1.memoryStore.jobs.find((j) => j.id === app.jobId);
                 return job?.hirerId === userId;
+            }).filter((app) => (jobId ? app.jobId === jobId : true))
+                .map((app) => {
+                const job = memory_store_1.memoryStore.jobs.find((j) => j.id === app.jobId);
+                const envoy = memory_store_1.memoryStore.users.find((u) => u.id === app.envoyId);
+                return { ...app, job, envoy };
             });
         });
     }

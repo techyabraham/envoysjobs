@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { StewardStatus, VerificationStatus } from "@prisma/client";
+import { JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
 
@@ -75,6 +75,54 @@ export class AdminService {
         const user = memoryStore.users.find((u) => u.id === userId);
         if (user) user.stewardStatus = status;
         return [user, { id: "audit", action: `Steward ${userId} -> ${status}` }];
+      });
+  }
+
+  updateJobStatus(id: string, status: JobStatus) {
+    if (!useMemory()) {
+      return this.prisma.$transaction([
+        this.prisma.job.update({ where: { id }, data: { status } }),
+        this.prisma.adminAuditLog.create({
+          data: { adminId: "system", action: `Job ${id} -> ${status}` }
+        })
+      ]);
+    }
+    seedMemory();
+    return this.prisma
+      .$transaction([
+        this.prisma.job.update({ where: { id }, data: { status } }),
+        this.prisma.adminAuditLog.create({
+          data: { adminId: "system", action: `Job ${id} -> ${status}` }
+        })
+      ])
+      .catch(() => {
+        const job = memoryStore.jobs.find((j) => j.id === id);
+        if (job) job.status = status as any;
+        return [job, { id: "audit", action: `Job ${id} -> ${status}` }];
+      });
+  }
+
+  resolveReport(id: string) {
+    if (!useMemory()) {
+      return this.prisma.$transaction([
+        this.prisma.report.delete({ where: { id } }),
+        this.prisma.adminAuditLog.create({
+          data: { adminId: "system", action: `Report ${id} resolved` }
+        })
+      ]);
+    }
+    seedMemory();
+    return this.prisma
+      .$transaction([
+        this.prisma.report.delete({ where: { id } }),
+        this.prisma.adminAuditLog.create({
+          data: { adminId: "system", action: `Report ${id} resolved` }
+        })
+      ])
+      .catch(() => {
+        const idx = memoryStore.reports.findIndex((r) => r.id === id);
+        const removed = idx >= 0 ? memoryStore.reports.splice(idx, 1)[0] : null;
+        return [removed, { id: "audit", action: `Report ${id} resolved` }];
       });
   }
 }

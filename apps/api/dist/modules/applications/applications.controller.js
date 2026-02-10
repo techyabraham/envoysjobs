@@ -28,8 +28,8 @@ let ApplicationsController = class ApplicationsController {
     apply(jobId, req) {
         return this.applicationsService.apply(jobId, req.user?.id || "");
     }
-    list(req) {
-        return this.applicationsService.list(req.user?.id || "");
+    list(req, jobId) {
+        return this.applicationsService.list(req.user?.id || "", jobId);
     }
     updateStatus(id, body) {
         return this.applicationsService.updateStatus(id, body.status);
@@ -47,8 +47,9 @@ __decorate([
 __decorate([
     (0, common_1.Get)("applications"),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)("jobId")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], ApplicationsController.prototype, "list", null);
 __decorate([

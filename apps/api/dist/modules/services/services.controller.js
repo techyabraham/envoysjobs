@@ -1,0 +1,97 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ServicesController = void 0;
+const common_1 = require("@nestjs/common");
+const zod_1 = require("zod");
+const zod_validation_pipe_1 = require("../../common/zod-validation.pipe");
+const jwt_auth_guard_1 = require("../../common/jwt-auth.guard");
+const roles_guard_1 = require("../../common/roles.guard");
+const roles_decorator_1 = require("../../common/roles.decorator");
+const services_service_1 = require("./services.service");
+const serviceSchema = zod_1.z.object({
+    title: zod_1.z.string().min(2),
+    description: zod_1.z.string().min(10),
+    rate: zod_1.z.string().min(2)
+});
+const serviceUpdateSchema = serviceSchema.partial();
+let ServicesController = class ServicesController {
+    constructor(servicesService) {
+        this.servicesService = servicesService;
+    }
+    create(req, body) {
+        return this.servicesService.create({ ...body, envoyId: req.user?.id || "" });
+    }
+    listMine(req) {
+        return this.servicesService.listByEnvoy(req.user?.id || "");
+    }
+    listAll() {
+        return this.servicesService.listAll();
+    }
+    get(id) {
+        return this.servicesService.get(id);
+    }
+    update(req, id, body) {
+        return this.servicesService.update(id, req.user?.id || "", body);
+    }
+};
+exports.ServicesController = ServicesController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ENVOY"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(serviceSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, void 0]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)("me"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ENVOY"),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "listMine", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "listAll", null);
+__decorate([
+    (0, common_1.Get)(":id"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "get", null);
+__decorate([
+    (0, common_1.Put)(":id"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ENVOY"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(serviceUpdateSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, void 0]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "update", null);
+exports.ServicesController = ServicesController = __decorate([
+    (0, common_1.Controller)("services"),
+    __metadata("design:paramtypes", [services_service_1.ServicesService])
+], ServicesController);

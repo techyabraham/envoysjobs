@@ -6,9 +6,11 @@ import { Button } from '../Button';
 
 interface HeaderProps {
   onNavigate?: (page: string) => void;
+  isAuthenticated?: boolean;
+  userName?: string;
 }
 
-export function Header({ onNavigate }: HeaderProps) {
+export function Header({ onNavigate, isAuthenticated, userName }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
@@ -52,20 +54,41 @@ export function Header({ onNavigate }: HeaderProps) {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => onNavigate?.('login')}
-            >
-              Sign In
-            </Button>
-            <Button 
-              variant="primary" 
-              size="sm"
-              onClick={() => onNavigate?.('signup')}
-            >
-              Get Started
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onNavigate?.('dashboard')}
+                >
+                  {userName ? `Hi, ${userName.split(' ')[0]}` : "Dashboard"}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => onNavigate?.('profile')}
+                >
+                  My Account
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => onNavigate?.('login')}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  variant="primary" 
+                  size="sm"
+                  onClick={() => onNavigate?.('signup')}
+                >
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,28 +117,57 @@ export function Header({ onNavigate }: HeaderProps) {
                 </button>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => {
-                    onNavigate?.('login');
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full"
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  variant="primary" 
-                  size="sm"
-                  onClick={() => {
-                    onNavigate?.('signup');
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full"
-                >
-                  Get Started
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        onNavigate?.('dashboard');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      Dashboard
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => {
+                        onNavigate?.('profile');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      My Account
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        onNavigate?.('login');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      Sign In
+                    </Button>
+                    <Button 
+                      variant="primary" 
+                      size="sm"
+                      onClick={() => {
+                        onNavigate?.('signup');
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full"
+                    >
+                      Get Started
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>

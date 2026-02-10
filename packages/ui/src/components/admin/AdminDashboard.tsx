@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import { 
@@ -9,7 +9,7 @@ import { Card } from '../Card';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 
-interface PendingItem {
+export interface PendingItem {
   id: string;
   type: 'job' | 'service' | 'user' | 'report';
   title: string;
@@ -18,6 +18,13 @@ interface PendingItem {
   status: 'pending' | 'approved' | 'rejected';
   details?: string;
 }
+
+export type AdminStat = {
+  label: string;
+  value: string;
+  icon: typeof Users;
+  color: string;
+};
 
 const mockPendingItems: PendingItem[] = [
   {
@@ -58,39 +65,55 @@ const mockPendingItems: PendingItem[] = [
   }
 ];
 
-const mockStats = [
+const mockStats: AdminStat[] = [
   { label: 'Pending Reviews', value: '12', icon: AlertTriangle, color: 'text-soft-gold' },
   { label: 'Total Users', value: '1,250', icon: Users, color: 'text-deep-blue' },
   { label: 'Active Jobs', value: '145', icon: Briefcase, color: 'text-emerald-green' },
   { label: 'Active Services', value: '89', icon: Wrench, color: 'text-deep-blue' }
 ];
 
-export function AdminDashboard() {
+interface AdminDashboardProps {
+  stats?: AdminStat[];
+  pendingItems?: PendingItem[];
+  onApprove?: (id: string) => void;
+  onReject?: (id: string) => void;
+}
+
+export function AdminDashboard({ stats, pendingItems, onApprove, onReject }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'jobs' | 'services' | 'users' | 'reports'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const items = pendingItems ?? mockPendingItems;
+  const statItems = stats ?? mockStats;
+
   const tabs = [
-    { id: 'all', label: 'All', count: mockPendingItems.length },
-    { id: 'jobs', label: 'Jobs', count: mockPendingItems.filter(i => i.type === 'job').length },
-    { id: 'services', label: 'Services', count: mockPendingItems.filter(i => i.type === 'service').length },
-    { id: 'users', label: 'Users', count: mockPendingItems.filter(i => i.type === 'user').length },
-    { id: 'reports', label: 'Reports', count: mockPendingItems.filter(i => i.type === 'report').length }
+    { id: 'all', label: 'All', count: items.length },
+    { id: 'jobs', label: 'Jobs', count: items.filter(i => i.type === 'job').length },
+    { id: 'services', label: 'Services', count: items.filter(i => i.type === 'service').length },
+    { id: 'users', label: 'Users', count: items.filter(i => i.type === 'user').length },
+    { id: 'reports', label: 'Reports', count: items.filter(i => i.type === 'report').length }
   ];
 
-  const filteredItems = mockPendingItems.filter(item => {
+  const filteredItems = items.filter(item => {
     if (activeTab !== 'all' && item.type !== activeTab.slice(0, -1)) return false;
     if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return item.status === 'pending';
   });
 
   const handleApprove = (id: string) => {
+    if (onApprove) {
+      onApprove(id);
+      return;
+    }
     console.log('Approving item:', id);
-    // In real app, this would call an API
   };
 
   const handleReject = (id: string) => {
+    if (onReject) {
+      onReject(id);
+      return;
+    }
     console.log('Rejecting item:', id);
-    // In real app, this would call an API
   };
 
   const getTypeIcon = (type: string) => {
@@ -128,7 +151,7 @@ export function AdminDashboard() {
       <div className="max-w-7xl mx-auto p-4 lg:p-8 space-y-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {mockStats.map((stat, index) => {
+          {statItems.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <Card key={index}>
@@ -218,7 +241,7 @@ export function AdminDashboard() {
                         {item.title}
                       </h3>
                       <p className="text-sm text-foreground-secondary mb-2">
-                        Submitted by {item.submittedBy} â€¢ {item.submittedDate}
+                        Submitted by {item.submittedBy} • {item.submittedDate}
                       </p>
                       {item.details && (
                         <p className="text-sm text-foreground-tertiary">
@@ -271,7 +294,7 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="text-foreground mb-1">Approved job posting</p>
-                  <p className="text-sm text-foreground-tertiary">Marketing Manager at Creative Agency â€¢ 1 hour ago</p>
+                  <p className="text-sm text-foreground-tertiary">Marketing Manager at Creative Agency • 1 hour ago</p>
                 </div>
               </div>
             </Card>
@@ -283,7 +306,7 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="text-foreground mb-1">Verified new member</p>
-                  <p className="text-sm text-foreground-tertiary">David Eze â€¢ 3 hours ago</p>
+                  <p className="text-sm text-foreground-tertiary">David Eze • 3 hours ago</p>
                 </div>
               </div>
             </Card>
@@ -295,7 +318,7 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="text-foreground mb-1">Rejected service listing</p>
-                  <p className="text-sm text-foreground-tertiary">Incomplete information â€¢ 5 hours ago</p>
+                  <p className="text-sm text-foreground-tertiary">Incomplete information • 5 hours ago</p>
                 </div>
               </div>
             </Card>
@@ -305,5 +328,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-
-

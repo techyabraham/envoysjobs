@@ -4,6 +4,7 @@ import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 export default function Page() {
   const api = useApi();
@@ -22,7 +23,7 @@ export default function Page() {
         {isLoading && <p className="text-foreground-secondary">Loading profile...</p>}
         {error && <p className="text-destructive">Failed to load profile.</p>}
         {data ? (
-          <div className="bg-white border border-border rounded-2xl p-6 space-y-4">
+          <div className="bg-white border border-border rounded-2xl p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl">{data.user?.firstName} {data.user?.lastName}</h3>
@@ -44,6 +45,13 @@ export default function Page() {
                 ))}
               </div>
             )}
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link href="/envoy/skills" className="btn-secondary">Manage Skills</Link>
+              <Link href="/envoy/portfolio" className="btn-secondary">Portfolio</Link>
+              <Link href="/envoy/availability" className="btn-secondary">Availability</Link>
+              <Link href="/envoy/history" className="btn-secondary">Job History</Link>
+              <Link href="/envoy/earnings" className="btn-secondary">Earnings</Link>
+            </div>
           </div>
         ) : null}
       </PageShell>

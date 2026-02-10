@@ -3,6 +3,8 @@ import { PrismaService } from "../prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { sanitizeMessage } from "@envoysjobs/utils";
 import { createId, memoryStore, seedMemory, useMemory } from "../../common/memory.store";
+import { promises as fs } from "fs";
+import path from "path";
 
 @Injectable()
 export class MessagingService {
@@ -91,11 +93,15 @@ export class MessagingService {
 
   listMessages(conversationId: string) {
     if (!useMemory()) {
-      return this.prisma.message.findMany({ where: { conversationId }, orderBy: { createdAt: "asc" } });
+      return this.prisma.message.findMany({
+        where: { conversationId },
+        orderBy: { createdAt: "asc" },
+        include: { attachments: true }
+      });
     }
     seedMemory();
     return this.prisma.message
-      .findMany({ where: { conversationId }, orderBy: { createdAt: "asc" } })
+      .findMany({ where: { conversationId }, orderBy: { createdAt: "asc" }, include: { attachments: true } })
       .catch(() => {
         return memoryStore.messages
           .filter((m) => m.conversationId === conversationId)
@@ -110,7 +116,8 @@ export class MessagingService {
           conversationId,
           senderId,
           text: sanitizeMessage(text)
-        }
+        },
+        include: { attachments: true }
       }).then(async (message) => {
         const convo = await this.prisma.conversation.findUnique({
           where: { id: conversationId },
@@ -153,5 +160,79 @@ export class MessagingService {
         }
         return message as any;
       });
+  }
+
+  async sendAttachment(conversationId: string, senderId: string, file: Express.Multer.File, text?: string) {
+    const sanitizedText = text ? sanitizeMessage(text) : "Sent an attachment";
+    const uploadsDir = path.join(process.cwd(), "apps/api/uploads");
+    await fs.mkdir(uploadsDir, { recursive: true });
+    const filename = `${senderId}-${Date.now()}-${file.originalname}`.replace(/\\s+/g, "_");
+    const filePath = path.join(uploadsDir, filename);
+    await fs.writeFile(filePath, file.buffer);
+
+    if (!useMemory()) {
+      const message = await this.prisma.message.create({
+        data: {
+          conversationId,
+          senderId,
+          text: sanitizedText,
+          attachments: {
+            create: {
+              url: `/uploads/${filename}`,
+              type: file.mimetype
+            }
+          }
+        },
+        include: { attachments: true }
+      });
+      const convo = await this.prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: { participants: true }
+      });
+      if (convo) {
+        const recipients = convo.participants.filter((p) => p.userId !== senderId);
+        await Promise.all(
+          recipients.map((p) =>
+            this.notifications.create(p.userId, "New message", "You received a new message.")
+          )
+        );
+      }
+      return message;
+    }
+
+    seedMemory();
+    const message = await this.prisma.message
+      .create({
+        data: {
+          conversationId,
+          senderId,
+          text: sanitizedText,
+          attachments: {
+            create: {
+              url: `/uploads/${filename}`,
+              type: file.mimetype
+            }
+          }
+        },
+        include: { attachments: true }
+      })
+      .catch(() => {
+        const created = {
+          id: createId(),
+          conversationId,
+          senderId,
+          text: sanitizedText,
+          createdAt: new Date()
+        };
+        memoryStore.messages.push(created);
+        return { ...created, attachments: [{ url: `/uploads/${filename}`, type: file.mimetype }] } as any;
+      });
+    const convo = memoryStore.conversations.find((c) => c.id === conversationId);
+    if (convo) {
+      convo.participants
+        .filter((id) => id !== senderId)
+        .forEach((id) => this.notifications.create(id, "New message", "You received a new message."));
+    }
+    return message;
   }
 }

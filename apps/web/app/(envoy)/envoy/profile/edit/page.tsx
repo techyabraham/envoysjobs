@@ -1,15 +1,26 @@
 "use client";
 
-import DashboardShell from "@/components/DashboardShell";
-import PageShell from "@/components/PageShell";
-import { useApi } from "@/lib/useApi";
+import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { EditProfilePage } from "@envoysjobs/ui";
+import { useApi } from "@/lib/useApi";
 
 export default function Page() {
+  const router = useRouter();
   const api = useApi();
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["envoy-profile-edit"],
+
+  const meQuery = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const res = await api<any>("/me");
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
+
+  const profileQuery = useQuery({
+    queryKey: ["envoy-profile"],
     queryFn: async () => {
       const res = await api<any>("/envoy/profile");
       if (res.error) throw new Error(res.error);
@@ -17,63 +28,77 @@ export default function Page() {
     }
   });
 
-  const [bio, setBio] = useState("");
-  const [location, setLocation] = useState("");
-  const [skills, setSkills] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const initialData = useMemo(() => {
+    const user = meQuery.data;
+    const profile = profileQuery.data;
+    return {
+      firstName: user?.firstName ?? "",
+      lastName: user?.lastName ?? "",
+      email: user?.email ?? "",
+      phone: user?.phone ?? "",
+      location: profile?.location ?? "",
+      bio: profile?.bio ?? "",
+      selectedSkills: profile?.skills ? String(profile.skills).split(",").map((item: string) => item.trim()).filter(Boolean) : [],
+      portfolio: profile?.portfolioLinks ?? "",
+      linkedIn: "",
+      twitter: "",
+      github: "",
+      yearsOfExperience: "",
+      hourlyRate: "",
+      availability: profile?.availability ?? "",
+      openToRemote: true,
+      willingToRelocate: false
+    };
+  }, [meQuery.data, profileQuery.data]);
 
-  const handleSave = async () => {
-    setSaving(true);
-    setSaveError(null);
-    const res = await api("/envoy/profile", {
+  const handleSave = async (data: any) => {
+    const profileRes = await api("/envoy/profile", {
       method: "PUT",
       body: JSON.stringify({
-        bio: bio || data?.bio || "",
-        location: location || data?.location || "",
-        availability: data?.availability || "",
-        portfolioLinks: data?.portfolioLinks || "",
-        skills: skills || data?.skills || ""
+        bio: data.bio,
+        location: data.location,
+        availability: data.availability,
+        portfolioLinks: data.portfolio,
+        skills: data.selectedSkills?.join(", ") ?? ""
       })
     });
-    setSaving(false);
-    if (res.error) {
-      setSaveError("Failed to save profile.");
+
+    if (profileRes.error) {
+      alert("Failed to save profile.");
       return;
     }
-    refetch();
+
+    const userRes = await api("/me", {
+      method: "PUT",
+      body: JSON.stringify({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone
+      })
+    });
+
+    if (userRes.error) {
+      alert("Failed to save user details.");
+      return;
+    }
+
+    router.push("/envoy/profile");
   };
 
+  if (meQuery.isLoading || profileQuery.isLoading) {
+    return (
+      <div className="min-h-screen bg-background-secondary flex items-center justify-center text-foreground-secondary">
+        Loading profile...
+      </div>
+    );
+  }
+
   return (
-    <DashboardShell userName="Grace">
-      <PageShell title="Edit Profile" description="Update your skills and bio.">
-        {isLoading && <p className="text-foreground-secondary">Loading profile...</p>}
-        {error && <p className="text-destructive">Failed to load profile.</p>}
-        <div className="bg-white border border-border rounded-2xl p-6 space-y-4">
-          <input
-            className="input"
-            placeholder="Location"
-            defaultValue={data?.location || ""}
-            onChange={(event) => setLocation(event.target.value)}
-          />
-          <textarea
-            className="input min-h-[120px]"
-            placeholder="Bio"
-            defaultValue={data?.bio || ""}
-            onChange={(event) => setBio(event.target.value)}
-          />
-          <input
-            className="input"
-            placeholder="Skills (comma separated)"
-            defaultValue={data?.skills || ""}
-            onChange={(event) => setSkills(event.target.value)}
-          />
-          {saveError && <p className="text-destructive">{saveError}</p>}
-          <button className="cta" onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save changes"}
-          </button>
-        </div>
-      </PageShell>
-    </DashboardShell>
+    <EditProfilePage
+      initialData={initialData}
+      onSave={handleSave}
+      onCancel={() => router.push("/envoy/profile")}
+    />
   );
 }

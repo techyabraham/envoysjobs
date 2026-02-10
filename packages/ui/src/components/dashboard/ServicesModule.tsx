@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Star, MessageCircle, Eye, TrendingUp, Edit, Plus } from 'lucide-react';
 import { Card } from '../Card';
 import { Badge } from '../Badge';
@@ -21,7 +21,7 @@ interface ServiceListing {
 const mockServiceListing: ServiceListing = {
   title: 'Professional Web Development',
   description: 'Full-stack web development services including React, Node.js, and database design. Specialized in creating modern, responsive websites and web applications.',
-  rate: 'â‚¦50,000 - â‚¦200,000/project',
+  rate: '₦50,000 - ₦200,000/project',
   rating: 4.9,
   reviewCount: 24,
   views: 156,
@@ -80,9 +80,40 @@ const mockReviews = [
   }
 ];
 
-export function ServicesModule() {
+interface ServicesModuleProps {
+  onCreate?: () => void;
+  onEdit?: () => void;
+  service?: {
+    title: string;
+    description: string;
+    rate: string;
+    status: 'ACTIVE' | 'PENDING' | 'PAUSED';
+  } | null;
+  stats?: {
+    rating: number;
+    reviewCount: number;
+    views: number;
+    enquiries: number;
+  };
+}
+
+export function ServicesModule({ onCreate, onEdit, service, stats }: ServicesModuleProps) {
   const [activeTab, setActiveTab] = useState<'listing' | 'enquiries' | 'reviews'>('listing');
-  const [hasService, setHasService] = useState(true);
+  const hasService = Boolean(service);
+
+  const resolvedService = useMemo<ServiceListing>(() => {
+    if (!service) return mockServiceListing;
+    return {
+      title: service.title,
+      description: service.description,
+      rate: service.rate,
+      status: service.status === 'ACTIVE' ? 'active' : service.status === 'PAUSED' ? 'paused' : 'pending',
+      rating: stats?.rating ?? 0,
+      reviewCount: stats?.reviewCount ?? 0,
+      views: stats?.views ?? 0,
+      enquiries: stats?.enquiries ?? 0
+    };
+  }, [service, stats]);
 
   const tabs = [
     { id: 'listing', label: 'My Service' },
@@ -117,7 +148,12 @@ export function ServicesModule() {
             <p className="text-foreground-secondary">Manage your service listings and enquiries</p>
           </div>
           {hasService && (
-            <Button variant="primary" size="sm" className="hidden sm:flex">
+            <Button
+              variant="primary"
+              size="sm"
+              className="hidden sm:flex"
+              onClick={onEdit}
+            >
               <Edit className="w-4 h-4" />
               Edit Service
             </Button>
@@ -130,7 +166,7 @@ export function ServicesModule() {
             description="Start offering your services to fellow Envoys and grow your opportunities."
             icon={<Plus className="w-16 h-16" />}
             action={
-              <Button variant="success">
+              <Button variant="success" onClick={onCreate}>
                 <Plus className="w-5 h-5" />
                 Create Service Listing
               </Button>
@@ -168,29 +204,29 @@ export function ServicesModule() {
                 {/* Service Listing Card */}
                 <Card className="relative">
                   <div className="absolute top-6 right-6">
-                    <Badge variant={mockServiceListing.status === 'active' ? 'success' : 'default'}>
-                      {mockServiceListing.status === 'active' ? 'Active' : 'Pending Review'}
+                    <Badge variant={resolvedService.status === 'active' ? 'success' : 'default'}>
+                      {resolvedService.status === 'active' ? 'Active' : resolvedService.status === 'paused' ? 'Paused' : 'Pending Review'}
                     </Badge>
                   </div>
 
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-2xl font-semibold text-foreground mb-2">
-                        {mockServiceListing.title}
+                        {resolvedService.title}
                       </h2>
                       <p className="text-foreground-secondary mb-4">
-                        {mockServiceListing.description}
+                        {resolvedService.description}
                       </p>
                       <div className="text-xl font-semibold text-deep-blue">
-                        {mockServiceListing.rate}
+                        {resolvedService.rate}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-6">
                       <div className="flex items-center gap-2">
-                        {renderStars(mockServiceListing.rating)}
-                        <span className="font-medium text-foreground">{mockServiceListing.rating}</span>
-                        <span className="text-foreground-tertiary">({mockServiceListing.reviewCount})</span>
+                        {renderStars(resolvedService.rating)}
+                        <span className="font-medium text-foreground">{resolvedService.rating.toFixed(1)}</span>
+                        <span className="text-foreground-tertiary">({resolvedService.reviewCount})</span>
                       </div>
                     </div>
                   </div>
@@ -205,7 +241,7 @@ export function ServicesModule() {
                       </div>
                       <div>
                         <div className="text-2xl font-bold text-foreground">
-                          {mockServiceListing.views}
+                          {resolvedService.views}
                         </div>
                         <div className="text-sm text-foreground-secondary">
                           Profile Views
@@ -221,7 +257,7 @@ export function ServicesModule() {
                       </div>
                       <div>
                         <div className="text-2xl font-bold text-foreground">
-                          {mockServiceListing.enquiries}
+                          {resolvedService.enquiries}
                         </div>
                         <div className="text-sm text-foreground-secondary">
                           Enquiries
@@ -283,12 +319,12 @@ export function ServicesModule() {
                 <Card className="bg-gradient-to-br from-soft-gold/10 to-soft-gold/5 border-soft-gold/20">
                   <div className="flex items-center gap-8">
                     <div className="text-center">
-                      <div className="text-5xl font-bold text-foreground mb-2">
-                        {mockServiceListing.rating}
+                        <div className="text-5xl font-bold text-foreground mb-2">
+                        {resolvedService.rating.toFixed(1)}
                       </div>
-                      {renderStars(mockServiceListing.rating)}
+                      {renderStars(resolvedService.rating)}
                       <p className="text-sm text-foreground-secondary mt-2">
-                        Based on {mockServiceListing.reviewCount} reviews
+                        Based on {resolvedService.reviewCount} reviews
                       </p>
                     </div>
                   </div>

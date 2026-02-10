@@ -17,6 +17,7 @@ export type Message = {
   senderId: string;
   text: string;
   createdAt?: string;
+  attachments?: { url: string; type: string }[];
 };
 
 export function useConversations(userId?: string) {
@@ -53,6 +54,43 @@ export function useSendMessage() {
       const res = await api<Message>(`/conversations/${params.conversationId}/messages`, {
         method: "POST",
         body: JSON.stringify({ text: params.text })
+      });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: (_, params) => {
+      queryClient.invalidateQueries({ queryKey: ["messages", params.conversationId] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+    }
+  });
+}
+
+export function useCreateConversation() {
+  const api = useApi();
+  return useMutation({
+    mutationFn: async (params: { jobId: string; envoyId: string; hirerId: string }) => {
+      const res = await api<{ id: string }>(`/conversations`, {
+        method: "POST",
+        body: JSON.stringify(params)
+      });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
+}
+
+export function useSendAttachment() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: { conversationId: string; file: File; text?: string }) => {
+      const form = new FormData();
+      form.append("file", params.file);
+      if (params.text) form.append("text", params.text);
+      const res = await api<Message>(`/conversations/${params.conversationId}/attachments`, {
+        method: "POST",
+        body: form,
+        headers: {}
       });
       if (res.error) throw new Error(res.error);
       return res.data;

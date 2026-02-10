@@ -3,6 +3,7 @@
 import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useMarkNotificationRead, useNotifications } from "@/lib/notifications";
+import Link from "next/link";
 
 export default function Page() {
   const { data, isLoading, error } = useNotifications();
@@ -11,6 +12,14 @@ export default function Page() {
   return (
     <DashboardShell userName="Grace">
       <PageShell title="Notifications" description="Stay updated with your activity.">
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Preferences</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/notifications/preferences" className="btn-secondary">
+              Notification Preferences
+            </Link>
+          </div>
+        </div>
         {isLoading && <p className="text-foreground-secondary">Loading notifications...</p>}
         {error && <p className="text-destructive">Failed to load notifications.</p>}
         {!isLoading && data?.length === 0 && (

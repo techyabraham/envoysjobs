@@ -7,6 +7,7 @@ import { useHirerJobs } from "@/lib/jobs";
 import { useConversations } from "@/lib/messaging";
 import { useNotifications } from "@/lib/notifications";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
@@ -34,6 +35,14 @@ export default function Page() {
           <StatCard label="Applications" value={applications.data?.length ?? 0} />
           <StatCard label="Conversations" value={conversations.data?.length ?? 0} />
           <StatCard label="Notifications" value={notifications.data?.length ?? 0} />
+        </div>
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick actions</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/hirer/jobs/new" className="btn-secondary">Post a Job</Link>
+            <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
+            <Link href="/hirer/shortlist" className="btn-secondary">Envoy Shortlist</Link>
+          </div>
         </div>
       </PageShell>
     </DashboardShell>

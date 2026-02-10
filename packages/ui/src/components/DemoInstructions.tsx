@@ -14,15 +14,15 @@ export function DemoInstructions() {
           <div className="text-sm text-white/90 space-y-2">
             <p><strong>Try these accounts:</strong></p>
             <ul className="space-y-1 ml-4">
-              <li>â€¢ Regular user: any email</li>
-              <li>â€¢ Admin: admin@envoysjobs.com</li>
+              <li>? Regular user: any email</li>
+              <li>? Admin: admin@envoysjobs.com</li>
             </ul>
             <p className="pt-2"><strong>Explore:</strong></p>
             <ul className="space-y-1 ml-4">
-              <li>â€¢ Jobs, Services, Gigs modules</li>
-              <li>â€¢ Real-time messaging UI</li>
-              <li>â€¢ Admin moderation panel</li>
-              <li>â€¢ Mobile responsive design</li>
+              <li>? Jobs, Services, Gigs modules</li>
+              <li>? Real-time messaging UI</li>
+              <li>? Admin moderation panel</li>
+              <li>? Mobile responsive design</li>
             </ul>
           </div>
         </div>

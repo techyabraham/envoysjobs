@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+ï»¿import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -10,19 +10,28 @@ async function main() {
 
   const admin = await prisma.user.upsert({
     where: { email: "admin@envoysjobs.com" },
-    update: {},
+    update: {
+      stewardStatus: null,
+      stewardDepartment: null,
+      stewardMatricNumber: null
+    },
     create: {
       email: "admin@envoysjobs.com",
       passwordHash: adminPassword,
       firstName: "Admin",
       lastName: "User",
-      role: "ADMIN"
+      role: "ADMIN",
+      stewardStatus: null
     }
   });
 
   const envoy = await prisma.user.upsert({
     where: { email: "envoy@envoysjobs.com" },
-    update: {},
+    update: {
+      stewardStatus: "PENDING",
+      stewardDepartment: "MEDIA",
+      stewardMatricNumber: "RCCG-001"
+    },
     create: {
       email: "envoy@envoysjobs.com",
       passwordHash: envoyPassword,
@@ -37,13 +46,18 @@ async function main() {
 
   const hirer = await prisma.user.upsert({
     where: { email: "hirer@envoysjobs.com" },
-    update: {},
+    update: {
+      stewardStatus: null,
+      stewardDepartment: null,
+      stewardMatricNumber: null
+    },
     create: {
       email: "hirer@envoysjobs.com",
       passwordHash: hirerPassword,
       firstName: "Daniel",
       lastName: "Okoro",
-      role: "HIRER"
+      role: "HIRER",
+      stewardStatus: null
     }
   });
 
@@ -107,52 +121,63 @@ async function main() {
     }
   });
 
-  await prisma.autoMessageTemplate.createMany({
-    data: [
-      {
-        key: "honour",
-        text: "I honour you",
-        audience: "BOTH",
-        quickReplies: ["you are amazing", "Thank you, I appreciate it", "Grateful for the opportunity"],
-        triggerRules: { exactMatch: "I honour you" }
+  const templates = [
+    {
+      key: "honour",
+      text: "I honour you",
+      audience: "BOTH",
+      quickReplies: ["you are amazing", "Thank you, I appreciate it", "Grateful for the opportunity"],
+      triggerRules: { exactMatch: "I honour you" }
+    },
+    {
+      key: "interest",
+      text: "Hello, I'm interested in this opportunity",
+      audience: "BOTH",
+      quickReplies: ["May we discuss the details?"],
+      triggerRules: {}
+    },
+    {
+      key: "thanks",
+      text: "Thank you for reaching out",
+      audience: "BOTH",
+      quickReplies: ["I'm available to proceed"],
+      triggerRules: {}
+    },
+    {
+      key: "available",
+      text: "I'm available to proceed",
+      audience: "BOTH",
+      quickReplies: ["Looking forward to working together"],
+      triggerRules: {}
+    },
+    {
+      key: "details",
+      text: "May we discuss the details?",
+      audience: "BOTH",
+      quickReplies: ["Thank you, I appreciate it"],
+      triggerRules: {}
+    },
+    {
+      key: "looking-forward",
+      text: "Looking forward to working together",
+      audience: "BOTH",
+      quickReplies: [],
+      triggerRules: {}
+    }
+  ];
+
+  for (const template of templates) {
+    await prisma.autoMessageTemplate.upsert({
+      where: { key: template.key },
+      update: {
+        text: template.text,
+        audience: template.audience,
+        quickReplies: template.quickReplies,
+        triggerRules: template.triggerRules
       },
-      {
-        key: "interest",
-        text: "Hello, I’m interested in this opportunity",
-        audience: "BOTH",
-        quickReplies: ["May we discuss the details?"],
-        triggerRules: {}
-      },
-      {
-        key: "thanks",
-        text: "Thank you for reaching out",
-        audience: "BOTH",
-        quickReplies: ["I’m available to proceed"],
-        triggerRules: {}
-      },
-      {
-        key: "available",
-        text: "I’m available to proceed",
-        audience: "BOTH",
-        quickReplies: ["Looking forward to working together"],
-        triggerRules: {}
-      },
-      {
-        key: "details",
-        text: "May we discuss the details?",
-        audience: "BOTH",
-        quickReplies: ["Thank you, I appreciate it"],
-        triggerRules: {}
-      },
-      {
-        key: "looking-forward",
-        text: "Looking forward to working together",
-        audience: "BOTH",
-        quickReplies: [],
-        triggerRules: {}
-      }
-    ]
-  });
+      create: template
+    });
+  }
 
   await prisma.notification.create({
     data: {
@@ -162,10 +187,47 @@ async function main() {
     }
   });
 
+  await prisma.service.upsert({
+    where: { id: "seed-service" },
+    update: {},
+    create: {
+      id: "seed-service",
+      envoyId: envoy.id,
+      title: "Content Strategy & Copywriting",
+      description: "End-to-end content planning and copywriting for ministries and community initiatives.",
+      rate: "â‚¦30,000 - â‚¦120,000/project",
+      status: "ACTIVE"
+    }
+  });
+
+  await prisma.gig.upsert({
+    where: { id: "seed-gig" },
+    update: {},
+    create: {
+      id: "seed-gig",
+      postedById: hirer.id,
+      title: "Event Logistics Support",
+      amount: "â‚¦20,000",
+      location: "Lagos",
+      duration: "1 day",
+      urgent: true,
+      status: "AVAILABLE"
+    }
+  });
   await prisma.adminAuditLog.create({
     data: {
       adminId: admin.id,
       action: "Seeded database"
+    }
+  });
+
+  await prisma.user.updateMany({
+    where: {
+      stewardDepartment: null,
+      stewardMatricNumber: null
+    },
+    data: {
+      stewardStatus: null
     }
   });
 }

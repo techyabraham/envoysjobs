@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
@@ -19,8 +19,8 @@ export class ApplicationsController {
   }
 
   @Get("applications")
-  list(@Req() req: any) {
-    return this.applicationsService.list(req.user?.id || "");
+  list(@Req() req: any, @Query("jobId") jobId?: string) {
+    return this.applicationsService.list(req.user?.id || "", jobId);
   }
 
   @Patch("applications/:id/status")

@@ -15,6 +15,8 @@ import { NotificationsModule } from "./modules/notifications/notifications.modul
 import { VerificationModule } from "./modules/verification/verification.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { ReportsModule } from "./modules/reports/reports.module";
+import { ServicesModule } from "./modules/services/services.module";
+import { GigsModule } from "./modules/gigs/gigs.module";
 
 @Module({
   imports: [
@@ -36,7 +38,9 @@ import { ReportsModule } from "./modules/reports/reports.module";
     NotificationsModule,
     VerificationModule,
     ReviewsModule,
-    ReportsModule
+    ReportsModule,
+    ServicesModule,
+    GigsModule
   ],
   controllers: [AppController],
   providers: [AppService]

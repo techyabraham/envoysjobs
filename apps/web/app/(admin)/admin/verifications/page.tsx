@@ -20,12 +20,14 @@ export default function Page() {
               <button
                 className="btn-secondary"
                 onClick={() => updateVerification.mutate({ id: verification.id, status: "VERIFIED" })}
+                disabled={verification.status === "VERIFIED"}
               >
                 Approve
               </button>
               <button
                 className="btn-secondary"
                 onClick={() => updateVerification.mutate({ id: verification.id, status: "REJECTED" })}
+                disabled={verification.status === "REJECTED"}
               >
                 Reject
               </button>

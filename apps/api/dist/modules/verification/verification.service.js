@@ -55,7 +55,7 @@ let VerificationService = class VerificationService {
     }
     async status(userId) {
         if (!userId)
-            return { phone: "PENDING", steward: "PENDING" };
+            return { phone: "PENDING", steward: "NOT_APPLICABLE" };
         if (!(0, memory_store_1.useMemory)()) {
             const user = await this.prisma.user.findUnique({ where: { id: userId } });
             const verification = await this.prisma.verification.findFirst({
@@ -63,12 +63,12 @@ let VerificationService = class VerificationService {
             });
             return {
                 phone: verification?.status ?? "PENDING",
-                steward: user?.stewardStatus ?? "PENDING"
+                steward: user?.stewardStatus ?? "NOT_APPLICABLE"
             };
         }
         (0, memory_store_1.seedMemory)();
         const user = memory_store_1.memoryStore.users.find((u) => u.id === userId);
-        return { phone: "PENDING", steward: user?.stewardStatus ?? "PENDING" };
+        return { phone: "PENDING", steward: user?.stewardStatus ?? "NOT_APPLICABLE" };
     }
 };
 exports.VerificationService = VerificationService;

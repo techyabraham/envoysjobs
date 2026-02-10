@@ -24,6 +24,8 @@ const notifications_module_1 = require("./modules/notifications/notifications.mo
 const verification_module_1 = require("./modules/verification/verification.module");
 const reviews_module_1 = require("./modules/reviews/reviews.module");
 const reports_module_1 = require("./modules/reports/reports.module");
+const services_module_1 = require("./modules/services/services.module");
+const gigs_module_1 = require("./modules/gigs/gigs.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -48,7 +50,9 @@ exports.AppModule = AppModule = __decorate([
             notifications_module_1.NotificationsModule,
             verification_module_1.VerificationModule,
             reviews_module_1.ReviewsModule,
-            reports_module_1.ReportsModule
+            reports_module_1.ReportsModule,
+            services_module_1.ServicesModule,
+            gigs_module_1.GigsModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService]

@@ -7,7 +7,7 @@ export type MemoryUser = {
   firstName: string;
   lastName: string;
   role: "ENVOY" | "HIRER" | "ADMIN";
-  stewardStatus?: "PENDING" | "VERIFIED" | "REJECTED";
+  stewardStatus?: "PENDING" | "VERIFIED" | "REJECTED" | null;
 };
 
 export type MemoryJob = {

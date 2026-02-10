@@ -4,6 +4,7 @@ import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useJob } from "@/lib/jobs";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
   const params = useParams();
@@ -13,15 +14,22 @@ export default function Page() {
   return (
     <DashboardShell userName="Daniel">
       <PageShell title={job?.title ?? "Job Preview"} description={job?.description}>
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href={`/hirer/jobs/${jobId}/applicants`} className="btn-secondary">View Applicants</Link>
+            <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
+          </div>
+        </div>
         {isLoading && <p className="text-foreground-secondary">Loading job...</p>}
         {error && <p className="text-destructive">Failed to load job.</p>}
         {job ? (
           <div className="bg-white border border-border rounded-2xl p-5 space-y-4">
             <div className="text-sm text-foreground-tertiary">
-              {job.locationType} ? {job.location ?? "Remote"}
+              {job.locationType} · {job.location ?? "Remote"}
             </div>
             <div className="text-sm text-foreground-tertiary">
-              Salary: {job.salaryMin ?? 0} - {job.salaryMax ?? 0}
+              Salary: ₦{job.salaryMin ?? 0} - ₦{job.salaryMax ?? 0}
             </div>
             <div className="text-sm text-foreground-tertiary">Status: {job.status}</div>
           </div>

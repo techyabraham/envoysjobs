@@ -96,7 +96,7 @@ const mockMessages: Message[] = [
   },
   {
     id: '6',
-    content: 'Perfect! For that scope, I can provide a quote of â‚¦150,000. Timeline would be about 2 weeks.',
+    content: 'Perfect! For that scope, I can provide a quote of ₦150,000. Timeline would be about 2 weeks.',
     sender: 'me',
     time: '11:00 AM',
     read: true

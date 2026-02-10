@@ -42,7 +42,7 @@ export class VerificationService {
   }
 
   async status(userId: string) {
-    if (!userId) return { phone: "PENDING", steward: "PENDING" };
+    if (!userId) return { phone: "PENDING", steward: "NOT_APPLICABLE" };
     if (!useMemory()) {
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
       const verification = await this.prisma.verification.findFirst({
@@ -50,11 +50,11 @@ export class VerificationService {
       });
       return {
         phone: verification?.status ?? "PENDING",
-        steward: user?.stewardStatus ?? "PENDING"
+        steward: user?.stewardStatus ?? "NOT_APPLICABLE"
       };
     }
     seedMemory();
     const user = memoryStore.users.find((u) => u.id === userId);
-    return { phone: "PENDING", steward: user?.stewardStatus ?? "PENDING" };
+    return { phone: "PENDING", steward: user?.stewardStatus ?? "NOT_APPLICABLE" };
   }
 }

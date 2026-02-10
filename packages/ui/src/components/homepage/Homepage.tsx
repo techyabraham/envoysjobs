@@ -17,7 +17,7 @@ const featuredJobs = [
     title: 'Senior Software Engineer',
     company: 'Tech Solutions Ltd',
     location: 'Lagos, Nigeria',
-    pay: 'â‚¦500,000 - â‚¦800,000/month',
+    pay: '₦500,000 - ₦800,000/month',
     type: 'Full-time',
     postedTime: '2 days ago',
     fromMember: true
@@ -26,7 +26,7 @@ const featuredJobs = [
     title: 'Marketing Manager',
     company: 'Creative Agency',
     location: 'Abuja, Nigeria',
-    pay: 'â‚¦350,000 - â‚¦500,000/month',
+    pay: '₦350,000 - ₦500,000/month',
     type: 'Full-time',
     postedTime: '1 week ago',
     fromMember: true
@@ -35,7 +35,7 @@ const featuredJobs = [
     title: 'Graphic Designer',
     company: 'Design Studio',
     location: 'Port Harcourt, Nigeria',
-    pay: 'â‚¦200,000 - â‚¦350,000/month',
+    pay: '₦200,000 - ₦350,000/month',
     type: 'Contract',
     postedTime: '3 days ago',
     fromMember: false
@@ -44,7 +44,7 @@ const featuredJobs = [
     title: 'Project Manager',
     company: 'Construction Co.',
     location: 'Ibadan, Nigeria',
-    pay: 'â‚¦400,000 - â‚¦600,000/month',
+    pay: '₦400,000 - ₦600,000/month',
     type: 'Full-time',
     postedTime: '5 days ago',
     fromMember: true
@@ -89,7 +89,7 @@ const featuredServices = [
 const featuredGigs = [
   {
     title: 'Event Setup Assistant',
-    amount: 'â‚¦15,000',
+    amount: '₦15,000',
     location: 'Lagos',
     duration: '1 day',
     urgent: true,
@@ -97,7 +97,7 @@ const featuredGigs = [
   },
   {
     title: 'Data Entry Specialist',
-    amount: 'â‚¦25,000',
+    amount: '₦25,000',
     location: 'Remote',
     duration: '3 days',
     urgent: false,
@@ -105,7 +105,7 @@ const featuredGigs = [
   },
   {
     title: 'Social Media Manager',
-    amount: 'â‚¦40,000',
+    amount: '₦40,000',
     location: 'Abuja',
     duration: '1 week',
     urgent: false,
@@ -113,7 +113,7 @@ const featuredGigs = [
   },
   {
     title: 'Moving Helper',
-    amount: 'â‚¦20,000',
+    amount: '₦20,000',
     location: 'Ikeja',
     duration: '2 days',
     urgent: true,

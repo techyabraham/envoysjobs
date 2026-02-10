@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../prisma/prisma.service";
 import bcrypt from "bcryptjs";
@@ -16,6 +16,10 @@ export class AuthService {
     role: "ENVOY" | "HIRER" | "ADMIN";
   }) {
     if (!useMemory()) {
+      const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
+      if (existing) {
+        throw new ConflictException("Email already in use");
+      }
       const hashed = await bcrypt.hash(data.password, 10);
       const user = await this.prisma.user.create({
         data: {
@@ -23,12 +27,17 @@ export class AuthService {
           passwordHash: hashed,
           firstName: data.firstName,
           lastName: data.lastName,
-          role: data.role
+          role: data.role,
+          stewardStatus: null
         }
       });
       return this.issueTokens(user);
     }
     seedMemory();
+    const existingMemory = memoryStore.users.find((u) => u.email === data.email);
+    if (existingMemory) {
+      throw new ConflictException("Email already in use");
+    }
     const hashed = await bcrypt.hash(data.password, 10);
     const user = await this.prisma.user
       .create({
@@ -37,7 +46,8 @@ export class AuthService {
           passwordHash: hashed,
           firstName: data.firstName,
           lastName: data.lastName,
-          role: data.role
+          role: data.role,
+          stewardStatus: null
         }
       })
       .catch(() => {
@@ -50,7 +60,7 @@ export class AuthService {
           firstName: data.firstName,
           lastName: data.lastName,
           role: data.role,
-          stewardStatus: "PENDING" as const
+          stewardStatus: null
         };
         memoryStore.users.push(newUser);
         return newUser as any;
@@ -121,6 +131,15 @@ export class AuthService {
     if (!record || record.otpCode !== code) throw new UnauthorizedException();
     await this.prisma.verification.update({ where: { phone }, data: { status: "VERIFIED" } });
     return { status: "verified" };
+  }
+
+  async forgotPassword(email: string) {
+    if (!email) throw new UnauthorizedException();
+    const user = await this.prisma.user.findUnique({ where: { email } }).catch(() => null);
+    if (!user) {
+      return { status: "sent" };
+    }
+    return { status: "sent" };
   }
 
   private async issueTokens(user: { id: string; role: string; email?: string; firstName?: string; lastName?: string }) {

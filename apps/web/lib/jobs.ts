@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/lib/useApi";
 
 export type Job = {
@@ -50,6 +50,36 @@ export function useHirerJobs(hirerId?: string) {
       const res = await api<Job[]>(`/jobs?hirerId=${hirerId}`);
       if (res.error) throw new Error(res.error);
       return res.data;
+    }
+  });
+}
+
+export function usePublishJob() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (jobId: string) => {
+      const res = await api(`/jobs/${jobId}/publish`, { method: "POST" });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["hirer-jobs"] });
+    }
+  });
+}
+
+export function useCloseJob() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (jobId: string) => {
+      const res = await api(`/jobs/${jobId}/close`, { method: "POST" });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["hirer-jobs"] });
     }
   });
 }

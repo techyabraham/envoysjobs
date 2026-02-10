@@ -25,6 +25,10 @@ let AuthService = class AuthService {
     }
     async signup(data) {
         if (!(0, memory_store_1.useMemory)()) {
+            const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
+            if (existing) {
+                throw new common_1.ConflictException("Email already in use");
+            }
             const hashed = await bcryptjs_1.default.hash(data.password, 10);
             const user = await this.prisma.user.create({
                 data: {
@@ -32,12 +36,17 @@ let AuthService = class AuthService {
                     passwordHash: hashed,
                     firstName: data.firstName,
                     lastName: data.lastName,
-                    role: data.role
+                    role: data.role,
+                    stewardStatus: null
                 }
             });
             return this.issueTokens(user);
         }
         (0, memory_store_1.seedMemory)();
+        const existingMemory = memory_store_1.memoryStore.users.find((u) => u.email === data.email);
+        if (existingMemory) {
+            throw new common_1.ConflictException("Email already in use");
+        }
         const hashed = await bcryptjs_1.default.hash(data.password, 10);
         const user = await this.prisma.user
             .create({
@@ -46,7 +55,8 @@ let AuthService = class AuthService {
                 passwordHash: hashed,
                 firstName: data.firstName,
                 lastName: data.lastName,
-                role: data.role
+                role: data.role,
+                stewardStatus: null
             }
         })
             .catch(() => {
@@ -60,7 +70,7 @@ let AuthService = class AuthService {
                 firstName: data.firstName,
                 lastName: data.lastName,
                 role: data.role,
-                stewardStatus: "PENDING"
+                stewardStatus: null
             };
             memory_store_1.memoryStore.users.push(newUser);
             return newUser;
@@ -134,6 +144,15 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException();
         await this.prisma.verification.update({ where: { phone }, data: { status: "VERIFIED" } });
         return { status: "verified" };
+    }
+    async forgotPassword(email) {
+        if (!email)
+            throw new common_1.UnauthorizedException();
+        const user = await this.prisma.user.findUnique({ where: { email } }).catch(() => null);
+        if (!user) {
+            return { status: "sent" };
+        }
+        return { status: "sent" };
     }
     async issueTokens(user) {
         const accessToken = this.jwt.sign({ sub: user.id, role: user.role });

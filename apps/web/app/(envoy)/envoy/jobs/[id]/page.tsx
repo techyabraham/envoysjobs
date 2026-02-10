@@ -1,18 +1,22 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useJob } from "@/lib/jobs";
+import { useCreateConversation } from "@/lib/messaging";
 import { useApi } from "@/lib/useApi";
-import { useSaveJob } from "@/lib/savedJobs";
+import { useSession } from "next-auth/react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
   const params = useParams();
+  const router = useRouter();
+  const api = useApi();
+  const { data: session } = useSession();
   const jobId = params?.id as string;
   const { data: job, isLoading, error } = useJob(jobId);
-  const api = useApi();
-  const saveJob = useSaveJob();
+  const createConversation = useCreateConversation();
 
   const handleApply = async () => {
     if (!jobId) return;
@@ -21,29 +25,41 @@ export default function Page() {
       alert("Failed to apply.");
       return;
     }
-    alert("Application sent.");
+    router.push("/envoy/applications");
+  };
+
+  const handleMessage = async () => {
+    if (!jobId || !job?.hirerId) return;
+    const envoyId = (session as any)?.user?.id as string | undefined;
+    if (!envoyId) return;
+    const convo = await createConversation.mutateAsync({ jobId, envoyId, hirerId: job.hirerId });
+    if (convo?.id) router.push(`/messages/${convo.id}`);
   };
 
   return (
     <DashboardShell userName="Grace">
       <PageShell title={job?.title ?? "Job Details"} description={job?.description}>
+        <div className="bg-white border border-border rounded-2xl p-5 space-y-3">
+          <p className="text-sm text-foreground-tertiary">Quick links</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/envoy/jobs" className="btn-secondary">Back to Jobs</Link>
+            <Link href="/envoy/saved" className="btn-secondary">Saved Jobs</Link>
+          </div>
+        </div>
         {isLoading && <p className="text-foreground-secondary">Loading job...</p>}
         {error && <p className="text-destructive">Failed to load job.</p>}
         {job ? (
           <div className="bg-white border border-border rounded-2xl p-5 space-y-4">
             <div className="text-sm text-foreground-tertiary">
-              {job.locationType} ? {job.location ?? "Remote"}
+              {job.locationType} - {job.location ?? "Remote"}
             </div>
             <div className="text-sm text-foreground-tertiary">
-              Salary: {job.salaryMin ?? 0} - {job.salaryMax ?? 0}
+              Salary: ₦{job.salaryMin ?? 0} - ₦{job.salaryMax ?? 0}
             </div>
-            <div className="flex gap-3">
-              <button onClick={handleApply} className="px-4 py-2 rounded-lg bg-emerald-green text-white">
-                Apply
-              </button>
-              <button onClick={() => saveJob.mutate(job.id)} className="btn-secondary">
-                Save job
-              </button>
+            <div className="text-sm text-foreground-tertiary">Status: {job.status}</div>
+            <div className="flex flex-wrap gap-3">
+              <button className="cta" onClick={handleApply}>Apply</button>
+              <button className="btn-secondary" onClick={handleMessage}>Message Hirer</button>
             </div>
           </div>
         ) : null}

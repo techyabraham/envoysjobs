@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagingController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const throttler_1 = require("@nestjs/throttler");
 const zod_1 = require("zod");
 const zod_validation_pipe_1 = require("../../common/zod-validation.pipe");
@@ -26,6 +27,9 @@ const conversationSchema = zod_1.z.object({
 });
 const messageSchema = zod_1.z.object({
     text: zod_1.z.string().min(1)
+});
+const attachmentSchema = zod_1.z.object({
+    text: zod_1.z.string().optional()
 });
 let MessagingController = class MessagingController {
     constructor(messagingService) {
@@ -42,6 +46,9 @@ let MessagingController = class MessagingController {
     }
     sendMessage(id, req, body) {
         return this.messagingService.sendMessage(id, req.user?.id || "", body.text);
+    }
+    sendAttachment(id, req, file, body) {
+        return this.messagingService.sendAttachment(id, req.user?.id || "", file, body.text);
     }
 };
 exports.MessagingController = MessagingController;
@@ -77,6 +84,27 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, void 0]),
     __metadata("design:returntype", void 0)
 ], MessagingController.prototype, "sendMessage", null);
+__decorate([
+    (0, throttler_1.Throttle)({ default: { limit: 10, ttl: 60000 } }),
+    (0, common_1.Post)("conversations/:id/attachments"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file", {
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: (req, file, cb) => {
+            const allowed = ["image/jpeg", "image/png", "application/pdf"];
+            if (!allowed.includes(file.mimetype)) {
+                return cb(new Error("Invalid file type"), false);
+            }
+            cb(null, true);
+        }
+    })),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.UploadedFile)()),
+    __param(3, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(attachmentSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object, void 0]),
+    __metadata("design:returntype", void 0)
+], MessagingController.prototype, "sendAttachment", null);
 exports.MessagingController = MessagingController = __decorate([
     (0, common_1.Controller)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

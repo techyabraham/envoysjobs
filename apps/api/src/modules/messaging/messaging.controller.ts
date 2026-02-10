@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { Throttle } from "@nestjs/throttler";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
@@ -13,6 +14,10 @@ const conversationSchema = z.object({
 
 const messageSchema = z.object({
   text: z.string().min(1)
+});
+
+const attachmentSchema = z.object({
+  text: z.string().optional()
 });
 
 @Controller()
@@ -43,5 +48,28 @@ export class MessagingController {
     @Body(new ZodValidationPipe(messageSchema)) body: z.infer<typeof messageSchema>
   ) {
     return this.messagingService.sendMessage(id, req.user?.id || "", body.text);
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post("conversations/:id/attachments")
+  @UseInterceptors(
+    FileInterceptor("file", {
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        const allowed = ["image/jpeg", "image/png", "application/pdf"];
+        if (!allowed.includes(file.mimetype)) {
+          return cb(new Error("Invalid file type"), false);
+        }
+        cb(null, true);
+      }
+    })
+  )
+  sendAttachment(
+    @Param("id") id: string,
+    @Req() req: any,
+    @UploadedFile() file: Express.Multer.File,
+    @Body(new ZodValidationPipe(attachmentSchema)) body: z.infer<typeof attachmentSchema>
+  ) {
+    return this.messagingService.sendAttachment(id, req.user?.id || "", file, body.text);
   }
 }
