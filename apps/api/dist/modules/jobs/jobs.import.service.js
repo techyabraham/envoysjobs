@@ -40,8 +40,9 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
     }
     async importExternalJobs() {
         const results = [];
-        results.push(await this.importJSearchJobs());
-        results.push(await this.importRemotiveJobs());
+        const skillKeywords = await this.getSkillKeywords();
+        results.push(await this.importJSearchJobs(skillKeywords));
+        results.push(await this.importRemotiveJobs(skillKeywords));
         return results;
     }
     async getSystemHirerId() {
@@ -74,32 +75,81 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
         const cleaned = (0, sanitize_html_1.default)(text, { allowedTags: [], allowedAttributes: {} });
         return cleaned.replace(/\s+/g, " ").trim();
     }
-    async importJSearchJobs() {
+    matchesSkills(text, skills) {
+        const normalized = text.toLowerCase();
+        return skills.some((skill) => normalized.includes(skill.toLowerCase()));
+    }
+    async getSkillKeywords() {
+        const enabled = this.config.get("JOBS_IMPORT_USE_SKILLS");
+        if (enabled === "false")
+            return [];
+        const limit = Number(this.config.get("JOBS_IMPORT_SKILL_LIMIT") || "6");
+        const skillsFromJoin = await this.prisma.userSkill.findMany({
+            select: { skill: { select: { name: true } } }
+        });
+        const joined = skillsFromJoin.map((item) => item.skill.name).filter(Boolean);
+        const profileSkills = await this.prisma.envoyProfile.findMany({
+            select: { skills: true }
+        });
+        for (const profile of profileSkills) {
+            if (!profile.skills)
+                continue;
+            const parts = profile.skills
+                .split(",")
+                .map((skill) => skill.trim())
+                .filter(Boolean);
+            joined.push(...parts);
+        }
+        const counts = new Map();
+        for (const skill of joined) {
+            const key = skill.toLowerCase();
+            counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+        const ranked = [...counts.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .map(([skill]) => skill);
+        return ranked.slice(0, limit);
+    }
+    async importJSearchJobs(skillKeywords) {
         const apiKey = this.config.get("JSEARCH_API_KEY") || "";
         if (!apiKey) {
-            return { source: "ADZUNA", fetched: 0, upserted: 0, skipped: 0 };
+            return { source: "JSEARCH", fetched: 0, upserted: 0, skipped: 0 };
         }
-        const baseUrl = this.config.get("JSEARCH_API_URL") || "https://api.openwebninja.com/v1/job-search";
-        const query = this.config.get("JSEARCH_QUERY") || "jobs";
+        const rapidApiHost = this.config.get("JSEARCH_RAPIDAPI_HOST") || "jsearch.p.rapidapi.com";
+        const useRapidApi = this.config.get("JSEARCH_RAPIDAPI") === "true" || apiKey.includes("amsh");
+        const baseUrl = useRapidApi
+            ? this.config.get("JSEARCH_API_URL") || "https://jsearch.p.rapidapi.com/search"
+            : this.config.get("JSEARCH_API_URL") || "https://api.openwebninja.com/v1/job-search";
+        const baseQuery = this.config.get("JSEARCH_QUERY") || "jobs";
         const location = this.config.get("JSEARCH_LOCATION") || "Nigeria";
         const country = this.config.get("JSEARCH_COUNTRY") || "ng";
         const datePosted = this.config.get("JSEARCH_DATE_POSTED") || "all";
         const maxPerRun = Number(this.config.get("JOBS_IMPORT_MAX_PER_RUN") || "20");
+        const query = skillKeywords.length > 0 ? skillKeywords.join(" OR ") : baseQuery;
         const url = new URL(baseUrl);
-        url.searchParams.set("query", query);
-        url.searchParams.set("location", location);
-        url.searchParams.set("country", country);
-        url.searchParams.set("date_posted", datePosted);
-        url.searchParams.set("page", "1");
-        url.searchParams.set("num_pages", "1");
-        const response = await fetch(url.toString(), {
-            headers: {
-                Authorization: `Bearer ${apiKey}`
+        if (useRapidApi) {
+            url.searchParams.set("query", `${query} in ${location}`.trim());
+            url.searchParams.set("page", "1");
+            url.searchParams.set("num_pages", "1");
+            if (country) {
+                url.searchParams.set("country", country.toLowerCase());
             }
-        });
+        }
+        else {
+            url.searchParams.set("query", query);
+            url.searchParams.set("location", location);
+            url.searchParams.set("country", country);
+            url.searchParams.set("date_posted", datePosted);
+            url.searchParams.set("page", "1");
+            url.searchParams.set("num_pages", "1");
+        }
+        const headers = useRapidApi
+            ? { "X-RapidAPI-Key": apiKey, "X-RapidAPI-Host": rapidApiHost }
+            : { Authorization: `Bearer ${apiKey}` };
+        const response = await fetch(url.toString(), { headers });
         if (!response.ok) {
             this.logger.warn(`JSearch fetch failed: ${response.status}`);
-            return { source: "ADZUNA", fetched: 0, upserted: 0, skipped: 0 };
+            return { source: "JSEARCH", fetched: 0, upserted: 0, skipped: 0 };
         }
         const data = (await response.json());
         const jobs = (data.jobs ?? data.data ?? data.results ?? []).slice(0, maxPerRun);
@@ -118,6 +168,10 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
                 continue;
             }
             const description = this.normalizeText(job?.job_description ?? job?.description);
+            if (skillKeywords.length > 0 && !this.matchesSkills(`${title} ${description}`, skillKeywords)) {
+                skipped += 1;
+                continue;
+            }
             const company = this.normalizeText(job?.employer_name ?? job?.company_name ?? job?.company);
             const locationParts = [
                 job?.job_city,
@@ -165,9 +219,9 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
             });
             upserted += 1;
         }
-        return { source: "ADZUNA", fetched: jobs.length, upserted, skipped };
+        return { source: "JSEARCH", fetched: jobs.length, upserted, skipped };
     }
-    async importRemotiveJobs() {
+    async importRemotiveJobs(skillKeywords) {
         const enabled = this.config.get("REMOTIVE_ENABLED");
         if (enabled === "false") {
             return { source: "REMOTIVE", fetched: 0, upserted: 0, skipped: 0 };
@@ -203,6 +257,10 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
                 continue;
             }
             const description = this.normalizeText(job?.description);
+            if (skillKeywords.length > 0 && !this.matchesSkills(`${title} ${description}`, skillKeywords)) {
+                skipped += 1;
+                continue;
+            }
             const company = this.normalizeText(job?.company_name);
             const location = this.normalizeText(job?.candidate_required_location) || "Remote";
             await this.prisma.job.upsert({

@@ -34,8 +34,9 @@ export class JobsImportService implements OnModuleInit {
 
   async importExternalJobs() {
     const results: ImportSummary[] = [];
-    results.push(await this.importJSearchJobs());
-    results.push(await this.importRemotiveJobs());
+    const skillKeywords = await this.getSkillKeywords();
+    results.push(await this.importJSearchJobs(skillKeywords));
+    results.push(await this.importRemotiveJobs(skillKeywords));
     return results;
   }
 
@@ -72,32 +73,88 @@ export class JobsImportService implements OnModuleInit {
     return cleaned.replace(/\s+/g, " ").trim();
   }
 
-  private async importJSearchJobs(): Promise<ImportSummary> {
+  private matchesSkills(text: string, skills: string[]) {
+    const normalized = text.toLowerCase();
+    return skills.some((skill) => normalized.includes(skill.toLowerCase()));
+  }
+
+  private async getSkillKeywords() {
+    const enabled = this.config.get<string>("JOBS_IMPORT_USE_SKILLS");
+    if (enabled === "false") return [];
+
+    const limit = Number(this.config.get<string>("JOBS_IMPORT_SKILL_LIMIT") || "6");
+    const skillsFromJoin = await this.prisma.userSkill.findMany({
+      select: { skill: { select: { name: true } } }
+    });
+
+    const joined = skillsFromJoin.map((item) => item.skill.name).filter(Boolean);
+    const profileSkills = await this.prisma.envoyProfile.findMany({
+      select: { skills: true }
+    });
+
+    for (const profile of profileSkills) {
+      if (!profile.skills) continue;
+      const parts = profile.skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean);
+      joined.push(...parts);
+    }
+
+    const counts = new Map<string, number>();
+    for (const skill of joined) {
+      const key = skill.toLowerCase();
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+
+    const ranked = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([skill]) => skill);
+
+    return ranked.slice(0, limit);
+  }
+
+  private async importJSearchJobs(skillKeywords: string[]): Promise<ImportSummary> {
     const apiKey = this.config.get<string>("JSEARCH_API_KEY") || "";
     if (!apiKey) {
       return { source: "JSEARCH", fetched: 0, upserted: 0, skipped: 0 };
     }
 
-    const baseUrl = this.config.get<string>("JSEARCH_API_URL") || "https://api.openwebninja.com/v1/job-search";
-    const query = this.config.get<string>("JSEARCH_QUERY") || "jobs";
+    const rapidApiHost = this.config.get<string>("JSEARCH_RAPIDAPI_HOST") || "jsearch.p.rapidapi.com";
+    const useRapidApi =
+      this.config.get<string>("JSEARCH_RAPIDAPI") === "true" || apiKey.includes("amsh");
+    const baseUrl = useRapidApi
+      ? this.config.get<string>("JSEARCH_API_URL") || "https://jsearch.p.rapidapi.com/search"
+      : this.config.get<string>("JSEARCH_API_URL") || "https://api.openwebninja.com/v1/job-search";
+    const baseQuery = this.config.get<string>("JSEARCH_QUERY") || "jobs";
     const location = this.config.get<string>("JSEARCH_LOCATION") || "Nigeria";
     const country = this.config.get<string>("JSEARCH_COUNTRY") || "ng";
     const datePosted = this.config.get<string>("JSEARCH_DATE_POSTED") || "all";
     const maxPerRun = Number(this.config.get<string>("JOBS_IMPORT_MAX_PER_RUN") || "20");
 
+    const query = skillKeywords.length > 0 ? skillKeywords.join(" OR ") : baseQuery;
     const url = new URL(baseUrl);
-    url.searchParams.set("query", query);
-    url.searchParams.set("location", location);
-    url.searchParams.set("country", country);
-    url.searchParams.set("date_posted", datePosted);
-    url.searchParams.set("page", "1");
-    url.searchParams.set("num_pages", "1");
-
-    const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${apiKey}`
+    if (useRapidApi) {
+      url.searchParams.set("query", `${query} in ${location}`.trim());
+      url.searchParams.set("page", "1");
+      url.searchParams.set("num_pages", "1");
+      if (country) {
+        url.searchParams.set("country", country.toLowerCase());
       }
-    });
+    } else {
+      url.searchParams.set("query", query);
+      url.searchParams.set("location", location);
+      url.searchParams.set("country", country);
+      url.searchParams.set("date_posted", datePosted);
+      url.searchParams.set("page", "1");
+      url.searchParams.set("num_pages", "1");
+    }
+
+    const headers: Record<string, string> = useRapidApi
+      ? { "X-RapidAPI-Key": apiKey, "X-RapidAPI-Host": rapidApiHost }
+      : { Authorization: `Bearer ${apiKey}` };
+
+    const response = await fetch(url.toString(), { headers });
 
     if (!response.ok) {
       this.logger.warn(`JSearch fetch failed: ${response.status}`);
@@ -124,6 +181,10 @@ export class JobsImportService implements OnModuleInit {
       }
 
       const description = this.normalizeText(job?.job_description ?? job?.description);
+      if (skillKeywords.length > 0 && !this.matchesSkills(`${title} ${description}`, skillKeywords)) {
+        skipped += 1;
+        continue;
+      }
       const company = this.normalizeText(job?.employer_name ?? job?.company_name ?? job?.company);
       const locationParts = [
         job?.job_city,
@@ -180,7 +241,7 @@ export class JobsImportService implements OnModuleInit {
     return { source: "JSEARCH", fetched: jobs.length, upserted, skipped };
   }
 
-  private async importRemotiveJobs(): Promise<ImportSummary> {
+  private async importRemotiveJobs(skillKeywords: string[]): Promise<ImportSummary> {
     const enabled = this.config.get<string>("REMOTIVE_ENABLED");
     if (enabled === "false") {
       return { source: "REMOTIVE", fetched: 0, upserted: 0, skipped: 0 };
@@ -224,6 +285,10 @@ export class JobsImportService implements OnModuleInit {
       }
 
       const description = this.normalizeText(job?.description);
+      if (skillKeywords.length > 0 && !this.matchesSkills(`${title} ${description}`, skillKeywords)) {
+        skipped += 1;
+        continue;
+      }
       const company = this.normalizeText(job?.company_name);
       const location = this.normalizeText(job?.candidate_required_location) || "Remote";
 
