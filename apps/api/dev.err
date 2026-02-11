@@ -86,7 +86,7 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
-31m[Nest] 13648  - [39m02/10/2026, 4:50:58 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +14ms[39m
+[31m[Nest] 10736  - [39m02/11/2026, 3:50:38 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +6ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^
@@ -108,7 +108,7 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
-[31m[Nest] 12980  - [39m02/10/2026, 4:52:55 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +8ms[39m
+[31m[Nest] 12980  - [39m02/10/2026, 4:52:55 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +8ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^
@@ -218,7 +218,7 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
-USE: address already in use :::4000[39m[38;5;3m +8ms[39m
+[31m[Nest] 14088  - [39m02/11/2026, 3:50:37 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +5ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^
@@ -240,7 +240,7 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
-[31m[Nest] 22816  - [39m02/10/2026, 10:36:02 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +7ms[39m
+NUSE: address already in use :::4000[39m[38;5;3m +7ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^
@@ -284,8 +284,7 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
-
-[31m[Nest] 17708  - [39m02/10/2026, 9:57:15 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +7ms[39m
+[31m[Nest] 24656  - [39m02/11/2026, 3:50:20 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +5ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^
@@ -307,7 +306,7 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
-[31m[Nest] 19940  - [39m02/10/2026, 10:36:00 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +8ms[39m
+[31m[Nest] 16480  - [39m02/11/2026, 3:50:37 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +4ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^
@@ -329,7 +328,30 @@ Error: listen EADDRINUSE: address already in use :::4000
 }
 
 Node.js v20.12.2
+
 [31m[Nest] 3100  - [39m02/10/2026, 11:23:58 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +8ms[39m
+node:net:1897
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::4000
+    at Server.setupListenHandle [as _listen2] (node:net:1897:16)
+    at listenInCluster (node:net:1945:12)
+    at Server.listen (node:net:2037:7)
+    at ExpressAdapter.listen (C:\src\envoysjobs\node_modules\.pnpm\@nestjs+platform-express@10.3.10_@nestjs+common@10.3.10_class-transformer@0.5.1_class-validat_3kvif5spq7wvxhs5bkoxkrybjm\node_modules\@nestjs\platform-express\adapters\express-adapter.js:95:32)
+    at C:\src\envoysjobs\node_modules\.pnpm\@nestjs+core@10.3.10_@nestjs+common@10.3.10_class-transformer@0.5.1_class-validator@0.14.1_re_tva4fjl6oyedawmhdxireoguqa\node_modules\@nestjs\core\nest-application.js:180:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\src\envoysjobs\node_modules\.pnpm\@nestjs+core@10.3.10_@nestjs+common@10.3.10_class-transformer@0.5.1_class-validator@0.14.1_re_tva4fjl6oyedawmhdxireoguqa\node_modules\@nestjs\core\nest-application.js:170:16)
+    at async bootstrap (C:\src\envoysjobs\apps\api\dist\main.js:20:5) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4000
+}
+
+Node.js v20.12.2
+[31m[Nest] 24848  - [39m02/11/2026, 3:50:20 PM [31m  ERROR[39m [38;5;3m[NestApplication] [39m[31mError: listen EADDRINUSE: address already in use :::4000[39m[38;5;3m +7ms[39m
 node:net:1897
     const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
                ^

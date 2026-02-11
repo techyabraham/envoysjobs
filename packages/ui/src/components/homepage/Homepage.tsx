@@ -45,6 +45,7 @@ interface HomepageProps {
   featuredJobs?: FeaturedJob[];
   featuredServices?: FeaturedService[];
   featuredGigs?: FeaturedGig[];
+  webinars?: { title: string; embedUrl: string }[];
 }
 
 // Mock data
@@ -163,11 +164,13 @@ export function Homepage({
   servicesListed,
   featuredJobs,
   featuredServices,
-  featuredGigs
+  featuredGigs,
+  webinars
 }: HomepageProps) {
   const jobs = featuredJobs?.length ? featuredJobs : fallbackJobs;
   const services = featuredServices?.length ? featuredServices : fallbackServices;
   const gigs = featuredGigs?.length ? featuredGigs : fallbackGigs;
+  const webinarList = webinars ?? [];
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
@@ -273,6 +276,48 @@ export function Homepage({
 
       {/* Community Impact Section */}
       <StatsSection jobsShared={jobsShared} servicesListed={servicesListed} />
+
+      {/* Webinars Teaser */}
+      {webinarList.length > 0 && (
+        <section className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl sm:text-4xl mb-2">Community Webinars</h2>
+                <p className="text-foreground-secondary">Learn, grow, and deliver with excellence.</p>
+              </div>
+              <Button variant="ghost" className="hidden sm:flex" onClick={() => onNavigate?.('webinars')}>
+                View Library
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {webinarList.slice(0, 2).map((webinar, index) => (
+                <div key={index} className="bg-white border border-border rounded-2xl p-4">
+                  <div className="aspect-video w-full overflow-hidden rounded-xl border border-border">
+                    <iframe
+                      src={webinar.embedUrl}
+                      title={webinar.title}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  </div>
+                  <h3 className="text-lg mt-4">{webinar.title}</h3>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 sm:hidden">
+              <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('webinars')}>
+                View Library
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Call to Action */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-deep-blue via-deep-blue-dark to-deep-blue-light text-white">

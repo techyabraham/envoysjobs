@@ -23,12 +23,12 @@ export function Header({ onNavigate, isAuthenticated, userName }: HeaderProps) {
   return (
     <header className="bg-white border-b border-border sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between py-5">
           {/* Logo */}
           <div className="flex items-center">
             <button 
               onClick={() => onNavigate?.('home')}
-              className="flex items-center gap-2 text-deep-blue hover:text-deep-blue-dark transition-colors"
+              className="flex items-center text-deep-blue hover:text-deep-blue-dark transition-colors"
             >
               <img
                 src="/envoysjobs.com-logo.png"

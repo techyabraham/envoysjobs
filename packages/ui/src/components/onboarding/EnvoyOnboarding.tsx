@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, User, MapPin, Briefcase, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '../Button';
 import { Input } from '../Input';
@@ -7,6 +7,13 @@ interface EnvoyOnboardingProps {
   onNavigate?: (page: string) => void;
   onComplete?: (data: any) => void;
   userName?: string;
+  initialData?: Partial<{
+    firstName: string;
+    lastName: string;
+    phone: string;
+    dateOfBirth: string;
+  }>;
+  lockName?: boolean;
 }
 
 type Step = 'personal' | 'skills' | 'location' | 'availability' | 'experience' | 'complete';
@@ -29,14 +36,20 @@ const nigerianStates = [
   'Warri', 'Akure', 'Calabar', 'Uyo', 'Sokoto', 'Maiduguri', 'Bauchi'
 ];
 
-export function EnvoyOnboarding({ onNavigate, onComplete, userName = 'Friend' }: EnvoyOnboardingProps) {
+export function EnvoyOnboarding({
+  onNavigate,
+  onComplete,
+  userName = 'Friend',
+  initialData,
+  lockName = false
+}: EnvoyOnboardingProps) {
   const [currentStep, setCurrentStep] = useState<Step>('personal');
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     // Personal
-    firstName: '',
-    lastName: '',
-    phone: '',
-    dateOfBirth: '',
+    firstName: initialData?.firstName ?? '',
+    lastName: initialData?.lastName ?? '',
+    phone: initialData?.phone ?? '',
+    dateOfBirth: initialData?.dateOfBirth ?? '',
     steward: 'no' as 'yes' | 'no',
     stewardDepartment: '',
     stewardDepartmentOther: '',
@@ -59,7 +72,18 @@ export function EnvoyOnboarding({ onNavigate, onComplete, userName = 'Friend' }:
     yearsOfExperience: '0-1' as '0-1' | '1-3' | '3-5' | '5-10' | '10+',
     bio: '',
     portfolio: ''
-  });
+  }));
+
+  useEffect(() => {
+    if (!initialData) return;
+    setFormData((prev) => ({
+      ...prev,
+      firstName: prev.firstName || initialData.firstName || '',
+      lastName: prev.lastName || initialData.lastName || '',
+      phone: prev.phone || initialData.phone || '',
+      dateOfBirth: prev.dateOfBirth || initialData.dateOfBirth || ''
+    }));
+  }, [initialData]);
 
   const steps: Step[] = ['personal', 'skills', 'location', 'availability', 'experience', 'complete'];
   const currentStepIndex = steps.indexOf(currentStep);
@@ -111,12 +135,16 @@ export function EnvoyOnboarding({ onNavigate, onComplete, userName = 'Friend' }:
                 placeholder="John"
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                disabled={lockName && Boolean(initialData?.firstName)}
+                className={lockName && initialData?.firstName ? 'bg-background-tertiary text-foreground-tertiary cursor-not-allowed' : ''}
               />
               <Input
                 label="Last Name"
                 placeholder="Doe"
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                disabled={lockName && Boolean(initialData?.lastName)}
+                className={lockName && initialData?.lastName ? 'bg-background-tertiary text-foreground-tertiary cursor-not-allowed' : ''}
               />
             </div>
 

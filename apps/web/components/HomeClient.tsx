@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Footer, Header, Homepage } from "@envoysjobs/ui";
+import { Footer, Homepage } from "@envoysjobs/ui";
 import { useSession } from "next-auth/react";
 import { useJobs } from "@/lib/jobs";
 import { usePublicServices } from "@/lib/services";
@@ -11,11 +11,10 @@ import { API_BASE_URL } from "@/lib/api";
 export default function HomeClient() {
   const router = useRouter();
   const { data: session } = useSession();
-  const role = (session as any)?.user?.role as string | undefined;
-  const name = (session as any)?.user?.name as string | undefined;
   const jobs = useJobs();
   const services = usePublicServices();
   const gigs = useAvailableGigs();
+  const role = (session as any)?.user?.role as string | undefined;
 
   const jobsShared = jobs.data ? jobs.data.length.toLocaleString() : "—";
   const servicesListed = services.data ? services.data.length.toLocaleString() : "—";
@@ -49,6 +48,13 @@ export default function HomeClient() {
       case "gig":
         if (id) router.push(`/gigs/${id}`);
         break;
+      case "webinars":
+        if (!session) {
+          router.push("/auth/login");
+          break;
+        }
+        router.push(role === "HIRER" ? "/hirer/webinars" : "/envoy/webinars");
+        break;
       case "dashboard":
         router.push(role === "HIRER" ? "/hirer/dashboard" : "/envoy/dashboard");
         break;
@@ -66,15 +72,20 @@ export default function HomeClient() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header
-        onNavigate={handleNavigate}
-        isAuthenticated={Boolean(session)}
-        userName={name}
-      />
       <Homepage
         onNavigate={handleNavigate}
         jobsShared={jobsShared}
         servicesListed={servicesListed}
+        webinars={[
+          {
+            title: "Building Excellence in Service Delivery",
+            embedUrl: "https://www.youtube.com/embed/R0Pq-mXu9kA"
+          },
+          {
+            title: "Economic Community and Growth",
+            embedUrl: "https://www.youtube.com/embed/LMhkLnHNwRA"
+          }
+        ]}
         featuredJobs={jobs.data?.slice(0, 4).map((job) => ({
           id: job.id,
           title: job.title,

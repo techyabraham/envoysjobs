@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { DashboardLayout } from "@envoysjobs/ui";
+import { signOut } from "next-auth/react";
 
 const pageMap: Record<string, string> = {
   "/envoy/dashboard": "dashboard",
@@ -10,6 +11,7 @@ const pageMap: Record<string, string> = {
   "/envoy/services/new": "services",
   "/envoy/gigs": "gigs",
   "/envoy/gigs/new": "gigs",
+  "/envoy/webinars": "webinars",
   "/envoy/notifications": "notifications",
   "/envoy/messages": "messages",
   "/envoy/profile": "profile",
@@ -22,6 +24,7 @@ const pageMap: Record<string, string> = {
   "/hirer/dashboard": "dashboard",
   "/hirer/jobs": "jobs",
   "/hirer/shortlist": "jobs",
+  "/hirer/webinars": "webinars",
   "/hirer/notifications": "notifications",
   "/hirer/profile": "profile",
   "/hirer/settings": "settings"
@@ -43,6 +46,10 @@ export default function DashboardShell({
       activePage={activePage}
       userName={userName}
       onNavigate={(page) => {
+        if (page === "signout") {
+          signOut({ callbackUrl: "/" });
+          return;
+        }
         if (page === "home") {
           router.push("/");
           return;
@@ -56,6 +63,10 @@ export default function DashboardShell({
             router.push("/envoy/dashboard");
             return;
           }
+          if (page === "webinars") {
+            router.push("/envoy/webinars");
+            return;
+          }
           router.push(`/envoy/${page}`);
           return;
         }
@@ -66,6 +77,10 @@ export default function DashboardShell({
           }
           if (page === "services" || page === "gigs") {
             router.push("/hirer/dashboard");
+            return;
+          }
+          if (page === "webinars") {
+            router.push("/hirer/webinars");
             return;
           }
           router.push(`/hirer/${page}`);

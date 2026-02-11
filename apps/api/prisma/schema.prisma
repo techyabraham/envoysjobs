@@ -156,6 +156,7 @@ model Job {
   title       String
   description String
   categoryId  String?
+  company     String?
   locationType JobLocationType
   location    String?
   salaryMin   Int?
@@ -163,6 +164,10 @@ model Job {
   urgency     String?
   status      JobStatus @default(DRAFT)
   hirerId     String
+  source      String?
+  sourceId    String?
+  sourceUrl   String?
+  applyUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -171,6 +176,8 @@ model Job {
   applications Application[]
   conversations Conversation[]
   savedBy     SavedJob[]
+
+  @@unique([source, sourceId], name: "source_sourceId")
 }
 
 model SavedJob {

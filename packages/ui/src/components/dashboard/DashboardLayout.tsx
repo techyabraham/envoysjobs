@@ -1,9 +1,9 @@
 ﻿"use client";
 
 import React, { useState } from 'react';
-import { 
-  Home, Briefcase, Wrench, Zap, MessageCircle, User, 
-  Bell, Search, Menu, X, Settings, LogOut 
+import {
+  Home, Briefcase, Wrench, Zap, MessageCircle, User,
+  Bell, Search, Menu, X, Settings, LogOut, Video
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -22,6 +22,7 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
     { id: 'jobs', name: 'Jobs', icon: Briefcase },
     { id: 'services', name: 'Services', icon: Wrench },
     { id: 'gigs', name: 'Gigs', icon: Zap },
+    { id: 'webinars', name: 'Webinars', icon: Video },
     { id: 'messages', name: 'Messages', icon: MessageCircle, badge: 3 },
     { id: 'profile', name: 'Profile', icon: User }
   ];
@@ -39,13 +40,12 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col bg-white border-r border-border">
         <div className="flex flex-col flex-1 min-h-0">
           {/* Logo */}
-          <div className="flex items-center gap-2 px-6 py-6 border-b border-border">
+          <div className="flex items-center px-6 py-5 border-b border-border">
             <img
               src="/envoysjobs.com-logo.png"
               alt="EnvoysJobs"
-              className="h-8 w-auto"
+              className="h-16 w-auto"
             />
-            <span className="text-xl font-bold text-foreground">EnvoysJobs</span>
           </div>
 
           {/* Navigation */}
@@ -82,7 +82,7 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
               <span className="font-medium">Settings</span>
             </button>
             <button 
-              onClick={() => onNavigate('home')}
+              onClick={() => onNavigate('signout')}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
             >
               <LogOut className="w-5 h-5" />
@@ -99,14 +99,13 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
           <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-border">
             <div className="flex flex-col h-full">
               {/* Logo */}
-              <div className="flex items-center justify-between px-6 py-6 border-b border-border">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-border">
                 <div className="flex items-center gap-2">
                   <img
                     src="/envoysjobs.com-logo.png"
                     alt="EnvoysJobs"
-                    className="h-8 w-auto"
+                    className="h-16 w-auto"
                   />
-                  <span className="text-xl font-bold text-foreground">EnvoysJobs</span>
                 </div>
                 <button onClick={() => setSidebarOpen(false)}>
                   <X className="w-6 h-6 text-foreground-secondary" />
@@ -150,7 +149,7 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
                   <span className="font-medium">Settings</span>
                 </button>
                 <button 
-                  onClick={() => onNavigate('home')}
+                  onClick={() => onNavigate('signout')}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   <LogOut className="w-5 h-5" />

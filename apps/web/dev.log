@@ -261,3 +261,221 @@
  ✓ Compiled in 4.9s (4731 modules)
  ✓ Compiled in 5.6s (4490 modules)
  ✓ Compiled in 2.7s (2337 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 2s (2394 modules)
+ GET /api/auth/session 200 in 2656ms
+ GET /api/auth/session 200 in 68ms
+ GET /api/auth/session 200 in 58ms
+ GET /api/auth/session 200 in 143ms
+ GET /api/auth/session 200 in 68ms
+ GET /api/auth/session 200 in 114ms
+ GET /api/auth/session 200 in 72ms
+ ○ Compiling /envoy/services ...
+ ✓ Compiled /envoy/services in 3.6s (2398 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 2.1s (2403 modules)
+ GET / 200 in 2608ms
+ GET /api/auth/session 200 in 457ms
+ GET /api/auth/session 200 in 68ms
+ GET /api/auth/session 200 in 61ms
+ GET /api/auth/session 200 in 82ms
+ ✓ Compiled in 6.1s (4710 modules)
+ GET /api/auth/session 200 in 278ms
+ GET /api/auth/session 200 in 80ms
+ GET /api/auth/session 200 in 123ms
+ GET /api/auth/session 200 in 67ms
+ GET /api/auth/session 200 in 109ms
+ GET /api/auth/session 200 in 62ms
+ GET /api/auth/session 200 in 251ms
+ GET /api/auth/session 200 in 88ms
+ GET /api/auth/session 200 in 251ms
+ GET /api/auth/session 200 in 76ms
+ GET /api/auth/session 200 in 113ms
+ GET /api/auth/session 200 in 60ms
+ ○ Compiling /envoy/profile ...
+ ✓ Compiled /envoy/profile in 1923ms (2397 modules)
+ GET /api/auth/session 200 in 226ms
+ GET /api/auth/session 200 in 73ms
+ GET /api/auth/session 200 in 99ms
+ GET /api/auth/session 200 in 60ms
+ GET / 200 in 281ms
+ GET /api/auth/session 200 in 128ms
+ GET /api/auth/session 200 in 69ms
+ GET /api/auth/session 200 in 68ms
+ ○ Compiling /services ...
+ ✓ Compiled /services in 1810ms (2156 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1799ms (2390 modules)
+ GET /api/auth/session 200 in 2416ms
+ GET /api/auth/session 200 in 65ms
+ GET /api/auth/session 200 in 77ms
+ ✓ Compiled in 9s (4727 modules)
+ GET /api/auth/session 200 in 6031ms
+ GET /api/auth/session 200 in 93ms
+ ✓ Compiled in 5.1s (4727 modules)
+ GET /api/auth/session 200 in 201ms
+ GET /api/auth/session 200 in 76ms
+ GET /api/auth/session 200 in 127ms
+ GET /api/auth/session 200 in 67ms
+ GET /api/auth/session 200 in 140ms
+ GET /api/auth/session 200 in 110ms
+ GET /api/auth/session 200 in 86ms
+ ○ Compiling /messages ...
+ ✓ Compiled /messages in 10.2s (4734 modules)
+ GET /api/auth/session 200 in 673ms
+ GET /api/auth/session 200 in 248ms
+ ✓ Compiled in 9.8s (4737 modules)
+ GET /services 200 in 1492ms
+ GET /api/auth/session 200 in 346ms
+ GET /api/auth/session 200 in 101ms
+ GET /api/auth/session 200 in 85ms
+ ✓ Compiled in 5.2s (4737 modules)
+ GET /api/auth/session 200 in 226ms
+ GET /api/auth/session 200 in 91ms
+ GET /api/auth/session 200 in 101ms
+ GET /api/auth/session 200 in 80ms
+ GET /api/auth/session 200 in 159ms
+ GET /api/auth/session 200 in 72ms
+ GET /api/auth/session 200 in 220ms
+ GET /api/auth/session 200 in 105ms
+ ○ Compiling /services/[id] ...
+ ✓ Compiled /services/[id] in 1604ms (2155 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1450ms (2392 modules)
+ GET /api/auth/session 200 in 1966ms
+ GET /api/auth/session 200 in 76ms
+ GET /api/auth/session 200 in 358ms
+ GET /api/auth/session 200 in 74ms
+ GET /api/auth/session 200 in 149ms
+ GET /api/auth/session 200 in 77ms
+ GET /api/auth/session 200 in 148ms
+ GET /api/auth/session 200 in 72ms
+ GET /api/auth/session 200 in 152ms
+ GET /api/auth/session 200 in 73ms
+ ○ Compiling /gigs ...
+ ✓ Compiled /gigs in 1474ms (2396 modules)
+ ○ Compiling /jobs/[id] ...
+ ✓ Compiled /jobs/[id] in 1654ms (2402 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 25.4s (4732 modules)
+ GET /api/auth/session 200 in 23165ms
+ GET / 200 in 21471ms
+ ○ Compiling /jobs/[id] ...
+ ✓ Compiled /jobs/[id] in 28.7s (4738 modules)
+ GET /api/auth/session 200 in 20186ms
+ GET /jobs/cmle1ogof00087h98s2xiumrg 200 in 12097ms
+ POST /api/auth/_log 200 in 573ms
+ GET /api/auth/session 200 in 848ms
+ ○ Compiling /auth/signup ...
+ ✓ Compiled /auth/signup in 20.7s (4745 modules)
+ GET /api/auth/session 200 in 21657ms
+ GET /api/auth/session 200 in 2682ms
+ GET /api/auth/session 200 in 197ms
+ GET /api/auth/session 200 in 90ms
+ GET /api/auth/session 200 in 108ms
+ GET /api/auth/session 200 in 129ms
+ GET /api/auth/session 200 in 320ms
+ ✓ Compiled in 3.8s (2341 modules)
+ GET /api/auth/session 200 in 144ms
+ GET /api/auth/session 200 in 349ms
+ GET /api/auth/session 200 in 85ms
+ ✓ Compiled in 7.5s (4716 modules)
+ ✓ Compiled in 2.7s (2341 modules)
+ GET /api/auth/session 200 in 337ms
+ GET /api/auth/session 200 in 101ms
+ GET /api/auth/providers 200 in 217ms
+ GET /api/auth/csrf 200 in 190ms
+ POST /api/auth/callback/credentials 200 in 350ms
+ GET /api/auth/session 200 in 133ms
+ ○ Compiling /onboarding/envoy ...
+ ✓ Compiled /onboarding/envoy in 4.9s (4722 modules)
+ GET /api/auth/session 200 in 255ms
+ GET /api/auth/session 200 in 81ms
+ ○ Compiling /envoy/dashboard ...
+ ✓ Compiled /envoy/dashboard in 4.6s (2141 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1924ms (2377 modules)
+ GET /api/auth/session 200 in 2579ms
+ GET /api/auth/session 200 in 95ms
+ GET /api/auth/session 200 in 150ms
+ GET /api/auth/session 200 in 91ms
+ ○ Compiling /envoy/webinars ...
+ ✓ Compiled /envoy/webinars in 3.2s (4727 modules)
+ GET /api/auth/session 200 in 355ms
+ GET /api/auth/session 200 in 144ms
+ GET /api/auth/session 200 in 196ms
+ GET /api/auth/session 200 in 101ms
+ GET /api/auth/session 200 in 199ms
+ GET /api/auth/session 200 in 124ms
+ GET /api/auth/session 200 in 141ms
+ GET /api/auth/session 200 in 107ms
+ GET /api/auth/session 200 in 132ms
+ GET /api/auth/session 200 in 90ms
+ ○ Compiling /envoy/profile ...
+ ✓ Compiled /envoy/profile in 3.1s (2401 modules)
+ GET / 200 in 684ms
+ GET /api/auth/session 200 in 291ms
+ GET /api/auth/session 200 in 127ms
+ GET /api/auth/session 200 in 111ms
+ GET / 200 in 146ms
+ GET /api/auth/session 200 in 164ms
+ GET /api/auth/session 200 in 82ms
+ GET /api/auth/session 200 in 81ms
+ GET /api/auth/session 200 in 253ms
+ GET /api/auth/session 200 in 99ms
+ GET /api/auth/session 200 in 184ms
+ GET /api/auth/session 200 in 96ms
+ ✓ Compiled in 8.3s (4741 modules)
+ ✓ Compiled in 5.7s (4741 modules)
+ GET /api/auth/session 200 in 271ms
+ GET /api/auth/session 200 in 93ms
+ GET /api/auth/session 200 in 145ms
+ ○ Compiling /auth/signup ...
+ ✓ Compiled /auth/signup in 1234ms (2401 modules)
+ ○ Compiling /gigs/[id] ...
+ ✓ Compiled /gigs/[id] in 17.3s (2160 modules)
+ ✓ Compiled in 6.4s (4498 modules)
+ ✓ Compiled in 4.5s (2345 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1153ms (2394 modules)
+ GET /api/auth/session 200 in 1702ms
+ GET /api/auth/session 200 in 100ms
+ GET /api/auth/session 200 in 184ms
+ GET /api/auth/session 200 in 81ms
+ ○ Compiling /jobs ...
+ ✓ Compiled /jobs in 2.7s (2400 modules)
+ ○ Compiling /jobs/filters ...
+ ✓ Compiled /jobs/filters in 2.9s (4728 modules)
+ GET /jobs/filters 200 in 3478ms
+ GET /api/auth/session 200 in 355ms
+ GET /api/auth/session 200 in 96ms
+ GET /api/auth/session 200 in 83ms
+ GET /api/auth/session 200 in 82ms
+ GET /api/auth/session 200 in 213ms
+ GET /api/auth/session 200 in 116ms
+ GET /api/auth/session 200 in 126ms
+ GET /api/auth/session 200 in 109ms
+ GET /api/auth/session 200 in 168ms
+ GET /api/auth/session 200 in 94ms
+ GET /jobs 200 in 386ms
+ GET /api/auth/session 200 in 201ms
+ GET /api/auth/session 200 in 114ms
+ GET /api/auth/session 200 in 143ms
+ GET /api/auth/session 200 in 809ms
+ GET /api/auth/session 200 in 119ms
+ ○ Compiling /gigs ...
+ ✓ Compiled /gigs in 2.4s (2399 modules)
+ GET /api/auth/session 200 in 396ms
+ GET /api/auth/session 200 in 110ms
+ GET /api/auth/session 200 in 191ms
+ GET /api/auth/session 200 in 119ms
+ ○ Compiling /services ...
+ ✓ Compiled /services in 3.6s (2403 modules)
+ ○ Compiling /services/[id] ...
+ ✓ Compiled /services/[id] in 1399ms (2407 modules)
+ GET /api/auth/session 200 in 347ms
+ GET /api/auth/session 200 in 110ms
+ GET /api/auth/session 200 in 246ms
+ GET /api/auth/session 200 in 138ms
+ ○ Compiling /messages ...
+ ✓ Compiled /messages in 6.5s (2400 modules)
