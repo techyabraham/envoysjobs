@@ -10,6 +10,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const throttler_1 = require("@nestjs/throttler");
+const schedule_1 = require("@nestjs/schedule");
 const app_controller_1 = require("./modules/app/app.controller");
 const app_service_1 = require("./modules/app/app.service");
 const prisma_module_1 = require("./modules/prisma/prisma.module");
@@ -36,6 +37,7 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
                 envFilePath: [".env.local", ".env", "apps/api/.env.local", "apps/api/.env"]
             }),
+            schedule_1.ScheduleModule.forRoot(),
             throttler_1.ThrottlerModule.forRoot({
                 throttlers: [{ ttl: 60, limit: 20 }]
             }),

@@ -25,12 +25,12 @@ export function mapJobToCard(job: Job): JobCard {
   return {
     id: job.id,
     title: job.title,
-    company: "EnvoysJobs",
+    company: job.company ?? "EnvoysJobs",
     location: job.location ?? (job.locationType === "REMOTE" ? "Remote" : "Onsite"),
     pay: formatSalary(job.salaryMin, job.salaryMax),
     type: "Full-time",
     postedTime: "Recently",
-    fromMember: false,
+    fromMember: !job.source,
     remote: job.locationType === "REMOTE",
     skills: [],
     applicants: 0

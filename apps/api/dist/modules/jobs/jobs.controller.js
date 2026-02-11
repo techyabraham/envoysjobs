@@ -17,7 +17,10 @@ const common_1 = require("@nestjs/common");
 const zod_1 = require("zod");
 const zod_validation_pipe_1 = require("../../common/zod-validation.pipe");
 const jwt_auth_guard_1 = require("../../common/jwt-auth.guard");
+const roles_decorator_1 = require("../../common/roles.decorator");
+const roles_guard_1 = require("../../common/roles.guard");
 const jobs_service_1 = require("./jobs.service");
+const jobs_import_service_1 = require("./jobs.import.service");
 const jobCreateSchema = zod_1.z.object({
     title: zod_1.z.string().min(2),
     description: zod_1.z.string().min(2),
@@ -30,8 +33,9 @@ const jobCreateSchema = zod_1.z.object({
 });
 const jobUpdateSchema = jobCreateSchema.partial();
 let JobsController = class JobsController {
-    constructor(jobsService) {
+    constructor(jobsService, jobsImport) {
         this.jobsService = jobsService;
+        this.jobsImport = jobsImport;
     }
     create(req, body) {
         return this.jobsService.create({ ...body, hirerId: req.user?.id || "" });
@@ -59,6 +63,9 @@ let JobsController = class JobsController {
     }
     unsave(req, id) {
         return this.jobsService.unsaveJob(req.user?.id || "", id);
+    }
+    importExternal() {
+        return this.jobsImport.importExternalJobs();
     }
 };
 exports.JobsController = JobsController;
@@ -136,7 +143,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], JobsController.prototype, "unsave", null);
+__decorate([
+    (0, common_1.Post)("import/external"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], JobsController.prototype, "importExternal", null);
 exports.JobsController = JobsController = __decorate([
     (0, common_1.Controller)("jobs"),
-    __metadata("design:paramtypes", [jobs_service_1.JobsService])
+    __metadata("design:paramtypes", [jobs_service_1.JobsService, jobs_import_service_1.JobsImportService])
 ], JobsController);

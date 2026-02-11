@@ -2,7 +2,10 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards 
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
+import { Roles } from "../../common/roles.decorator";
+import { RolesGuard } from "../../common/roles.guard";
 import { JobsService } from "./jobs.service";
+import { JobsImportService } from "./jobs.import.service";
 
 const jobCreateSchema = z.object({
   title: z.string().min(2),
@@ -19,7 +22,7 @@ const jobUpdateSchema = jobCreateSchema.partial();
 
 @Controller("jobs")
 export class JobsController {
-  constructor(private jobsService: JobsService) {}
+  constructor(private jobsService: JobsService, private jobsImport: JobsImportService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -74,5 +77,12 @@ export class JobsController {
   @UseGuards(JwtAuthGuard)
   unsave(@Req() req: any, @Param("id") id: string) {
     return this.jobsService.unsaveJob(req.user?.id || "", id);
+  }
+
+  @Post("import/external")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  importExternal() {
+    return this.jobsImport.importExternalJobs();
   }
 }

@@ -34,10 +34,11 @@ export default function Page() {
   const mappedJob = useMemo(() => {
     if (!job) return undefined;
     const locationLabel = job.location ?? (job.locationType === "REMOTE" ? "Remote" : "Onsite");
+    const sourceLabel = job.source ?? "EnvoysJobs";
     return {
       id: job.id,
       title: job.title,
-      company: "EnvoysJobs",
+      company: job.company ?? "EnvoysJobs",
       location: locationLabel,
       locationType: job.locationType === "REMOTE" ? "Remote" : job.locationType === "HYBRID" ? "Hybrid" : "Onsite",
       salary: formatSalary(job.salaryMin, job.salaryMax),
@@ -47,7 +48,7 @@ export default function Page() {
       postedDate: "Recently",
       applicants: 0,
       views: 0,
-      fromMember: false,
+      fromMember: !job.source,
       memberVerified: false,
       description: job.description ?? "",
       responsibilities: ["Deliver quality work and communicate clearly.", "Collaborate with the hirer to meet milestones."],
@@ -58,7 +59,10 @@ export default function Page() {
       aboutCompany: "Company details will be shared after application.",
       companySize: "Not specified",
       companyIndustry: "Not specified",
-      companyWebsite: "#"
+      companyWebsite: "#",
+      source: sourceLabel,
+      sourceUrl: job.sourceUrl ?? undefined,
+      applyUrl: job.applyUrl ?? undefined
     };
   }, [job]);
 
@@ -112,6 +116,10 @@ export default function Page() {
       }}
       onApply={async () => {
         if (!jobId) return;
+        if (job?.applyUrl) {
+          window.open(job.applyUrl, "_blank", "noopener,noreferrer");
+          return;
+        }
         const res = await api(`/jobs/${jobId}/apply`, { method: "POST" });
         if (res.error) {
           alert("Failed to apply.");

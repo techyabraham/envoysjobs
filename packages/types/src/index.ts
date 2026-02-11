@@ -48,6 +48,7 @@ export type JobDTO = {
   title: string;
   category: string;
   description: string;
+  company?: string | null;
   locationType: JobLocationType;
   location?: string | null;
   salaryMin?: number | null;
@@ -55,6 +56,10 @@ export type JobDTO = {
   urgency?: string | null;
   status: "DRAFT" | "PUBLISHED" | "CLOSED";
   hirerId: string;
+  source?: string | null;
+  sourceId?: string | null;
+  sourceUrl?: string | null;
+  applyUrl?: string | null;
 };
 
 export type AutoMessageTemplateDTO = {

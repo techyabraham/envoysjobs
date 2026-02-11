@@ -1,6 +1,7 @@
 ﻿import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
+import { ScheduleModule } from "@nestjs/schedule";
 import { AppController } from "./modules/app/app.controller";
 import { AppService } from "./modules/app/app.service";
 import { PrismaModule } from "./modules/prisma/prisma.module";
@@ -24,6 +25,7 @@ import { GigsModule } from "./modules/gigs/gigs.module";
       isGlobal: true,
       envFilePath: [".env.local", ".env", "apps/api/.env.local", "apps/api/.env"]
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60, limit: 20 }]
     }),

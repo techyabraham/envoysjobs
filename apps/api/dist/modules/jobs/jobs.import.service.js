@@ -40,7 +40,7 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
     }
     async importExternalJobs() {
         const results = [];
-        results.push(await this.importAdzunaJobs());
+        results.push(await this.importJSearchJobs());
         results.push(await this.importRemotiveJobs());
         return results;
     }
@@ -74,60 +74,77 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
         const cleaned = (0, sanitize_html_1.default)(text, { allowedTags: [], allowedAttributes: {} });
         return cleaned.replace(/\s+/g, " ").trim();
     }
-    async importAdzunaJobs() {
-        const appId = this.config.get("ADZUNA_APP_ID") || "";
-        const appKey = this.config.get("ADZUNA_APP_KEY") || "";
-        if (!appId || !appKey) {
+    async importJSearchJobs() {
+        const apiKey = this.config.get("JSEARCH_API_KEY") || "";
+        if (!apiKey) {
             return { source: "ADZUNA", fetched: 0, upserted: 0, skipped: 0 };
         }
-        const country = this.config.get("ADZUNA_COUNTRY") || "ng";
-        const pageSize = Number(this.config.get("ADZUNA_PAGE_SIZE") || "20");
-        const url = new URL(`https://api.adzuna.com/v1/api/jobs/${country}/search/1`);
-        url.searchParams.set("app_id", appId);
-        url.searchParams.set("app_key", appKey);
-        url.searchParams.set("results_per_page", String(pageSize));
-        url.searchParams.set("content-type", "application/json");
-        url.searchParams.set("sort_by", "date");
-        const response = await fetch(url.toString());
+        const baseUrl = this.config.get("JSEARCH_API_URL") || "https://api.openwebninja.com/v1/job-search";
+        const query = this.config.get("JSEARCH_QUERY") || "jobs";
+        const location = this.config.get("JSEARCH_LOCATION") || "Nigeria";
+        const country = this.config.get("JSEARCH_COUNTRY") || "ng";
+        const datePosted = this.config.get("JSEARCH_DATE_POSTED") || "all";
+        const maxPerRun = Number(this.config.get("JOBS_IMPORT_MAX_PER_RUN") || "20");
+        const url = new URL(baseUrl);
+        url.searchParams.set("query", query);
+        url.searchParams.set("location", location);
+        url.searchParams.set("country", country);
+        url.searchParams.set("date_posted", datePosted);
+        url.searchParams.set("page", "1");
+        url.searchParams.set("num_pages", "1");
+        const response = await fetch(url.toString(), {
+            headers: {
+                Authorization: `Bearer ${apiKey}`
+            }
+        });
         if (!response.ok) {
-            this.logger.warn(`Adzuna fetch failed: ${response.status}`);
+            this.logger.warn(`JSearch fetch failed: ${response.status}`);
             return { source: "ADZUNA", fetched: 0, upserted: 0, skipped: 0 };
         }
         const data = (await response.json());
-        const results = data.results ?? [];
+        const jobs = (data.jobs ?? data.data ?? data.results ?? []).slice(0, maxPerRun);
         const hirerId = await this.getSystemHirerId();
         let upserted = 0;
         let skipped = 0;
-        for (const job of results) {
-            const sourceId = String(job?.id ?? "");
+        for (const job of jobs) {
+            const sourceId = String(job?.job_id ?? job?.id ?? "");
             if (!sourceId) {
                 skipped += 1;
                 continue;
             }
-            const locationName = job?.location?.display_name ??
-                (Array.isArray(job?.location?.area) ? job.location.area.join(", ") : null);
-            const title = this.normalizeText(job?.title);
+            const title = this.normalizeText(job?.job_title ?? job?.title);
             if (!title) {
                 skipped += 1;
                 continue;
             }
-            const description = this.normalizeText(job?.description);
-            const company = this.normalizeText(job?.company?.display_name);
-            const locationType = typeof locationName === "string" && locationName.toLowerCase().includes("remote")
-                ? "REMOTE"
-                : "ONSITE";
+            const description = this.normalizeText(job?.job_description ?? job?.description);
+            const company = this.normalizeText(job?.employer_name ?? job?.company_name ?? job?.company);
+            const locationParts = [
+                job?.job_city,
+                job?.job_state,
+                job?.job_country
+            ].filter(Boolean);
+            const locationName = locationParts.length > 0 ? locationParts.join(", ") : this.normalizeText(job?.job_location ?? location);
+            const isRemote = Boolean(job?.job_is_remote);
+            const locationType = isRemote ? "REMOTE" : "ONSITE";
+            const minSalaryRaw = job?.job_min_salary ?? job?.min_salary;
+            const maxSalaryRaw = job?.job_max_salary ?? job?.max_salary;
+            const salaryMin = Number.isFinite(Number(minSalaryRaw)) ? Math.round(Number(minSalaryRaw)) : undefined;
+            const salaryMax = Number.isFinite(Number(maxSalaryRaw)) ? Math.round(Number(maxSalaryRaw)) : undefined;
+            const applyUrl = job?.job_apply_link ?? job?.apply_url ?? job?.job_url ?? job?.url;
+            const sourceUrl = job?.job_google_link ?? applyUrl;
             await this.prisma.job.upsert({
-                where: { source_sourceId: { source: "ADZUNA", sourceId } },
+                where: { source_sourceId: { source: "JSEARCH", sourceId } },
                 update: {
                     title,
                     description,
                     locationType,
                     location: locationName ?? undefined,
-                    salaryMin: job?.salary_min ? Math.round(job.salary_min) : undefined,
-                    salaryMax: job?.salary_max ? Math.round(job.salary_max) : undefined,
+                    salaryMin,
+                    salaryMax,
                     company: company || undefined,
-                    sourceUrl: job?.redirect_url ?? undefined,
-                    applyUrl: job?.redirect_url ?? undefined,
+                    sourceUrl: sourceUrl ?? undefined,
+                    applyUrl: applyUrl ?? undefined,
                     status: "PUBLISHED"
                 },
                 create: {
@@ -135,20 +152,20 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
                     description,
                     locationType,
                     location: locationName ?? undefined,
-                    salaryMin: job?.salary_min ? Math.round(job.salary_min) : undefined,
-                    salaryMax: job?.salary_max ? Math.round(job.salary_max) : undefined,
+                    salaryMin,
+                    salaryMax,
                     company: company || undefined,
-                    source: "ADZUNA",
+                    source: "JSEARCH",
                     sourceId,
-                    sourceUrl: job?.redirect_url ?? undefined,
-                    applyUrl: job?.redirect_url ?? undefined,
+                    sourceUrl: sourceUrl ?? undefined,
+                    applyUrl: applyUrl ?? undefined,
                     status: "PUBLISHED",
                     hirerId
                 }
             });
             upserted += 1;
         }
-        return { source: "ADZUNA", fetched: results.length, upserted, skipped };
+        return { source: "ADZUNA", fetched: jobs.length, upserted, skipped };
     }
     async importRemotiveJobs() {
         const enabled = this.config.get("REMOTIVE_ENABLED");
@@ -162,8 +179,9 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
             this.logger.warn(`Remotive fetch failed: ${response.status}`);
             return { source: "REMOTIVE", fetched: 0, upserted: 0, skipped: 0 };
         }
+        const maxPerRun = Number(this.config.get("JOBS_IMPORT_MAX_PER_RUN") || "20");
         const data = (await response.json());
-        const results = data.jobs ?? [];
+        const results = (data.jobs ?? []).slice(0, maxPerRun);
         const hirerId = await this.getSystemHirerId();
         let upserted = 0;
         let skipped = 0;

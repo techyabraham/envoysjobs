@@ -67,7 +67,10 @@ We believe in creating an inclusive, supportive environment where everyone can d
 
   companySize: '50-100 employees',
   companyIndustry: 'Technology',
-  companyWebsite: 'https://techinnovations.ng'
+  companyWebsite: 'https://techinnovations.ng',
+  source: 'EnvoysJobs',
+  sourceUrl: '#',
+  applyUrl: '#'
 };
 
 type JobDetailsData = typeof jobData;
@@ -121,6 +124,11 @@ export function JobDetailsPage({ onBack, onApply, job, saved, onToggleSave, onMe
                     From Our Members
                   </div>
                 )}
+                {data.source && data.source !== "EnvoysJobs" && (
+                  <div className="inline-flex items-center gap-1 px-3 py-1 bg-background-secondary text-foreground-secondary rounded-lg text-sm">
+                    Source: {data.source}
+                  </div>
+                )}
                 {data.memberVerified && (
                   <Badge variant="success">
                     <CheckCircle className="w-3 h-3" />
@@ -153,6 +161,14 @@ export function JobDetailsPage({ onBack, onApply, job, saved, onToggleSave, onMe
               >
                 <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
               </Button>
+              {data.applyUrl && data.applyUrl !== "#" && (
+                <Button
+                  variant="ghost"
+                  onClick={() => window.open(data.applyUrl, "_blank", "noopener,noreferrer")}
+                >
+                  View Original
+                </Button>
+              )}
               <Button variant="ghost">
                 <Share2 className="w-5 h-5" />
               </Button>

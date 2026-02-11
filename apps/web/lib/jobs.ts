@@ -7,6 +7,7 @@ export type Job = {
   id: string;
   title: string;
   description: string;
+  company?: string | null;
   locationType: "ONSITE" | "REMOTE" | "HYBRID";
   location?: string | null;
   salaryMin?: number | null;
@@ -14,6 +15,10 @@ export type Job = {
   urgency?: string | null;
   status: "DRAFT" | "PUBLISHED" | "CLOSED";
   hirerId: string;
+  source?: string | null;
+  sourceId?: string | null;
+  sourceUrl?: string | null;
+  applyUrl?: string | null;
 };
 
 export function useJobs() {
