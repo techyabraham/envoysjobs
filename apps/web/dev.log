@@ -151,3 +151,113 @@
  GET /api/auth/session 500 in 290ms
  POST /api/auth/_log 500 in 369ms
  GET /services/cmle2h4p70005xr3470m9vuqm 500 in 335ms
+ ✓ Compiled /_not-found in 8.8s (4463 modules)
+ GET /_next/static/webpack/3119f85e269e4449.webpack.hot-update.json 404 in 9571ms
+ GET /envoy/services/new 200 in 578ms
+ GET /_next/static/webpack/3119f85e269e4449.webpack.hot-update.json 404 in 508ms
+ ○ Compiling /services/[id] ...
+ ✓ Compiled /services/[id] in 7.9s (4449 modules)
+ GET /services/cmle2h4p70005xr3470m9vuqm 200 in 8615ms
+ GET /_next/static/webpack/3119f85e269e4449.webpack.hot-update.json 404 in 4788ms
+ GET /envoy/services/new 200 in 8722ms
+ GET /services/cmle2h4p70005xr3470m9vuqm 200 in 2784ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 3.9s (2378 modules)
+ GET /api/auth/session 200 in 7452ms
+ GET /api/auth/session 200 in 68ms
+ GET /api/auth/session 200 in 59ms
+ GET /api/auth/session 200 in 56ms
+ GET /api/auth/session 200 in 63ms
+ GET /api/auth/session 200 in 60ms
+ GET /api/auth/session 200 in 712ms
+ GET /api/auth/session 200 in 107ms
+ GET /api/auth/session 200 in 115ms
+ GET /api/auth/session 200 in 95ms
+ GET /api/auth/session 200 in 65ms
+ GET /services/cmle2h4p70005xr3470m9vuqm 200 in 455ms
+ GET /api/auth/session 200 in 118ms
+ GET /api/auth/session 200 in 61ms
+ GET /api/auth/session 200 in 65ms
+ GET /api/auth/session 200 in 54ms
+ GET / 200 in 246ms
+ GET /api/auth/session 200 in 183ms
+ GET /api/auth/session 200 in 81ms
+ GET /api/auth/session 200 in 58ms
+ GET /api/auth/session 200 in 164ms
+ GET /api/auth/session 200 in 60ms
+ ○ Compiling /gigs/[id] ...
+ ✓ Compiled /gigs/[id] in 3.6s (4467 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 2.6s (2372 modules)
+ GET /api/auth/session 200 in 3290ms
+ GET /api/auth/session 200 in 297ms
+ GET /api/auth/session 200 in 2285ms
+ GET /api/auth/session 200 in 159ms
+ GET /api/auth/session 200 in 254ms
+ GET /api/auth/session 200 in 91ms
+ GET /api/auth/session 200 in 121ms
+ GET /api/auth/session 200 in 60ms
+ ○ Compiling /envoy/services ...
+ ✓ Compiled /envoy/services in 2.5s (2377 modules)
+ ○ Compiling /envoy/dashboard ...
+ ✓ Compiled /envoy/dashboard in 2.2s (2383 modules)
+ GET /api/auth/session 200 in 307ms
+ GET /api/auth/session 200 in 67ms
+ GET /api/auth/session 200 in 98ms
+ GET /api/auth/session 200 in 95ms
+ GET /api/auth/session 200 in 92ms
+ GET /api/auth/session 200 in 68ms
+ GET /api/auth/session 200 in 121ms
+ GET /api/auth/session 200 in 70ms
+ ○ Compiling /envoy/jobs ...
+ ✓ Compiled /envoy/jobs in 2.9s (2397 modules)
+ ○ Compiling /envoy/services ...
+ ✓ Compiled /envoy/services in 604ms (2401 modules)
+ ○ Compiling /envoy/gigs ...
+ ✓ Compiled /envoy/gigs in 4.6s (4738 modules)
+ ✓ Compiled in 1568ms (2333 modules)
+ GET /api/auth/session 200 in 259ms
+ GET /api/auth/session 200 in 65ms
+ GET /services/cmle2h4p70005xr3470m9vuqm 200 in 427ms
+ GET /api/auth/session 200 in 133ms
+ GET /api/auth/session 200 in 59ms
+ GET /api/auth/session 200 in 54ms
+ GET / 200 in 148ms
+ GET /api/auth/session 200 in 122ms
+ GET /api/auth/session 200 in 88ms
+ GET /api/auth/session 200 in 62ms
+ ○ Compiling /messages ...
+ ✓ Compiled /messages in 4.6s (4733 modules)
+ ○ Compiling /envoy/profile ...
+ ✓ Compiled /envoy/profile in 1625ms (2403 modules)
+ ○ Compiling /envoy/services ...
+ ✓ Compiled /envoy/services in 590ms (2407 modules)
+ ○ Compiling /envoy/services/new ...
+ ✓ Compiled /envoy/services/new in 1343ms (2170 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1517ms (2393 modules)
+ GET /api/auth/session 200 in 2010ms
+ GET /api/auth/session 200 in 70ms
+ GET /api/auth/session 200 in 63ms
+ ○ Compiling /envoy/services ...
+ ✓ Compiled /envoy/services in 822ms (2397 modules)
+ GET /api/auth/session 200 in 413ms
+ GET /api/auth/session 200 in 54ms
+ GET /api/auth/session 200 in 166ms
+ GET /api/auth/session 200 in 76ms
+ GET /api/auth/session 200 in 131ms
+ GET /api/auth/session 200 in 66ms
+ ○ Compiling /envoy/dashboard ...
+ ✓ Compiled /envoy/dashboard in 3.8s (2403 modules)
+ ○ Compiling /envoy/gigs ...
+ ✓ Compiled /envoy/gigs in 2.9s (2403 modules)
+ ○ Compiling /envoy/gigs/new ...
+ ✓ Compiled /envoy/gigs/new in 10s (4498 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 2.4s (2394 modules)
+ GET /api/auth/session 200 in 2934ms
+ GET /api/auth/session 200 in 98ms
+ GET /api/auth/session 200 in 80ms
+ ✓ Compiled in 4.9s (4731 modules)
+ ✓ Compiled in 5.6s (4490 modules)
+ ✓ Compiled in 2.7s (2337 modules)

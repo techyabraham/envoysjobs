@@ -33,9 +33,8 @@ export function Header({ onNavigate, isAuthenticated, userName }: HeaderProps) {
               <img
                 src="/envoysjobs.com-logo.png"
                 alt="EnvoysJobs"
-                className="h-8 w-auto"
+                className="h-16 w-auto"
               />
-              <span className="text-xl font-bold">EnvoysJobs</span>
             </button>
           </div>
 
