@@ -5,7 +5,7 @@ import { Menu, X, User } from 'lucide-react';
 import { Button } from '../Button';
 
 interface HeaderProps {
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, id?: string) => void;
   isAuthenticated?: boolean;
   userName?: string;
 }

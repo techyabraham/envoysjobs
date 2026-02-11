@@ -11,11 +11,12 @@ interface GigCardProps {
   duration: string;
   urgent?: boolean;
   postedBy: string;
+  onAction?: () => void;
 }
 
-export function GigCard({ title, amount, location, duration, urgent, postedBy }: GigCardProps) {
+export function GigCard({ title, amount, location, duration, urgent, postedBy, onAction }: GigCardProps) {
   return (
-    <Card hover className="flex flex-col h-full">
+    <Card hover className="flex flex-col h-full" onClick={onAction}>
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-base font-semibold text-foreground flex-1">{title}</h3>
         {urgent && (
@@ -42,7 +43,7 @@ export function GigCard({ title, amount, location, duration, urgent, postedBy }:
       </div>
 
       <div className="mt-auto">
-        <Button variant="success" size="sm" className="w-full">
+        <Button variant="success" size="sm" className="w-full" onClick={onAction}>
           Apply for Gig
         </Button>
       </div>

@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServicesController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const zod_1 = require("zod");
 const zod_validation_pipe_1 = require("../../common/zod-validation.pipe");
 const jwt_auth_guard_1 = require("../../common/jwt-auth.guard");
@@ -45,6 +46,9 @@ let ServicesController = class ServicesController {
     update(req, id, body) {
         return this.servicesService.update(id, req.user?.id || "", body);
     }
+    uploadImage(req, id, file) {
+        return this.servicesService.uploadImage(id, req.user?.id || "", file);
+    }
 };
 exports.ServicesController = ServicesController;
 __decorate([
@@ -74,7 +78,6 @@ __decorate([
 ], ServicesController.prototype, "listAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -91,6 +94,27 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, void 0]),
     __metadata("design:returntype", void 0)
 ], ServicesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Post)(":id/image"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ENVOY"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file", {
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: (req, file, cb) => {
+            const allowed = ["image/jpeg", "image/png"];
+            if (!allowed.includes(file.mimetype)) {
+                return cb(new Error("Invalid file type"), false);
+            }
+            cb(null, true);
+        }
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "uploadImage", null);
 exports.ServicesController = ServicesController = __decorate([
     (0, common_1.Controller)("services"),
     __metadata("design:paramtypes", [services_service_1.ServicesService])

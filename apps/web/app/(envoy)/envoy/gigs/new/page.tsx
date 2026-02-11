@@ -5,10 +5,12 @@ import PageShell from "@/components/PageShell";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCreateGig } from "@/lib/gigs";
+import { useSession } from "next-auth/react";
 
 export default function Page() {
   const router = useRouter();
   const createGig = useCreateGig();
+  const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [location, setLocation] = useState("");
@@ -19,6 +21,20 @@ export default function Page() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
+    if (status === "loading") {
+      setError("Please wait, loading session...");
+      return;
+    }
+    const role = (session as any)?.user?.role as string | undefined;
+    if (!session) {
+      setError("Please sign in to post a gig.");
+      router.push("/auth/login");
+      return;
+    }
+    if (role !== "ENVOY") {
+      setError("Envoy account required to post gigs.");
+      return;
+    }
     try {
       await createGig.mutateAsync({ title, amount, location, duration, urgent });
       router.push("/envoy/gigs");
@@ -40,7 +56,7 @@ export default function Page() {
           />
           <input
             className="input"
-            placeholder="Amount (e.g. ₦15,000)"
+            placeholder="Amount (e.g. NGN 15,000)"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             required

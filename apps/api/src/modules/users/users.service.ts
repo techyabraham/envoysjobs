@@ -1,4 +1,6 @@
 import { Injectable } from "@nestjs/common";
+import fs from "fs/promises";
+import path from "path";
 import { PrismaService } from "../prisma/prisma.service";
 import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
 
@@ -23,6 +25,19 @@ export class UsersService {
       memoryStore.users[index] = { ...memoryStore.users[index], ...data };
       return memoryStore.users[index];
     });
+  }
+
+  async uploadAvatar(userId: string, file: Express.Multer.File) {
+    if (!file) return { error: "No file uploaded" };
+    const uploadsDir = path.join(process.cwd(), "apps/api/uploads");
+    await fs.mkdir(uploadsDir, { recursive: true });
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filename = `avatar-${userId}-${Date.now()}-${safeName}`;
+    const filePath = path.join(uploadsDir, filename);
+    await fs.writeFile(filePath, file.buffer);
+    const imageUrl = `/uploads/${filename}`;
+    await this.updateUser(userId, { imageUrl });
+    return { imageUrl };
   }
 
   getEnvoyProfile(userId: string) {

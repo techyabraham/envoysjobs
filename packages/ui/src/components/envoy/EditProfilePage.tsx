@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Camera, Save, X } from 'lucide-react';
-import { Button } from '../Button';
-import { Input } from '../Input';
+import React, { useState } from "react";
+import { Camera, Save, X } from "lucide-react";
+import { Button } from "../Button";
+import { Input } from "../Input";
 
 type EditProfileFormData = {
   firstName: string;
@@ -26,34 +26,36 @@ type EditProfileFormData = {
 
 interface EditProfilePageProps {
   initialData?: Partial<EditProfileFormData>;
+  profileImageUrl?: string | null;
+  onImageUpload?: (file: File) => Promise<string | void>;
   onSave?: (data: EditProfileFormData) => void;
   onCancel?: () => void;
 }
 
 const skills = [
-  'Web Development', 'Mobile Development', 'UI/UX Design', 'Graphic Design',
-  'Content Writing', 'Copywriting', 'Digital Marketing', 'Social Media Management',
-  'Photography', 'Videography', 'Video Editing', 'Animation',
-  'Accounting', 'Bookkeeping', 'Project Management', 'Customer Service'
+  "Web Development", "Mobile Development", "UI/UX Design", "Graphic Design",
+  "Content Writing", "Copywriting", "Digital Marketing", "Social Media Management",
+  "Photography", "Videography", "Video Editing", "Animation",
+  "Accounting", "Bookkeeping", "Project Management", "Customer Service"
 ];
 
-export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePageProps) {
+export function EditProfilePage({ initialData, profileImageUrl, onImageUpload, onSave, onCancel }: EditProfilePageProps) {
   const [formData, setFormData] = useState<EditProfileFormData>(() => {
     const base = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      phone: '+234 XXX XXX XXXX',
-      location: 'Lagos, Nigeria',
-      bio: 'Experienced web developer with 5+ years building modern applications.',
-      selectedSkills: ['Web Development', 'UI/UX Design'],
-      portfolio: 'https://johndoe.com',
-      linkedIn: '',
-      twitter: '',
-      github: '',
-      yearsOfExperience: '5-10',
-      hourlyRate: '5000',
-      availability: 'full-time',
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      phone: "+234 XXX XXX XXXX",
+      location: "Lagos, Nigeria",
+      bio: "Experienced web developer with 5+ years building modern applications.",
+      selectedSkills: ["Web Development", "UI/UX Design"],
+      portfolio: "https://johndoe.com",
+      linkedIn: "",
+      twitter: "",
+      github: "",
+      yearsOfExperience: "5-10",
+      hourlyRate: "5000",
+      availability: "full-time",
       openToRemote: true,
       willingToRelocate: false
     };
@@ -65,7 +67,7 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
   });
 
   const [showSkillsModal, setShowSkillsModal] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(profileImageUrl ?? null);
 
   const toggleSkill = (skill: string) => {
     setFormData(prev => ({
@@ -78,14 +80,15 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
     }));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      const previewUrl = URL.createObjectURL(file);
+      setProfileImage(previewUrl);
+      if (onImageUpload) {
+        const uploadedUrl = await onImageUpload(file);
+        if (uploadedUrl) setProfileImage(uploadedUrl);
+      }
     }
   };
 
@@ -95,7 +98,6 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
 
   return (
     <div className="min-h-screen bg-background-secondary">
-      {/* Header */}
       <div className="bg-white border-b border-border sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl">Edit Profile</h1>
@@ -111,9 +113,7 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        {/* Profile Photo */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl mb-4">Profile Photo</h2>
           <div className="flex items-center gap-6">
@@ -143,7 +143,6 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
           </div>
         </div>
 
-        {/* Basic Information */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl mb-6">Basic Information</h2>
           <div className="space-y-4">
@@ -183,7 +182,6 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
           </div>
         </div>
 
-        {/* Professional Information */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl mb-6">Professional Information</h2>
           <div className="space-y-4">
@@ -221,7 +219,7 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
                 ))}
               </div>
               <Button variant="outline" size="sm" onClick={() => setShowSkillsModal(true)}>
-                {formData.selectedSkills.length === 0 ? 'Add Skills' : 'Edit Skills'}
+                {formData.selectedSkills.length === 0 ? "Add Skills" : "Edit Skills"}
               </Button>
             </div>
 
@@ -242,7 +240,7 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
               </div>
 
               <Input
-                label="Hourly Rate (₦)"
+                label="Hourly Rate (NGN)"
                 type="number"
                 value={formData.hourlyRate}
                 onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
@@ -253,17 +251,17 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
             <div>
               <label className="block text-sm font-medium mb-2">Availability</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {['full-time', 'part-time', 'freelance', 'any'].map(type => (
+                {["full-time", "part-time", "freelance", "any"].map(type => (
                   <button
                     key={type}
                     onClick={() => setFormData({ ...formData, availability: type })}
                     className={`p-3 rounded-lg capitalize transition-all ${
                       formData.availability === type
-                        ? 'bg-emerald-green text-white'
-                        : 'bg-background-secondary hover:bg-background-tertiary'
+                        ? "bg-emerald-green text-white"
+                        : "bg-background-secondary hover:bg-background-tertiary"
                     }`}
                   >
-                    {type === 'any' ? 'Any' : type.replace('-', ' ')}
+                    {type === "any" ? "Any" : type.replace("-", " ")}
                   </button>
                 ))}
               </div>
@@ -299,7 +297,6 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
           </div>
         </div>
 
-        {/* Links & Portfolio */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h2 className="text-xl mb-6">Links & Portfolio</h2>
           <div className="space-y-4">
@@ -337,7 +334,6 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
           </div>
         </div>
 
-        {/* Save Button - Mobile */}
         <div className="sm:hidden sticky bottom-4">
           <Button variant="success" size="lg" className="w-full" onClick={handleSave}>
             <Save className="w-4 h-4" />
@@ -346,7 +342,6 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
         </div>
       </div>
 
-      {/* Skills Modal */}
       {showSkillsModal && (
         <div className="fixed inset-0 bg-foreground/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -354,7 +349,7 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
               <div>
                 <h3 className="text-xl">Select Skills</h3>
                 <p className="text-sm text-foreground-secondary mt-1">
-                  Choose up to 10 skills • Selected: {formData.selectedSkills.length}/10
+                  Choose up to 10 skills - Selected: {formData.selectedSkills.length}/10
                 </p>
               </div>
               <button onClick={() => setShowSkillsModal(false)}>
@@ -370,8 +365,8 @@ export function EditProfilePage({ initialData, onSave, onCancel }: EditProfilePa
                   disabled={!formData.selectedSkills.includes(skill) && formData.selectedSkills.length >= 10}
                   className={`p-3 rounded-lg text-sm transition-all ${
                     formData.selectedSkills.includes(skill)
-                      ? 'bg-deep-blue text-white'
-                      : 'bg-background-secondary hover:bg-background-tertiary'
+                      ? "bg-deep-blue text-white"
+                      : "bg-background-secondary hover:bg-background-tertiary"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {skill}

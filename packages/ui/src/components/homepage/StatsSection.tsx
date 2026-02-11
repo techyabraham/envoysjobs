@@ -1,12 +1,17 @@
-﻿import React from 'react';
-import { Users, Briefcase, Wrench, TrendingUp } from 'lucide-react';
+import React from "react";
+import { Users, Briefcase, Wrench, TrendingUp } from "lucide-react";
 
-export function StatsSection() {
+export interface StatsSectionProps {
+  servicesListed?: string;
+  jobsShared?: string;
+}
+
+export function StatsSection({ servicesListed = "0", jobsShared = "0" }: StatsSectionProps) {
   const stats = [
-    { icon: Users, label: 'Members Hired', value: '500+', color: 'text-emerald-green' },
-    { icon: Wrench, label: 'Services Listed', value: '200+', color: 'text-soft-gold' },
-    { icon: Briefcase, label: 'Jobs Shared', value: '1,000+', color: 'text-deep-blue' },
-    { icon: TrendingUp, label: 'Success Rate', value: '95%', color: 'text-emerald-green' }
+    { icon: Users, label: "Members Hired", value: "500+", color: "text-emerald-green" },
+    { icon: Wrench, label: "Services Listed", value: servicesListed, color: "text-soft-gold" },
+    { icon: Briefcase, label: "Jobs Shared", value: jobsShared, color: "text-deep-blue" },
+    { icon: TrendingUp, label: "Success Rate", value: "95%", color: "text-emerald-green" }
   ];
 
   return (
@@ -41,4 +46,3 @@ export function StatsSection() {
     </section>
   );
 }
-

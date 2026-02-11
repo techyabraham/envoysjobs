@@ -7,12 +7,48 @@ import { GigCard } from './GigCard';
 import { StatsSection } from './StatsSection';
 import { Button } from '../Button';
 
+interface FeaturedJob {
+  id?: string;
+  title: string;
+  company?: string;
+  location: string;
+  pay: string;
+  type: string;
+  postedTime: string;
+  fromMember?: boolean;
+}
+
+interface FeaturedService {
+  id?: string;
+  name: string;
+  photo?: string | null;
+  skill: string;
+  tags: string[];
+  rating: number;
+  reviewCount: number;
+}
+
+interface FeaturedGig {
+  id?: string;
+  title: string;
+  amount: string;
+  location: string;
+  duration: string;
+  urgent?: boolean;
+  postedBy: string;
+}
+
 interface HomepageProps {
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string, id?: string) => void;
+  jobsShared?: string;
+  servicesListed?: string;
+  featuredJobs?: FeaturedJob[];
+  featuredServices?: FeaturedService[];
+  featuredGigs?: FeaturedGig[];
 }
 
 // Mock data
-const featuredJobs = [
+const fallbackJobs = [
   {
     title: 'Senior Software Engineer',
     company: 'Tech Solutions Ltd',
@@ -51,7 +87,7 @@ const featuredJobs = [
   }
 ];
 
-const featuredServices = [
+const fallbackServices = [
   {
     name: 'Sarah Adeyemi',
     photo: 'https://images.unsplash.com/photo-1739300293504-234817eead52?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwcHJvZmVzc2lvbmFsJTIwd29tYW4lMjBvZmZpY2V8ZW58MXx8fHwxNzY5OTAwMTM3fDA&ixlib=rb-4.1.0&q=80&w=1080',
@@ -86,7 +122,7 @@ const featuredServices = [
   }
 ];
 
-const featuredGigs = [
+const fallbackGigs = [
   {
     title: 'Event Setup Assistant',
     amount: '₦15,000',
@@ -121,7 +157,17 @@ const featuredGigs = [
   }
 ];
 
-export function Homepage({ onNavigate }: HomepageProps) {
+export function Homepage({
+  onNavigate,
+  jobsShared,
+  servicesListed,
+  featuredJobs,
+  featuredServices,
+  featuredGigs
+}: HomepageProps) {
+  const jobs = featuredJobs?.length ? featuredJobs : fallbackJobs;
+  const services = featuredServices?.length ? featuredServices : fallbackServices;
+  const gigs = featuredGigs?.length ? featuredGigs : fallbackGigs;
   return (
     <div className="min-h-screen bg-background">
       <HeroSection />
@@ -141,8 +187,12 @@ export function Homepage({ onNavigate }: HomepageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredJobs.map((job, index) => (
-              <JobCard key={index} {...job} />
+            {jobs.map((job, index) => (
+              <JobCard
+                key={index}
+                {...job}
+                onAction={() => onNavigate?.(job.id ? "job" : "jobs", job.id)}
+              />
             ))}
           </div>
 
@@ -170,8 +220,12 @@ export function Homepage({ onNavigate }: HomepageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredServices.map((service, index) => (
-              <ServiceCard key={index} {...service} />
+            {services.map((service, index) => (
+              <ServiceCard
+                key={index}
+                {...service}
+                onAction={() => onNavigate?.(service.id ? "service" : "services", service.id)}
+              />
             ))}
           </div>
 
@@ -199,8 +253,12 @@ export function Homepage({ onNavigate }: HomepageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredGigs.map((gig, index) => (
-              <GigCard key={index} {...gig} />
+            {gigs.map((gig, index) => (
+              <GigCard
+                key={index}
+                {...gig}
+                onAction={() => onNavigate?.(gig.id ? "gig" : "gigs", gig.id)}
+              />
             ))}
           </div>
 
@@ -214,7 +272,7 @@ export function Homepage({ onNavigate }: HomepageProps) {
       </section>
 
       {/* Community Impact Section */}
-      <StatsSection />
+      <StatsSection jobsShared={jobsShared} servicesListed={servicesListed} />
 
       {/* Call to Action */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-deep-blue via-deep-blue-dark to-deep-blue-light text-white">

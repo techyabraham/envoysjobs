@@ -5,6 +5,7 @@ import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { API_BASE_URL } from "@/lib/api";
 
 export default function Page() {
   const params = useParams();
@@ -28,9 +29,22 @@ export default function Page() {
         {error && <p className="text-destructive">Failed to load profile.</p>}
         {data ? (
           <div className="bg-white border border-border rounded-2xl p-6 space-y-4">
-            <div>
-              <h3 className="text-xl">{data.user?.firstName} {data.user?.lastName}</h3>
-              <p className="text-foreground-secondary">{data.bio || "Envoy"}</p>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-deep-blue text-white flex items-center justify-center text-lg font-semibold overflow-hidden">
+                {data.user?.imageUrl ? (
+                  <img
+                    src={`${API_BASE_URL}${data.user.imageUrl}`}
+                    alt={`${data.user?.firstName ?? "Envoy"} profile`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{data.user?.firstName?.[0] ?? "E"}</span>
+                )}
+              </div>
+              <div>
+                <h3 className="text-xl">{data.user?.firstName} {data.user?.lastName}</h3>
+                <p className="text-foreground-secondary">{data.bio || "Envoy"}</p>
+              </div>
             </div>
             <p className="text-foreground-secondary">{data.location || "Location not set"}</p>
             {data.skills && (

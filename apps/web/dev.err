@@ -1,0 +1,250 @@
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⨯ ./app/services/[id]/page.tsx
+Error: 
+  [31mx[0m Unterminated string constant
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+   : [31;1m^^^^^^^^^^^^^^[0m
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+ [2m3[0m | import { useService } from \@/lib/services\;
+   `----
+
+  [31mx[0m Expected unicode escape
+   ,-[[36;1;4mC:\src\envoysjobs\apps\web\app\services\[id]\page.tsx[0m:1:1]
+ [2m1[0m | " use client\;
+ [2m2[0m | 
+ [2m3[0m | import PageShell from \@/components/PageShell\;
+   : [31;1m                      ^[0m
+ [2m4[0m | import { useService } from \@/lib/services\;
+ [2m5[0m | import { useParams, useRouter } from \next/navigation\;
+ [2m5[0m | import { API_BASE_URL } from \@/lib/api\;
+   `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/services/[id]/page.tsx
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.

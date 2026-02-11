@@ -142,7 +142,7 @@ export class AuthService {
     return { status: "sent" };
   }
 
-  private async issueTokens(user: { id: string; role: string; email?: string; firstName?: string; lastName?: string }) {
+  private async issueTokens(user: { id: string; role: string; email?: string; firstName?: string; lastName?: string; imageUrl?: string | null }) {
     const accessToken = this.jwt.sign({ sub: user.id, role: user.role });
     const tokenValue = `${user.id}-${Date.now()}`;
     const refreshToken = await this.prisma.refreshToken
@@ -166,7 +166,8 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
+        role: user.role,
+        imageUrl: (user as any).imageUrl ?? null
       }
     };
   }

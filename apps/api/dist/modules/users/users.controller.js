@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../../common/jwt-auth.guard");
 const users_service_1 = require("./users.service");
 let UsersController = class UsersController {
@@ -25,6 +26,9 @@ let UsersController = class UsersController {
     }
     updateMe(req, body) {
         return this.usersService.updateUser(req.user?.id || "", body);
+    }
+    uploadAvatar(req, file) {
+        return this.usersService.uploadAvatar(req.user?.id || "", file);
     }
     getEnvoy(req, userId) {
         return this.usersService.getEnvoyProfile(userId || req.user?.id || "");
@@ -55,6 +59,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateMe", null);
+__decorate([
+    (0, common_1.Post)("me/avatar"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file", {
+        limits: { fileSize: 5 * 1024 * 1024 },
+        fileFilter: (req, file, cb) => {
+            const allowed = ["image/jpeg", "image/png"];
+            if (!allowed.includes(file.mimetype)) {
+                return cb(new Error("Invalid file type"), false);
+            }
+            cb(null, true);
+        }
+    })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "uploadAvatar", null);
 __decorate([
     (0, common_1.Get)("envoy/profile"),
     __param(0, (0, common_1.Req)()),

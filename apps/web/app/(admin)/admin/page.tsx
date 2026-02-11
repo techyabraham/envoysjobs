@@ -11,12 +11,14 @@ import {
   useUpdateStewardStatus,
   useUpdateVerificationStatus
 } from "@/lib/admin";
+import { usePublicServices } from "@/lib/services";
 
 export default function Page() {
   const users = useAdminUsers();
   const jobs = useAdminJobs();
   const reports = useAdminReports();
   const verifications = useAdminVerifications();
+  const services = usePublicServices();
   const updateSteward = useUpdateStewardStatus();
   const updateVerification = useUpdateVerificationStatus();
 
@@ -26,13 +28,14 @@ export default function Page() {
     const pendingReviews =
       (reports.data?.length ?? 0) +
       (verifications.data?.filter((v) => v.status === "PENDING").length ?? 0);
+    const activeServices = services.data?.length ?? 0;
     return [
       { label: "Pending Reviews", value: String(pendingReviews), icon: AlertTriangle, color: "text-soft-gold" },
       { label: "Total Users", value: String(totalUsers), icon: UsersIcon, color: "text-deep-blue" },
       { label: "Active Jobs", value: String(activeJobs), icon: Briefcase, color: "text-emerald-green" },
-      { label: "Active Services", value: "0", icon: Wrench, color: "text-deep-blue" }
+      { label: "Active Services", value: String(activeServices), icon: Wrench, color: "text-deep-blue" }
     ];
-  }, [users.data, jobs.data, reports.data, verifications.data]);
+  }, [users.data, jobs.data, reports.data, verifications.data, services.data]);
 
   const pendingItems = useMemo<PendingItem[]>(() => {
     const pendingVerifications = (verifications.data ?? [])

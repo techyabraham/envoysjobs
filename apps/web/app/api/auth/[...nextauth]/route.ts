@@ -28,6 +28,7 @@ const handler = NextAuth({
           email: data.user?.email,
           name: `${data.user?.firstName ?? ""} ${data.user?.lastName ?? ""}`.trim(),
           role: data.user?.role,
+          imageUrl: data.user?.imageUrl ?? null,
           accessToken: data.accessToken,
           refreshToken: data.refreshToken
         } as any;

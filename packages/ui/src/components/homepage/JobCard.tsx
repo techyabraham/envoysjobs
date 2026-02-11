@@ -12,11 +12,12 @@ interface JobCardProps {
   postedTime: string;
   fromMember?: boolean;
   company?: string;
+  onAction?: () => void;
 }
 
-export function JobCard({ title, location, pay, type, postedTime, fromMember, company }: JobCardProps) {
+export function JobCard({ title, location, pay, type, postedTime, fromMember, company, onAction }: JobCardProps) {
   return (
-    <Card hover className="flex flex-col h-full">
+    <Card hover className="flex flex-col h-full" onClick={onAction}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-foreground mb-1">{title}</h3>
@@ -51,7 +52,7 @@ export function JobCard({ title, location, pay, type, postedTime, fromMember, co
       </div>
 
       <div className="mt-auto">
-        <Button variant="primary" size="sm" className="w-full">
+        <Button variant="primary" size="sm" className="w-full" onClick={onAction}>
           Apply Now
         </Button>
       </div>

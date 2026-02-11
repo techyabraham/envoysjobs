@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Req, UseGuards, UseInterceptors, UploadedFile } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
@@ -38,7 +39,6 @@ export class ServicesController {
   }
 
   @Get(":id")
-  @UseGuards(JwtAuthGuard)
   get(@Param("id") id: string) {
     return this.servicesService.get(id);
   }
@@ -52,5 +52,24 @@ export class ServicesController {
     @Body(new ZodValidationPipe(serviceUpdateSchema)) body: z.infer<typeof serviceUpdateSchema>
   ) {
     return this.servicesService.update(id, req.user?.id || "", body);
+  }
+
+  @Post(":id/image")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ENVOY")
+  @UseInterceptors(
+    FileInterceptor("file", {
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        const allowed = ["image/jpeg", "image/png"];
+        if (!allowed.includes(file.mimetype)) {
+          return cb(new Error("Invalid file type"), false);
+        }
+        cb(null, true);
+      }
+    })
+  )
+  uploadImage(@Req() req: any, @Param("id") id: string, @UploadedFile() file: Express.Multer.File) {
+    return this.servicesService.uploadImage(id, req.user?.id || "", file);
   }
 }

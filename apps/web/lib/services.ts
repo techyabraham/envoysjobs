@@ -8,6 +8,7 @@ export type Service = {
   title: string;
   description: string;
   rate: string;
+  imageUrl?: string | null;
   status: "ACTIVE" | "PENDING" | "PAUSED";
   createdAt: string;
   updatedAt: string;

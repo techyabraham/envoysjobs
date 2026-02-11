@@ -6,10 +6,12 @@ import { useApi } from "@/lib/useApi";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function Page() {
   const api = useApi();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [locationType, setLocationType] = useState<"ONSITE" | "REMOTE" | "HYBRID">("REMOTE");
@@ -23,6 +25,23 @@ export default function Page() {
     event.preventDefault();
     setLoading(true);
     setError(null);
+    if (status === "loading") {
+      setLoading(false);
+      setError("Please wait, loading session...");
+      return;
+    }
+    const role = (session as any)?.user?.role as string | undefined;
+    if (!session) {
+      setLoading(false);
+      setError("Please sign in to post a job.");
+      router.push("/auth/login");
+      return;
+    }
+    if (role !== "HIRER") {
+      setLoading(false);
+      setError("Hirer account required to post jobs.");
+      return;
+    }
 
     const payload = {
       title,

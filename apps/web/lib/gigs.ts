@@ -29,6 +29,19 @@ export function useAvailableGigs() {
   });
 }
 
+export function useGig(id?: string) {
+  const api = useApi();
+  return useQuery({
+    queryKey: ["gigs", id],
+    enabled: Boolean(id),
+    queryFn: async () => {
+      const res = await api<Gig>(`/gigs/${id}`);
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
+}
+
 export function useMyGigs() {
   const api = useApi();
   return useQuery({

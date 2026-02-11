@@ -3,8 +3,11 @@
 import PageShell from "@/components/PageShell";
 import { ServiceCard } from "@envoysjobs/ui";
 import { usePublicServices } from "@/lib/services";
+import { API_BASE_URL } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
   const { data, isLoading, error } = usePublicServices();
 
   return (
@@ -21,11 +24,12 @@ export default function Page() {
           <ServiceCard
             key={service.id}
             name={service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy"}
-            photo="https://images.unsplash.com/photo-1616804827035-f4aa814c14ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwcHJvZmVzc2lvbmFsJTIwbWFuJTIwYnVzaW5lc3N8ZW58MXx8fHwxNzY5OTAwMTM3fDA&ixlib=rb-4.1.0&q=80&w=1080"
+            photo={service.imageUrl ? `${API_BASE_URL}${service.imageUrl}` : null}
             skill={service.title}
             tags={service.description.split(" ").slice(0, 3)}
             rating={4.8}
             reviewCount={12}
+            onAction={() => router.push(`/services/${service.id}`)}
           />
         ))}
       </div>

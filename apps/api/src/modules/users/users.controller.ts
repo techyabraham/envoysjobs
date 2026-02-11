@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Put, Post, Query, Req, UseGuards, UseInterceptors, UploadedFile } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
 import { UsersService } from "./users.service";
 
@@ -15,6 +16,23 @@ export class UsersController {
   @Put("me")
   updateMe(@Req() req: any, @Body() body: any) {
     return this.usersService.updateUser(req.user?.id || "", body);
+  }
+
+  @Post("me/avatar")
+  @UseInterceptors(
+    FileInterceptor("file", {
+      limits: { fileSize: 5 * 1024 * 1024 },
+      fileFilter: (req, file, cb) => {
+        const allowed = ["image/jpeg", "image/png"];
+        if (!allowed.includes(file.mimetype)) {
+          return cb(new Error("Invalid file type"), false);
+        }
+        cb(null, true);
+      }
+    })
+  )
+  uploadAvatar(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
+    return this.usersService.uploadAvatar(req.user?.id || "", file);
   }
 
   @Get("envoy/profile")

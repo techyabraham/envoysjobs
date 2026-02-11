@@ -6,6 +6,7 @@ export type MemoryUser = {
   passwordHash: string;
   firstName: string;
   lastName: string;
+  imageUrl?: string | null;
   role: "ENVOY" | "HIRER" | "ADMIN";
   stewardStatus?: "PENDING" | "VERIFIED" | "REJECTED" | null;
 };

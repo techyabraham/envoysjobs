@@ -3,8 +3,10 @@
 import PageShell from "@/components/PageShell";
 import { GigCard } from "@envoysjobs/ui";
 import { useAvailableGigs } from "@/lib/gigs";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
   const { data, isLoading, error } = useAvailableGigs();
 
   return (
@@ -26,6 +28,7 @@ export default function Page() {
             duration={gig.duration}
             urgent={gig.urgent}
             postedBy={gig.postedBy ? `${gig.postedBy.firstName} ${gig.postedBy.lastName}` : "Envoy"}
+            onAction={() => router.push(`/gigs/${gig.id}`)}
           />
         ))}
       </div>
