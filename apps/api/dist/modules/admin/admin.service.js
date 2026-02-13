@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminService = void 0;
 const common_1 = require("@nestjs/common");
+const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../prisma/prisma.service");
 const memory_store_1 = require("../../common/memory.store");
 let AdminService = class AdminService {
@@ -132,6 +133,40 @@ let AdminService = class AdminService {
             const idx = memory_store_1.memoryStore.reports.findIndex((r) => r.id === id);
             const removed = idx >= 0 ? memory_store_1.memoryStore.reports.splice(idx, 1)[0] : null;
             return [removed, { id: "audit", action: `Report ${id} resolved` }];
+        });
+    }
+    createJob(adminId, data) {
+        const contactMethods = data.contactMethods?.length ? data.contactMethods : [client_1.ContactMethod.PLATFORM];
+        return this.prisma.job.create({
+            data: {
+                ...data,
+                contactMethods,
+                hirerId: adminId,
+                status: data.status ?? "PUBLISHED"
+            }
+        });
+    }
+    createService(adminId, data) {
+        const contactMethods = data.contactMethods?.length ? data.contactMethods : [client_1.ContactMethod.PLATFORM];
+        return this.prisma.service.create({
+            data: {
+                ...data,
+                contactMethods,
+                envoyId: adminId,
+                status: "ACTIVE"
+            }
+        });
+    }
+    createGig(adminId, data) {
+        const contactMethods = data.contactMethods?.length ? data.contactMethods : [client_1.ContactMethod.PLATFORM];
+        return this.prisma.gig.create({
+            data: {
+                ...data,
+                contactMethods,
+                postedById: adminId,
+                status: "AVAILABLE",
+                urgent: data.urgent ?? false
+            }
         });
     }
 };

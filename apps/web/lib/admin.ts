@@ -148,3 +148,73 @@ export function useUpdateVerificationStatus() {
     }
   });
 }
+
+export function useAdminCreateJob() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      title: string;
+      description: string;
+      locationType: "ONSITE" | "REMOTE" | "HYBRID";
+      location?: string;
+      salaryMin?: number;
+      salaryMax?: number;
+      urgency?: string;
+      status?: "DRAFT" | "PUBLISHED" | "CLOSED";
+    }) => {
+      const res = await api("/admin/jobs", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-jobs"] });
+    }
+  });
+}
+
+export function useAdminCreateService() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { title: string; description: string; rate: string }) => {
+      const res = await api("/admin/services", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["services", "public"] });
+    }
+  });
+}
+
+export function useAdminCreateGig() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      title: string;
+      description: string;
+      amount: string;
+      location: string;
+      duration: string;
+      urgent?: boolean;
+    }) => {
+      const res = await api("/admin/gigs", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gigs", "available"] });
+    }
+  });
+}

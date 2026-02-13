@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
+import { ContactMethod, JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
 
@@ -124,5 +124,83 @@ export class AdminService {
         const removed = idx >= 0 ? memoryStore.reports.splice(idx, 1)[0] : null;
         return [removed, { id: "audit", action: `Report ${id} resolved` }];
       });
+  }
+
+  createJob(
+    adminId: string,
+    data: {
+      title: string;
+      description: string;
+      locationType: "ONSITE" | "REMOTE" | "HYBRID";
+      location?: string;
+      salaryMin?: number;
+      salaryMax?: number;
+      urgency?: string;
+      status?: "DRAFT" | "PUBLISHED" | "CLOSED";
+      contactMethods?: ContactMethod[];
+      contactEmail?: string;
+      contactWebsite?: string;
+      contactWhatsapp?: string;
+    }
+  ) {
+    const contactMethods = data.contactMethods?.length ? data.contactMethods : [ContactMethod.PLATFORM];
+    return this.prisma.job.create({
+      data: {
+        ...data,
+        contactMethods,
+        hirerId: adminId,
+        status: data.status ?? "PUBLISHED"
+      }
+    });
+  }
+
+  createService(
+    adminId: string,
+    data: {
+      title: string;
+      description: string;
+      rate: string;
+      contactMethods?: ContactMethod[];
+      contactEmail?: string;
+      contactWebsite?: string;
+      contactWhatsapp?: string;
+    }
+  ) {
+    const contactMethods = data.contactMethods?.length ? data.contactMethods : [ContactMethod.PLATFORM];
+    return this.prisma.service.create({
+      data: {
+        ...data,
+        contactMethods,
+        envoyId: adminId,
+        status: "ACTIVE"
+      }
+    });
+  }
+
+  createGig(
+    adminId: string,
+    data: {
+      title: string;
+      description: string;
+      amount: string;
+      location: string;
+      duration: string;
+      urgent?: boolean;
+      contactMethods?: ContactMethod[];
+      contactEmail?: string;
+      contactWebsite?: string;
+      contactWhatsapp?: string;
+    }
+  ) {
+    const contactMethods = data.contactMethods?.length ? data.contactMethods : [ContactMethod.PLATFORM];
+    return this.prisma.gig.create({
+      data: {
+        ...data,
+        contactMethods,
+        postedById: adminId,
+        status: "AVAILABLE",
+        urgent: data.urgent ?? false
+      }
+    });
   }
 }

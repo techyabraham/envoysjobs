@@ -49,7 +49,7 @@ interface HomepageProps {
 }
 
 // Mock data
-const fallbackJobs = [
+const fallbackJobs: FeaturedJob[] = [
   {
     title: 'Senior Software Engineer',
     company: 'Tech Solutions Ltd',
@@ -88,7 +88,7 @@ const fallbackJobs = [
   }
 ];
 
-const fallbackServices = [
+const fallbackServices: FeaturedService[] = [
   {
     name: 'Sarah Adeyemi',
     photo: 'https://images.unsplash.com/photo-1739300293504-234817eead52?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwcHJvZmVzc2lvbmFsJTIwd29tYW4lMjBvZmZpY2V8ZW58MXx8fHwxNzY5OTAwMTM3fDA&ixlib=rb-4.1.0&q=80&w=1080',
@@ -123,7 +123,7 @@ const fallbackServices = [
   }
 ];
 
-const fallbackGigs = [
+const fallbackGigs: FeaturedGig[] = [
   {
     title: 'Event Setup Assistant',
     amount: '₦15,000',

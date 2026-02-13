@@ -30,6 +30,42 @@ const stewardSchema = zod_1.z.object({
 const jobStatusSchema = zod_1.z.object({
     status: zod_1.z.nativeEnum(client_1.JobStatus)
 });
+const contactMethodEnum = zod_1.z.nativeEnum(client_1.ContactMethod);
+const contactInfoSchema = zod_1.z.object({
+    contactMethods: zod_1.z.array(contactMethodEnum).optional(),
+    contactEmail: zod_1.z.string().email().optional(),
+    contactWebsite: zod_1.z.string().url().optional(),
+    contactWhatsapp: zod_1.z.string().min(8).optional()
+});
+const adminCreateJobSchema = zod_1.z
+    .object({
+    title: zod_1.z.string().min(2),
+    description: zod_1.z.string().min(2),
+    locationType: zod_1.z.enum(["ONSITE", "REMOTE", "HYBRID"]),
+    location: zod_1.z.string().optional(),
+    salaryMin: zod_1.z.number().optional(),
+    salaryMax: zod_1.z.number().optional(),
+    urgency: zod_1.z.string().optional(),
+    status: zod_1.z.enum(["DRAFT", "PUBLISHED", "CLOSED"]).optional()
+})
+    .merge(contactInfoSchema);
+const adminCreateServiceSchema = zod_1.z
+    .object({
+    title: zod_1.z.string().min(2),
+    description: zod_1.z.string().min(10),
+    rate: zod_1.z.string().min(2)
+})
+    .merge(contactInfoSchema);
+const adminCreateGigSchema = zod_1.z
+    .object({
+    title: zod_1.z.string().min(2),
+    description: zod_1.z.string().min(10),
+    amount: zod_1.z.string().min(2),
+    location: zod_1.z.string().min(2),
+    duration: zod_1.z.string().min(1),
+    urgent: zod_1.z.boolean().optional()
+})
+    .merge(contactInfoSchema);
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
@@ -57,6 +93,15 @@ let AdminController = class AdminController {
     }
     resolveReport(id) {
         return this.adminService.resolveReport(id);
+    }
+    createJob(req, body) {
+        return this.adminService.createJob(req.user?.id || "", body);
+    }
+    createService(req, body) {
+        return this.adminService.createService(req.user?.id || "", body);
+    }
+    createGig(req, body) {
+        return this.adminService.createGig(req.user?.id || "", body);
     }
 };
 exports.AdminController = AdminController;
@@ -115,6 +160,30 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "resolveReport", null);
+__decorate([
+    (0, common_1.Post)("jobs"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(adminCreateJobSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, void 0]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "createJob", null);
+__decorate([
+    (0, common_1.Post)("services"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(adminCreateServiceSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, void 0]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "createService", null);
+__decorate([
+    (0, common_1.Post)("gigs"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(adminCreateGigSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, void 0]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "createGig", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)("admin"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

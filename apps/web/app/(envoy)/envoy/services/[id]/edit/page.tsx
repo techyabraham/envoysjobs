@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useService, useUpdateService } from "@/lib/services";
 import { useApi } from "@/lib/useApi";
 import { API_BASE_URL } from "@/lib/api";
+import { CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 
 interface PageProps {
   params: { id: string };
@@ -22,6 +23,10 @@ export default function Page({ params }: PageProps) {
   const [rate, setRate] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [contactMethods, setContactMethods] = useState<ContactMethod[]>(["PLATFORM"]);
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactWebsite, setContactWebsite] = useState("");
+  const [contactWhatsapp, setContactWhatsapp] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +35,10 @@ export default function Page({ params }: PageProps) {
       setDescription(service.description);
       setRate(service.rate);
       setPreviewUrl(service.imageUrl ? `${API_BASE_URL}${service.imageUrl}` : null);
+      setContactMethods(service.contactMethods?.length ? service.contactMethods : ["PLATFORM"]);
+      setContactEmail(service.contactEmail ?? "");
+      setContactWebsite(service.contactWebsite ?? "");
+      setContactWhatsapp(service.contactWhatsapp ?? "");
     }
   }, [service]);
 
@@ -37,7 +46,15 @@ export default function Page({ params }: PageProps) {
     event.preventDefault();
     setError(null);
     try {
-      await updateService.mutateAsync({ title, description, rate });
+      await updateService.mutateAsync({
+        title,
+        description,
+        rate,
+        contactMethods,
+        contactEmail: contactEmail || undefined,
+        contactWebsite: contactWebsite || undefined,
+        contactWhatsapp: contactWhatsapp || undefined
+      });
       if (imageFile) {
         const formData = new FormData();
         formData.append("file", imageFile);
@@ -100,6 +117,52 @@ export default function Page({ params }: PageProps) {
             onChange={(event) => setRate(event.target.value)}
             required
           />
+          <div className="bg-background-secondary border border-border rounded-2xl p-4 space-y-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">How should customers reach you?</p>
+              <p className="text-xs text-foreground-tertiary">Select all that apply.</p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 text-sm text-foreground-secondary">
+              {(["PLATFORM", "EMAIL", "WEBSITE", "WHATSAPP"] as ContactMethod[]).map((method) => (
+                <label key={method} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={contactMethods.includes(method)}
+                    onChange={() =>
+                      setContactMethods((prev) =>
+                        prev.includes(method) ? prev.filter((item) => item !== method) : [...prev, method]
+                      )
+                    }
+                  />
+                  {CONTACT_LABELS[method]}
+                </label>
+              ))}
+            </div>
+            {contactMethods.includes("EMAIL") && (
+              <input
+                className="input"
+                placeholder="Contact email"
+                value={contactEmail}
+                onChange={(event) => setContactEmail(event.target.value)}
+              />
+            )}
+            {contactMethods.includes("WEBSITE") && (
+              <input
+                className="input"
+                placeholder="Website link"
+                value={contactWebsite}
+                onChange={(event) => setContactWebsite(event.target.value)}
+              />
+            )}
+            {contactMethods.includes("WHATSAPP") && (
+              <input
+                className="input"
+                placeholder="WhatsApp number (e.g. 0803 000 0000)"
+                value={contactWhatsapp}
+                onChange={(event) => setContactWhatsapp(event.target.value)}
+              />
+            )}
+          </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex flex-wrap gap-3">
             <button className="cta" type="submit" disabled={updateService.isPending}>

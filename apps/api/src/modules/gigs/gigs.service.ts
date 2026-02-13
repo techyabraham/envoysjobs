@@ -1,14 +1,29 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { ContactMethod } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class GigsService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: { title: string; amount: string; location: string; duration: string; urgent?: boolean; postedById: string }) {
+  create(data: {
+    title: string;
+    description: string;
+    amount: string;
+    location: string;
+    duration: string;
+    urgent?: boolean;
+    postedById: string;
+    contactMethods?: ContactMethod[];
+    contactEmail?: string;
+    contactWebsite?: string;
+    contactWhatsapp?: string;
+  }) {
+    const contactMethods = data.contactMethods?.length ? data.contactMethods : [ContactMethod.PLATFORM];
     return this.prisma.gig.create({
       data: {
         ...data,
+        contactMethods,
         status: "AVAILABLE",
         urgent: data.urgent ?? false
       }
@@ -46,27 +61,47 @@ export class GigsService {
   async update(
     id: string,
     userId: string,
-    data: { title?: string; amount?: string; location?: string; duration?: string; urgent?: boolean }
+    data: {
+      title?: string;
+      description?: string;
+      amount?: string;
+      location?: string;
+      duration?: string;
+      urgent?: boolean;
+      contactMethods?: ContactMethod[];
+      contactEmail?: string;
+      contactWebsite?: string;
+      contactWhatsapp?: string;
+    }
   ) {
     const existing = await this.prisma.gig.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException("Gig not found");
-    if (existing.postedById !== userId) throw new ForbiddenException("Not allowed");
+    if (existing.postedById !== userId) {
+      const actor = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true }
+      });
+      if (actor?.role !== "ADMIN") throw new ForbiddenException("Not allowed");
+    }
 
     return this.prisma.gig.update({
       where: { id },
-      data
+      data: {
+        ...data,
+        contactMethods: data.contactMethods?.length ? data.contactMethods : undefined
+      }
     });
   }
 
-  async apply(gigId: string, applicantId: string) {
+  async apply(gigId: string, applicantId: string, counterBudget?: string) {
     const existingGig = await this.prisma.gig.findUnique({ where: { id: gigId } });
     if (!existingGig) throw new NotFoundException("Gig not found");
     if (existingGig.postedById === applicantId) throw new ForbiddenException("Cannot apply to your own gig");
 
     return this.prisma.gigApplication.upsert({
       where: { gigId_applicantId: { gigId, applicantId } },
-      update: { status: "APPLIED" },
-      create: { gigId, applicantId, status: "APPLIED" }
+      update: { status: "APPLIED", counterBudget },
+      create: { gigId, applicantId, status: "APPLIED", counterBudget }
     });
   }
 }

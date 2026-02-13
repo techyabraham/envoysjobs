@@ -22,6 +22,10 @@ export type MemoryJob = {
   urgency?: string;
   status: "DRAFT" | "PUBLISHED" | "CLOSED";
   hirerId: string;
+  contactMethods?: ("PLATFORM" | "EMAIL" | "WEBSITE" | "WHATSAPP")[];
+  contactEmail?: string;
+  contactWebsite?: string;
+  contactWhatsapp?: string;
   createdAt: Date;
 };
 

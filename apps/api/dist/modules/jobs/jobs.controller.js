@@ -21,7 +21,26 @@ const roles_decorator_1 = require("../../common/roles.decorator");
 const roles_guard_1 = require("../../common/roles.guard");
 const jobs_service_1 = require("./jobs.service");
 const jobs_import_service_1 = require("./jobs.import.service");
-const jobCreateSchema = zod_1.z.object({
+const contactMethodEnum = zod_1.z.enum(["PLATFORM", "EMAIL", "WEBSITE", "WHATSAPP"]);
+const contactInfoSchema = zod_1.z.object({
+    contactMethods: zod_1.z.array(contactMethodEnum).optional(),
+    contactEmail: zod_1.z.string().email().optional(),
+    contactWebsite: zod_1.z.string().url().optional(),
+    contactWhatsapp: zod_1.z.string().min(8).optional()
+});
+function validateContact(data, ctx) {
+    const methods = data.contactMethods ?? [];
+    if (methods.includes("EMAIL") && !data.contactEmail) {
+        ctx.addIssue({ code: zod_1.z.ZodIssueCode.custom, path: ["contactEmail"], message: "Email is required." });
+    }
+    if (methods.includes("WEBSITE") && !data.contactWebsite) {
+        ctx.addIssue({ code: zod_1.z.ZodIssueCode.custom, path: ["contactWebsite"], message: "Website is required." });
+    }
+    if (methods.includes("WHATSAPP") && !data.contactWhatsapp) {
+        ctx.addIssue({ code: zod_1.z.ZodIssueCode.custom, path: ["contactWhatsapp"], message: "WhatsApp number is required." });
+    }
+}
+const jobBaseSchema = zod_1.z.object({
     title: zod_1.z.string().min(2),
     description: zod_1.z.string().min(2),
     locationType: zod_1.z.enum(["ONSITE", "REMOTE", "HYBRID"]),
@@ -31,7 +50,8 @@ const jobCreateSchema = zod_1.z.object({
     urgency: zod_1.z.string().optional(),
     status: zod_1.z.enum(["DRAFT", "PUBLISHED", "CLOSED"]).optional()
 });
-const jobUpdateSchema = jobCreateSchema.partial();
+const jobCreateSchema = jobBaseSchema.merge(contactInfoSchema).superRefine(validateContact);
+const jobUpdateSchema = jobBaseSchema.partial().merge(contactInfoSchema).superRefine(validateContact);
 let JobsController = class JobsController {
     constructor(jobsService, jobsImport) {
         this.jobsService = jobsService;

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 
 export default function Page() {
   const api = useApi();
@@ -18,6 +19,10 @@ export default function Page() {
   const [location, setLocation] = useState("");
   const [salaryMin, setSalaryMin] = useState("");
   const [salaryMax, setSalaryMax] = useState("");
+  const [contactMethods, setContactMethods] = useState<ContactMethod[]>(["PLATFORM"]);
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactWebsite, setContactWebsite] = useState("");
+  const [contactWhatsapp, setContactWhatsapp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,6 +55,10 @@ export default function Page() {
       location: location || undefined,
       salaryMin: salaryMin ? Number(salaryMin) : undefined,
       salaryMax: salaryMax ? Number(salaryMax) : undefined,
+      contactMethods,
+      contactEmail: contactEmail || undefined,
+      contactWebsite: contactWebsite || undefined,
+      contactWhatsapp: contactWhatsapp || undefined,
       status: "DRAFT"
     };
 
@@ -121,6 +130,52 @@ export default function Page() {
               value={salaryMax}
               onChange={(event) => setSalaryMax(event.target.value)}
             />
+          </div>
+          <div className="bg-background-secondary border border-border rounded-2xl p-4 space-y-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">How should envoys apply?</p>
+              <p className="text-xs text-foreground-tertiary">Select all methods you want enabled.</p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 text-sm text-foreground-secondary">
+              {(["PLATFORM", "EMAIL", "WEBSITE", "WHATSAPP"] as ContactMethod[]).map((method) => (
+                <label key={method} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={contactMethods.includes(method)}
+                    onChange={() =>
+                      setContactMethods((prev) =>
+                        prev.includes(method) ? prev.filter((item) => item !== method) : [...prev, method]
+                      )
+                    }
+                  />
+                  {CONTACT_LABELS[method]}
+                </label>
+              ))}
+            </div>
+            {contactMethods.includes("EMAIL") && (
+              <input
+                className="input"
+                placeholder="Contact email"
+                value={contactEmail}
+                onChange={(event) => setContactEmail(event.target.value)}
+              />
+            )}
+            {contactMethods.includes("WEBSITE") && (
+              <input
+                className="input"
+                placeholder="Application website URL"
+                value={contactWebsite}
+                onChange={(event) => setContactWebsite(event.target.value)}
+              />
+            )}
+            {contactMethods.includes("WHATSAPP") && (
+              <input
+                className="input"
+                placeholder="WhatsApp number (e.g. 0803 000 0000)"
+                value={contactWhatsapp}
+                onChange={(event) => setContactWhatsapp(event.target.value)}
+              />
+            )}
           </div>
           {error && <p className="text-destructive">{error}</p>}
           <button className="cta" type="submit" disabled={loading}>

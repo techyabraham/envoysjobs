@@ -28,7 +28,7 @@ export function JobCard({ title, location, pay, type, postedTime, fromMember, co
         {fromMember && (
           <Badge variant="gold" className="shrink-0">
             <Award className="w-3 h-3" />
-            From Our Members
+            From An Envoy
           </Badge>
         )}
       </div>

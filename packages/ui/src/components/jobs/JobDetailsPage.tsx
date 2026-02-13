@@ -121,7 +121,7 @@ export function JobDetailsPage({ onBack, onApply, job, saved, onToggleSave, onMe
               <div className="flex items-center gap-3 mb-2">
                 {data.fromMember && (
                   <div className="inline-flex items-center gap-1 px-3 py-1 bg-soft-gold/10 text-soft-gold rounded-lg text-sm">
-                    From Our Members
+                    From An Envoy
                   </div>
                 )}
                 {data.source && data.source !== "EnvoysJobs" && (
@@ -305,7 +305,7 @@ export function JobDetailsPage({ onBack, onApply, job, saved, onToggleSave, onMe
                 <div>
                   <p className="text-sm text-foreground-tertiary mb-1">Website</p>
                   <a href={data.companyWebsite} className="text-deep-blue hover:text-deep-blue-dark font-medium">
-                    View Site ->
+                    View Site
                   </a>
                 </div>
               </div>

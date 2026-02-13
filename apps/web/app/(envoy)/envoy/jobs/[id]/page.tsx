@@ -8,6 +8,7 @@ import { useApi } from "@/lib/useApi";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { buildWhatsappUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 
 export default function Page() {
   const params = useParams();
@@ -17,15 +18,33 @@ export default function Page() {
   const jobId = params?.id as string;
   const { data: job, isLoading, error } = useJob(jobId);
   const createConversation = useCreateConversation();
+  const methods = job?.contactMethods?.length ? job.contactMethods : (["PLATFORM"] as ContactMethod[]);
 
   const handleApply = async () => {
     if (!jobId) return;
-    const res = await api(`/jobs/${jobId}/apply`, { method: "POST" });
-    if (res.error) {
-      alert("Failed to apply.");
+    if (methods.includes("WHATSAPP")) {
+      const url = buildWhatsappUrl(job?.contactWhatsapp);
+      if (url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
+    }
+    if (methods.includes("EMAIL") && job?.contactEmail) {
+      window.location.href = `mailto:${job.contactEmail}`;
       return;
     }
-    router.push("/envoy/applications");
+    if (methods.includes("WEBSITE") && job?.contactWebsite) {
+      window.open(job.contactWebsite, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (methods.includes("PLATFORM")) {
+      const res = await api(`/jobs/${jobId}/apply`, { method: "POST" });
+      if (res.error) {
+        alert("Failed to apply.");
+        return;
+      }
+      router.push("/envoy/applications");
+    }
   };
 
   const handleMessage = async () => {
@@ -59,6 +78,11 @@ export default function Page() {
             <div className="text-sm text-foreground-tertiary">Status: {job.status}</div>
             <div className="flex flex-wrap gap-3">
               <button className="cta" onClick={handleApply}>Apply</button>
+              {methods.map((method) => (
+                <span key={method} className="text-xs px-2 py-1 rounded-lg bg-background-secondary text-foreground-secondary">
+                  {CONTACT_LABELS[method]}
+                </span>
+              ))}
               <button className="btn-secondary" onClick={handleMessage}>Message Hirer</button>
             </div>
           </div>

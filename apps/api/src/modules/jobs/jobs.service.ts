@@ -7,12 +7,16 @@ export class JobsService {
   constructor(private prisma: PrismaService) {}
 
   create(data: any) {
-    if (!useMemory()) return this.prisma.job.create({ data });
+    const contactMethods = Array.isArray(data.contactMethods) && data.contactMethods.length
+      ? data.contactMethods
+      : ["PLATFORM"];
+    if (!useMemory()) return this.prisma.job.create({ data: { ...data, contactMethods } });
     seedMemory();
-    return this.prisma.job.create({ data }).catch(() => {
+    return this.prisma.job.create({ data: { ...data, contactMethods } }).catch(() => {
       const job = {
         id: createId(),
         ...data,
+        contactMethods,
         status: data.status ?? "DRAFT",
         createdAt: new Date()
       };

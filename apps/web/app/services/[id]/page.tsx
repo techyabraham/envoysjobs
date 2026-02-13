@@ -1,15 +1,21 @@
 "use client";
 
 import PageShell from "@/components/PageShell";
-import { useService } from "@/lib/services";
+import { useService, useServiceInquiry } from "@/lib/services";
 import { useParams, useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/lib/api";
+import { buildWhatsappUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
+import { useSession } from "next-auth/react";
 
 export default function Page() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
+  const { data: session } = useSession();
   const { data, isLoading, error } = useService(id);
+  const inquiry = useServiceInquiry(id);
+
+  const methods = data?.contactMethods?.length ? data.contactMethods : (["PLATFORM"] as ContactMethod[]);
 
   return (
     <PageShell title="Service" description="Service details and envoy profile.">
@@ -46,7 +52,55 @@ export default function Page() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button className="cta" onClick={() => router.push("/messages")}>Message Envoy</button>
+            {methods.map((method) => {
+              if (method === "WHATSAPP") {
+                const url = buildWhatsappUrl(data.contactWhatsapp);
+                if (!url) return null;
+                return (
+                  <button key={method} className="cta" onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>
+                    {CONTACT_LABELS[method]}
+                  </button>
+                );
+              }
+              if (method === "EMAIL" && data.contactEmail) {
+                return (
+                  <button key={method} className="cta" onClick={() => window.location.href = `mailto:${data.contactEmail}`}>
+                    {CONTACT_LABELS[method]}
+                  </button>
+                );
+              }
+              if (method === "WEBSITE" && data.contactWebsite) {
+                return (
+                  <button key={method} className="cta" onClick={() => window.open(data.contactWebsite!, "_blank", "noopener,noreferrer")}>
+                    {CONTACT_LABELS[method]}
+                  </button>
+                );
+              }
+              if (method === "PLATFORM") {
+                return (
+                  <button
+                    key={method}
+                    className="cta"
+                    onClick={async () => {
+                      if (!session) {
+                        router.push("/auth/login");
+                        return;
+                      }
+                      try {
+                        await inquiry.mutateAsync({ method: "PLATFORM", message: "I am interested in this service." });
+                        alert("Interest sent to envoy.");
+                      } catch {
+                        alert("Unable to send interest.");
+                      }
+                    }}
+                    disabled={inquiry.isPending}
+                  >
+                    {inquiry.isPending ? "Sending..." : "Contact on EnvoysJobs"}
+                  </button>
+                );
+              }
+              return null;
+            })}
             <button className="btn-secondary" onClick={() => router.push("/services")}>Back to Services</button>
           </div>
         </div>

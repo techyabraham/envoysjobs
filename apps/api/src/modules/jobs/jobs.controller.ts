@@ -7,7 +7,28 @@ import { RolesGuard } from "../../common/roles.guard";
 import { JobsService } from "./jobs.service";
 import { JobsImportService } from "./jobs.import.service";
 
-const jobCreateSchema = z.object({
+const contactMethodEnum = z.enum(["PLATFORM", "EMAIL", "WEBSITE", "WHATSAPP"]);
+const contactInfoSchema = z.object({
+  contactMethods: z.array(contactMethodEnum).optional(),
+  contactEmail: z.string().email().optional(),
+  contactWebsite: z.string().url().optional(),
+  contactWhatsapp: z.string().min(8).optional()
+});
+
+function validateContact(data: { contactMethods?: string[]; contactEmail?: string; contactWebsite?: string; contactWhatsapp?: string }, ctx: z.RefinementCtx) {
+  const methods = data.contactMethods ?? [];
+  if (methods.includes("EMAIL") && !data.contactEmail) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["contactEmail"], message: "Email is required." });
+  }
+  if (methods.includes("WEBSITE") && !data.contactWebsite) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["contactWebsite"], message: "Website is required." });
+  }
+  if (methods.includes("WHATSAPP") && !data.contactWhatsapp) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["contactWhatsapp"], message: "WhatsApp number is required." });
+  }
+}
+
+const jobBaseSchema = z.object({
   title: z.string().min(2),
   description: z.string().min(2),
   locationType: z.enum(["ONSITE", "REMOTE", "HYBRID"]),
@@ -18,7 +39,8 @@ const jobCreateSchema = z.object({
   status: z.enum(["DRAFT", "PUBLISHED", "CLOSED"]).optional()
 });
 
-const jobUpdateSchema = jobCreateSchema.partial();
+const jobCreateSchema = jobBaseSchema.merge(contactInfoSchema).superRefine(validateContact);
+const jobUpdateSchema = jobBaseSchema.partial().merge(contactInfoSchema).superRefine(validateContact);
 
 @Controller("jobs")
 export class JobsController {

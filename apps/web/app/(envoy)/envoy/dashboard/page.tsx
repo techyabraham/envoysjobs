@@ -33,7 +33,7 @@ export default function Page() {
     title: job.title,
     company: "EnvoysJobs",
     match: idx === 0 ? "92%" : "86%",
-    badge: "From Our Members"
+    badge: "From An Envoy"
   }));
 
   const stats = [

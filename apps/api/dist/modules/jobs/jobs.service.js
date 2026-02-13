@@ -18,13 +18,17 @@ let JobsService = class JobsService {
         this.prisma = prisma;
     }
     create(data) {
+        const contactMethods = Array.isArray(data.contactMethods) && data.contactMethods.length
+            ? data.contactMethods
+            : ["PLATFORM"];
         if (!(0, memory_store_1.useMemory)())
-            return this.prisma.job.create({ data });
+            return this.prisma.job.create({ data: { ...data, contactMethods } });
         (0, memory_store_1.seedMemory)();
-        return this.prisma.job.create({ data }).catch(() => {
+        return this.prisma.job.create({ data: { ...data, contactMethods } }).catch(() => {
             const job = {
                 id: (0, memory_store_1.createId)(),
                 ...data,
+                contactMethods,
                 status: data.status ?? "DRAFT",
                 createdAt: new Date()
             };

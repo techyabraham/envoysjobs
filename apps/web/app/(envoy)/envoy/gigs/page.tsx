@@ -57,7 +57,7 @@ export default function Page() {
         availableGigs={availableGigs}
         postedGigs={postedGigs}
         appliedGigs={appliedGigs}
-        onApply={(gigId) => applyToGig.mutate(gigId)}
+        onApply={(gigId) => applyToGig.mutate({ gigId })}
       />
     </DashboardShell>
   );

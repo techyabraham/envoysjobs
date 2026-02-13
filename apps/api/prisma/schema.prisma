@@ -51,6 +51,13 @@ enum VerificationStatus {
   REJECTED
 }
 
+enum ContactMethod {
+  PLATFORM
+  EMAIL
+  WEBSITE
+  WHATSAPP
+}
+
 enum ServiceStatus {
   ACTIVE
   PENDING
@@ -102,6 +109,7 @@ model User {
   services    Service[] @relation("EnvoyServices")
   gigs        Gig[]     @relation("UserGigs")
   gigApplications GigApplication[] @relation("GigApplicant")
+  serviceInquiries ServiceInquiry[]
 }
 
 model EnvoyProfile {
@@ -168,6 +176,10 @@ model Job {
   sourceId    String?
   sourceUrl   String?
   applyUrl    String?
+  contactMethods ContactMethod[] @default([])
+  contactEmail    String?
+  contactWebsite  String?
+  contactWhatsapp String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -324,21 +336,31 @@ model Service {
   rate        String
   imageUrl    String?
   status      ServiceStatus @default(PENDING)
+  contactMethods ContactMethod[] @default([])
+  contactEmail    String?
+  contactWebsite  String?
+  contactWhatsapp String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   envoy User @relation("EnvoyServices", fields: [envoyId], references: [id])
+  inquiries ServiceInquiry[]
 }
 
 model Gig {
   id         String @id @default(cuid())
   postedById String
   title      String
+  description String
   amount     String
   location   String
   duration   String
   urgent     Boolean @default(false)
   status     GigStatus @default(AVAILABLE)
+  contactMethods ContactMethod[] @default([])
+  contactEmail    String?
+  contactWebsite  String?
+  contactWhatsapp String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -350,6 +372,7 @@ model GigApplication {
   id          String @id @default(cuid())
   gigId       String
   applicantId String
+  counterBudget String?
   status      GigApplicationStatus @default(APPLIED)
   createdAt   DateTime @default(now())
 
@@ -357,4 +380,16 @@ model GigApplication {
   applicant User @relation("GigApplicant", fields: [applicantId], references: [id])
 
   @@unique([gigId, applicantId])
+}
+
+model ServiceInquiry {
+  id         String @id @default(cuid())
+  serviceId  String
+  customerId String
+  method     ContactMethod?
+  message    String?
+  createdAt  DateTime @default(now())
+
+  service  Service @relation(fields: [serviceId], references: [id])
+  customer User    @relation(fields: [customerId], references: [id])
 }

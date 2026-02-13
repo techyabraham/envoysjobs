@@ -11,6 +11,10 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: "admin@envoysjobs.com" },
     update: {
+      passwordHash: adminPassword,
+      firstName: "Super",
+      lastName: "Admin",
+      role: "ADMIN",
       stewardStatus: null,
       stewardDepartment: null,
       stewardMatricNumber: null
@@ -18,8 +22,8 @@ async function main() {
     create: {
       email: "admin@envoysjobs.com",
       passwordHash: adminPassword,
-      firstName: "Admin",
-      lastName: "User",
+      firstName: "Super",
+      lastName: "Admin",
       role: "ADMIN",
       stewardStatus: null
     }
@@ -189,24 +193,87 @@ async function main() {
 
   await prisma.service.upsert({
     where: { id: "seed-service" },
-    update: {},
+    update: {
+      envoyId: admin.id,
+      title: "Community Business Support Services",
+      description: "Business setup support, customer service optimization, and delivery systems for growing brands.",
+      rate: "₦30,000 - ₦150,000/project",
+      status: "ACTIVE",
+      contactMethods: ["PLATFORM", "WHATSAPP"],
+      contactWhatsapp: "08030000000"
+    },
     create: {
       id: "seed-service",
-      envoyId: envoy.id,
-      title: "Content Strategy & Copywriting",
-      description: "End-to-end content planning and copywriting for ministries and community initiatives.",
-      rate: "₦30,000 - ₦120,000/project",
-      status: "ACTIVE"
+      envoyId: admin.id,
+      title: "Community Business Support Services",
+      description: "Business setup support, customer service optimization, and delivery systems for growing brands.",
+      rate: "₦30,000 - ₦150,000/project",
+      status: "ACTIVE",
+      contactMethods: ["PLATFORM", "WHATSAPP"],
+      contactWhatsapp: "08030000000"
+    }
+  });
+
+  await prisma.service.upsert({
+    where: { id: "seed-service-2" },
+    update: {
+      envoyId: admin.id,
+      title: "Event Planning & Coordination",
+      description: "Planning, vendor coordination, and on-site execution for private and community events.",
+      rate: "₦40,000 - ₦200,000/event",
+      status: "ACTIVE",
+      contactMethods: ["PLATFORM"]
+    },
+    create: {
+      id: "seed-service-2",
+      envoyId: admin.id,
+      title: "Event Planning & Coordination",
+      description: "Planning, vendor coordination, and on-site execution for private and community events.",
+      rate: "₦40,000 - ₦200,000/event",
+      status: "ACTIVE",
+      contactMethods: ["PLATFORM"]
+    }
+  });
+
+  await prisma.service.upsert({
+    where: { id: "seed-service-3" },
+    update: {
+      envoyId: admin.id,
+      title: "Digital Marketing Support",
+      description: "Campaign planning, social media management, and lead generation support for SMEs.",
+      rate: "₦35,000 - ₦120,000/month",
+      status: "ACTIVE",
+      contactMethods: ["PLATFORM", "EMAIL"],
+      contactEmail: "admin@envoysjobs.com"
+    },
+    create: {
+      id: "seed-service-3",
+      envoyId: admin.id,
+      title: "Digital Marketing Support",
+      description: "Campaign planning, social media management, and lead generation support for SMEs.",
+      rate: "₦35,000 - ₦120,000/month",
+      status: "ACTIVE",
+      contactMethods: ["PLATFORM", "EMAIL"],
+      contactEmail: "admin@envoysjobs.com"
     }
   });
 
   await prisma.gig.upsert({
     where: { id: "seed-gig" },
-    update: {},
+    update: {
+      title: "Event Logistics Support",
+      description: "Assist with venue setup, guest coordination, and movement of event materials.",
+      amount: "₦20,000",
+      location: "Lagos",
+      duration: "1 day",
+      urgent: true,
+      status: "AVAILABLE"
+    },
     create: {
       id: "seed-gig",
       postedById: hirer.id,
       title: "Event Logistics Support",
+      description: "Assist with venue setup, guest coordination, and movement of event materials.",
       amount: "₦20,000",
       location: "Lagos",
       duration: "1 day",

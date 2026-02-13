@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { LoginPage } from "@envoysjobs/ui";
 
 export default function AdminLoginClient() {
@@ -28,6 +28,13 @@ export default function AdminLoginClient() {
       password
     });
     if (result?.ok) {
+      const session = await getSession();
+      const role = (session as any)?.user?.role as string | undefined;
+      if (role !== "ADMIN") {
+        alert("This portal is restricted to super admins.");
+        router.push("/auth/login");
+        return;
+      }
       router.push("/admin");
       return;
     }

@@ -62,7 +62,7 @@ export function DashboardOverview({
       title: 'Senior Developer Position',
       company: 'Tech Solutions Ltd',
       match: '95%',
-      badge: 'From Our Members'
+      badge: 'From An Envoy'
     },
     {
       type: 'gig',

@@ -2,15 +2,21 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/lib/useApi";
+import type { ContactMethod } from "@/lib/contact";
 
 export type Gig = {
   id: string;
   title: string;
+  description: string;
   amount: string;
   location: string;
   duration: string;
   urgent: boolean;
   status: "AVAILABLE" | "APPLIED" | "ONGOING" | "COMPLETED";
+  contactMethods?: ContactMethod[];
+  contactEmail?: string | null;
+  contactWebsite?: string | null;
+  contactWhatsapp?: string | null;
   postedById: string;
   createdAt: string;
   updatedAt: string;
@@ -70,7 +76,18 @@ export function useCreateGig() {
   const api = useApi();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { title: string; amount: string; location: string; duration: string; urgent?: boolean }) => {
+    mutationFn: async (payload: {
+      title: string;
+      description: string;
+      amount: string;
+      location: string;
+      duration: string;
+      urgent?: boolean;
+      contactMethods?: ContactMethod[];
+      contactEmail?: string;
+      contactWebsite?: string;
+      contactWhatsapp?: string;
+    }) => {
       const res = await api<Gig>("/gigs", {
         method: "POST",
         body: JSON.stringify(payload)
@@ -89,8 +106,11 @@ export function useApplyToGig() {
   const api = useApi();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (gigId: string) => {
-      const res = await api<{ id: string }>(`/gigs/${gigId}/apply`, { method: "POST" });
+    mutationFn: async (payload: { gigId: string; counterBudget?: string }) => {
+      const res = await api<{ id: string }>(`/gigs/${payload.gigId}/apply`, {
+        method: "POST",
+        body: JSON.stringify({ counterBudget: payload.counterBudget })
+      });
       if (res.error) throw new Error(res.error);
       return res.data;
     },

@@ -77,13 +77,24 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
     }
     matchesSkills(text, skills) {
         const normalized = text.toLowerCase();
-        return skills.some((skill) => normalized.includes(skill.toLowerCase()));
+        return skills.some((skill) => {
+            const raw = skill.toLowerCase().trim();
+            if (!raw)
+                return false;
+            const tokens = raw.split(/[\s/,&-]+/).filter(Boolean);
+            return tokens.some((token) => token.length >= 3 && normalized.includes(token));
+        });
     }
     async getSkillKeywords() {
         const enabled = this.config.get("JOBS_IMPORT_USE_SKILLS");
         if (enabled === "false")
             return [];
         const limit = Number(this.config.get("JOBS_IMPORT_SKILL_LIMIT") || "6");
+        const seed = this.config.get("JOBS_IMPORT_SKILL_SEED") || "";
+        const seeded = seed
+            .split("|")
+            .map((skill) => skill.trim())
+            .filter(Boolean);
         const skillsFromJoin = await this.prisma.userSkill.findMany({
             select: { skill: { select: { name: true } } }
         });
@@ -100,6 +111,7 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
                 .filter(Boolean);
             joined.push(...parts);
         }
+        joined.push(...seeded);
         const counts = new Map();
         for (const skill of joined) {
             const key = skill.toLowerCase();
@@ -120,12 +132,12 @@ let JobsImportService = JobsImportService_1 = class JobsImportService {
         const baseUrl = useRapidApi
             ? this.config.get("JSEARCH_API_URL") || "https://jsearch.p.rapidapi.com/search"
             : this.config.get("JSEARCH_API_URL") || "https://api.openwebninja.com/v1/job-search";
-        const baseQuery = this.config.get("JSEARCH_QUERY") || "jobs";
+        const baseQuery = this.config.get("JSEARCH_QUERY") || "jobs in Nigeria";
         const location = this.config.get("JSEARCH_LOCATION") || "Nigeria";
         const country = this.config.get("JSEARCH_COUNTRY") || "ng";
         const datePosted = this.config.get("JSEARCH_DATE_POSTED") || "all";
         const maxPerRun = Number(this.config.get("JOBS_IMPORT_MAX_PER_RUN") || "20");
-        const query = skillKeywords.length > 0 ? skillKeywords.join(" OR ") : baseQuery;
+        const query = baseQuery;
         const url = new URL(baseUrl);
         if (useRapidApi) {
             url.searchParams.set("query", `${query} in ${location}`.trim());

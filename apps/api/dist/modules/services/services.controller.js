@@ -21,12 +21,36 @@ const jwt_auth_guard_1 = require("../../common/jwt-auth.guard");
 const roles_guard_1 = require("../../common/roles.guard");
 const roles_decorator_1 = require("../../common/roles.decorator");
 const services_service_1 = require("./services.service");
-const serviceSchema = zod_1.z.object({
+const contactMethodEnum = zod_1.z.enum(["PLATFORM", "EMAIL", "WEBSITE", "WHATSAPP"]);
+const contactInfoSchema = zod_1.z.object({
+    contactMethods: zod_1.z.array(contactMethodEnum).optional(),
+    contactEmail: zod_1.z.string().email().optional(),
+    contactWebsite: zod_1.z.string().url().optional(),
+    contactWhatsapp: zod_1.z.string().min(8).optional()
+});
+function validateContact(data, ctx) {
+    const methods = data.contactMethods ?? [];
+    if (methods.includes("EMAIL") && !data.contactEmail) {
+        ctx.addIssue({ code: zod_1.z.ZodIssueCode.custom, path: ["contactEmail"], message: "Email is required." });
+    }
+    if (methods.includes("WEBSITE") && !data.contactWebsite) {
+        ctx.addIssue({ code: zod_1.z.ZodIssueCode.custom, path: ["contactWebsite"], message: "Website is required." });
+    }
+    if (methods.includes("WHATSAPP") && !data.contactWhatsapp) {
+        ctx.addIssue({ code: zod_1.z.ZodIssueCode.custom, path: ["contactWhatsapp"], message: "WhatsApp number is required." });
+    }
+}
+const serviceBaseSchema = zod_1.z.object({
     title: zod_1.z.string().min(2),
     description: zod_1.z.string().min(10),
     rate: zod_1.z.string().min(2)
 });
-const serviceUpdateSchema = serviceSchema.partial();
+const serviceSchema = serviceBaseSchema.merge(contactInfoSchema).superRefine(validateContact);
+const serviceUpdateSchema = serviceBaseSchema.partial().merge(contactInfoSchema).superRefine(validateContact);
+const inquirySchema = zod_1.z.object({
+    method: contactMethodEnum.optional(),
+    message: zod_1.z.string().max(500).optional()
+});
 let ServicesController = class ServicesController {
     constructor(servicesService) {
         this.servicesService = servicesService;
@@ -37,8 +61,11 @@ let ServicesController = class ServicesController {
     listMine(req) {
         return this.servicesService.listByEnvoy(req.user?.id || "");
     }
-    listAll() {
-        return this.servicesService.listAll();
+    listMyServices(req) {
+        return this.servicesService.listByEnvoy(req.user?.id || "");
+    }
+    listAll(q) {
+        return this.servicesService.listAll(q);
     }
     get(id) {
         return this.servicesService.get(id);
@@ -49,12 +76,15 @@ let ServicesController = class ServicesController {
     uploadImage(req, id, file) {
         return this.servicesService.uploadImage(id, req.user?.id || "", file);
     }
+    inquire(req, id, body) {
+        return this.servicesService.inquire(id, req.user?.id || "", body);
+    }
 };
 exports.ServicesController = ServicesController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ENVOY"),
+    (0, roles_decorator_1.Roles)("ENVOY", "ADMIN"),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(serviceSchema))),
     __metadata("design:type", Function),
@@ -71,9 +101,18 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ServicesController.prototype, "listMine", null);
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)("mine"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "listMyServices", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)("q")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ServicesController.prototype, "listAll", null);
 __decorate([
@@ -86,7 +125,7 @@ __decorate([
 __decorate([
     (0, common_1.Put)(":id"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ENVOY"),
+    (0, roles_decorator_1.Roles)("ENVOY", "ADMIN"),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)("id")),
     __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(serviceUpdateSchema))),
@@ -97,7 +136,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)(":id/image"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ENVOY"),
+    (0, roles_decorator_1.Roles)("ENVOY", "ADMIN"),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)("file", {
         limits: { fileSize: 5 * 1024 * 1024 },
         fileFilter: (req, file, cb) => {
@@ -115,6 +154,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, String, Object]),
     __metadata("design:returntype", void 0)
 ], ServicesController.prototype, "uploadImage", null);
+__decorate([
+    (0, common_1.Post)(":id/inquiries"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(inquirySchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, void 0]),
+    __metadata("design:returntype", void 0)
+], ServicesController.prototype, "inquire", null);
 exports.ServicesController = ServicesController = __decorate([
     (0, common_1.Controller)("services"),
     __metadata("design:paramtypes", [services_service_1.ServicesService])

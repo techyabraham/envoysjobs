@@ -9,6 +9,7 @@ export type ApplicationStatus =
   | "HIRED"
   | "REJECTED";
 export type StewardStatus = "PENDING" | "VERIFIED" | "REJECTED";
+export type ContactMethod = "PLATFORM" | "EMAIL" | "WEBSITE" | "WHATSAPP";
 
 export type UserDTO = {
   id: string;
@@ -60,6 +61,10 @@ export type JobDTO = {
   sourceId?: string | null;
   sourceUrl?: string | null;
   applyUrl?: string | null;
+  contactMethods?: ContactMethod[];
+  contactEmail?: string | null;
+  contactWebsite?: string | null;
+  contactWhatsapp?: string | null;
 };
 
 export type AutoMessageTemplateDTO = {

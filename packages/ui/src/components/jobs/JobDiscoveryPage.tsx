@@ -389,7 +389,7 @@ export function JobDiscoveryPage({ onJobClick, jobs, savedJobIds, onToggleSave }
                     {/* Member Badge */}
                     {job.fromMember && (
                       <div className="inline-flex items-center gap-1 px-2 py-1 bg-soft-gold/10 text-soft-gold rounded-lg text-xs mb-3">
-                        ⭐ From Our Members
+                        ⭐ From An Envoy
                       </div>
                     )}
 

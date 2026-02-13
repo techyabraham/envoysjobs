@@ -8,6 +8,7 @@ import { useSavedJobs, useSaveJob, useUnsaveJob } from "@/lib/savedJobs";
 import { useApi } from "@/lib/useApi";
 import { useCreateConversation } from "@/lib/messaging";
 import { useSession } from "next-auth/react";
+import { buildWhatsappUrl, type ContactMethod } from "@/lib/contact";
 
 function formatSalary(min?: number | null, max?: number | null) {
   if (min == null && max == null) return "Negotiable";
@@ -30,6 +31,7 @@ export default function Page() {
 
   const savedIds = useMemo(() => (savedJobs ?? []).map((item) => item.id), [savedJobs]);
   const isSaved = jobId ? savedIds.includes(jobId) : false;
+  const methods = job?.contactMethods?.length ? job.contactMethods : (["PLATFORM"] as ContactMethod[]);
 
   const mappedJob = useMemo(() => {
     if (!job) return undefined;
@@ -116,13 +118,33 @@ export default function Page() {
       }}
       onApply={async () => {
         if (!jobId) return;
+        if (methods.includes("WHATSAPP")) {
+          const url = buildWhatsappUrl(job?.contactWhatsapp);
+          if (url) {
+            window.open(url, "_blank", "noopener,noreferrer");
+            return;
+          }
+        }
+        if (methods.includes("EMAIL") && job?.contactEmail) {
+          window.location.href = `mailto:${job.contactEmail}`;
+          return;
+        }
+        if (methods.includes("WEBSITE")) {
+          const target = job?.contactWebsite || job?.applyUrl;
+          if (target) {
+            window.open(target, "_blank", "noopener,noreferrer");
+            return;
+          }
+        }
         if (job?.applyUrl) {
           window.open(job.applyUrl, "_blank", "noopener,noreferrer");
           return;
         }
-        const res = await api(`/jobs/${jobId}/apply`, { method: "POST" });
-        if (res.error) {
-          alert("Failed to apply.");
+        if (methods.includes("PLATFORM")) {
+          const res = await api(`/jobs/${jobId}/apply`, { method: "POST" });
+          if (res.error) {
+            alert("Failed to apply.");
+          }
         }
       }}
     />

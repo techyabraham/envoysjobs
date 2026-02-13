@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/lib/useApi";
+import type { ContactMethod } from "@/lib/contact";
 
 export type Job = {
   id: string;
@@ -19,6 +20,10 @@ export type Job = {
   sourceId?: string | null;
   sourceUrl?: string | null;
   applyUrl?: string | null;
+  contactMethods?: ContactMethod[];
+  contactEmail?: string | null;
+  contactWebsite?: string | null;
+  contactWhatsapp?: string | null;
 };
 
 export function useJobs() {

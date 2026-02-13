@@ -40,9 +40,17 @@ export default function SiteHeader() {
         if (id) router.push(`/gigs/${id}`);
         break;
       case "dashboard":
+        if (role === "ADMIN") {
+          router.push("/admin");
+          break;
+        }
         router.push(role === "HIRER" ? "/hirer/dashboard" : "/envoy/dashboard");
         break;
       case "profile":
+        if (role === "ADMIN") {
+          router.push("/admin");
+          break;
+        }
         router.push(role === "HIRER" ? "/hirer/profile" : "/envoy/profile");
         break;
       case "about":
