@@ -8,19 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServicesService = void 0;
 const common_1 = require("@nestjs/common");
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
 const client_1 = require("@prisma/client");
 const prisma_service_1 = require("../prisma/prisma.service");
+const storage_service_1 = require("../../common/storage.service");
 let ServicesService = class ServicesService {
-    constructor(prisma) {
+    constructor(prisma, storage) {
         this.prisma = prisma;
+        this.storage = storage;
     }
     create(data) {
         const contactMethods = data.contactMethods?.length ? data.contactMethods : [client_1.ContactMethod.PLATFORM];
@@ -102,16 +99,10 @@ let ServicesService = class ServicesService {
         }
         if (!file)
             throw new common_1.NotFoundException("No file uploaded");
-        const uploadsDir = path_1.default.join(process.cwd(), "apps/api/uploads");
-        await promises_1.default.mkdir(uploadsDir, { recursive: true });
-        const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const filename = `service-${id}-${Date.now()}-${safeName}`;
-        const filePath = path_1.default.join(uploadsDir, filename);
-        await promises_1.default.writeFile(filePath, file.buffer);
-        const imageUrl = `/uploads/${filename}`;
+        const stored = await this.storage.save(file, "services");
         return this.prisma.service.update({
             where: { id },
-            data: { imageUrl }
+            data: { imageUrl: stored.url }
         });
     }
     async inquire(serviceId, customerId, data) {
@@ -133,5 +124,5 @@ let ServicesService = class ServicesService {
 exports.ServicesService = ServicesService;
 exports.ServicesService = ServicesService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, storage_service_1.StorageService])
 ], ServicesService);

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { EditProfilePage } from "@envoysjobs/ui";
 import { useApi } from "@/lib/useApi";
-import { API_BASE_URL } from "@/lib/api";
+import { resolveAssetUrl } from "@/lib/api";
 
 export default function Page() {
   const router = useRouter();
@@ -98,7 +98,7 @@ export default function Page() {
       alert("Failed to upload image.");
       return;
     }
-    return `${API_BASE_URL}${res.data.imageUrl}`;
+    return resolveAssetUrl(res.data.imageUrl) as string;
   };
 
   if (meQuery.isLoading || profileQuery.isLoading) {
@@ -112,7 +112,7 @@ export default function Page() {
   return (
     <EditProfilePage
       initialData={initialData}
-      profileImageUrl={meQuery.data?.imageUrl ? `${API_BASE_URL}${meQuery.data.imageUrl}` : null}
+      profileImageUrl={resolveAssetUrl(meQuery.data?.imageUrl) as string | null}
       onImageUpload={handleImageUpload}
       onSave={handleSave}
       onCancel={() => router.push("/envoy/profile")}

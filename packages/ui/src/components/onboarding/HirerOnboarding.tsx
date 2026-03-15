@@ -38,6 +38,9 @@ export function HirerOnboarding({ onNavigate, onComplete, userName = 'Friend' }:
     stewardDepartment: '',
     stewardDepartmentOther: '',
     stewardMatricNumber: '',
+    isRecruiter: 'no' as 'yes' | 'no',
+    recruiterIndustries: [] as string[],
+    recruiterSkillsInput: '',
     
     // Intent
     hiringNeeds: [] as string[],
@@ -73,6 +76,15 @@ export function HirerOnboarding({ onNavigate, onComplete, userName = 'Friend' }:
       hiringNeeds: prev.hiringNeeds.includes(need)
         ? prev.hiringNeeds.filter(n => n !== need)
         : [...prev.hiringNeeds, need]
+    }));
+  };
+
+  const toggleRecruiterIndustry = (industry: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      recruiterIndustries: prev.recruiterIndustries.includes(industry)
+        ? prev.recruiterIndustries.filter((item) => item !== industry)
+        : [...prev.recruiterIndustries, industry]
     }));
   };
 
@@ -260,6 +272,67 @@ export function HirerOnboarding({ onNavigate, onComplete, userName = 'Friend' }:
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             />
+
+            <div className="space-y-3">
+              <label className="block text-sm font-medium">Are you a recruiter?</label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 text-sm text-foreground-secondary">
+                  <input
+                    type="radio"
+                    checked={formData.isRecruiter === 'yes'}
+                    onChange={() => setFormData({ ...formData, isRecruiter: 'yes' })}
+                    className="h-4 w-4"
+                  />
+                  Yes
+                </label>
+                <label className="flex items-center gap-2 text-sm text-foreground-secondary">
+                  <input
+                    type="radio"
+                    checked={formData.isRecruiter === 'no'}
+                    onChange={() =>
+                      setFormData({
+                        ...formData,
+                        isRecruiter: 'no',
+                        recruiterIndustries: [],
+                        recruiterSkillsInput: ''
+                      })
+                    }
+                    className="h-4 w-4"
+                  />
+                  No
+                </label>
+              </div>
+            </div>
+
+            {formData.isRecruiter === 'yes' && (
+              <div className="space-y-4 rounded-xl bg-background-secondary p-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Industries you recruit from</label>
+                  <div className="flex flex-wrap gap-2">
+                    {industries.map((industry) => (
+                      <button
+                        key={industry}
+                        type="button"
+                        onClick={() => toggleRecruiterIndustry(industry)}
+                        className={`rounded-full px-3 py-1.5 text-sm transition-all ${
+                          formData.recruiterIndustries.includes(industry)
+                            ? 'bg-deep-blue text-white'
+                            : 'bg-white border border-input-border text-foreground-secondary hover:bg-background-tertiary'
+                        }`}
+                      >
+                        {industry}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Input
+                  label="Skills you recruit for (optional)"
+                  placeholder="e.g. Product Design, Sales, Data Analysis"
+                  value={formData.recruiterSkillsInput}
+                  onChange={(e) => setFormData({ ...formData, recruiterSkillsInput: e.target.value })}
+                />
+              </div>
+            )}
 
             <div className="space-y-3">
               <label className="block text-sm font-medium">Are you a Steward at RCCG The Envoys?</label>
@@ -494,6 +567,9 @@ export function HirerOnboarding({ onNavigate, onComplete, userName = 'Friend' }:
                 disabled={
                   (currentStep === 'type' && !formData.hirerType) ||
                   (currentStep === 'basic' && (!formData.companyName || !formData.location)) ||
+                  (currentStep === 'basic' &&
+                    formData.isRecruiter === 'yes' &&
+                    formData.recruiterIndustries.length === 0) ||
                   (currentStep === 'basic' &&
                     formData.steward === 'yes' &&
                     (!formData.stewardDepartment ||

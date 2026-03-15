@@ -36,8 +36,10 @@ export class MessagingController {
   }
 
   @Get("conversations/:id/messages")
-  listMessages(@Param("id") id: string) {
-    return this.messagingService.listMessages(id);
+  listMessages(@Param("id") id: string, @Query("page") page?: string, @Query("limit") limit?: string) {
+    const pageNum = Math.max(0, Number(page || 0));
+    const limitNum = Math.min(100, Math.max(1, Number(limit || 50)));
+    return this.messagingService.listMessages(id, pageNum, limitNum);
   }
 
   @Throttle({ default: { limit: 20, ttl: 60000 } })

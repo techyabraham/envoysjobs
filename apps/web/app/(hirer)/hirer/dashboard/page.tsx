@@ -3,9 +3,11 @@
 import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
 import { useApplications } from "@/lib/applications";
+import { useApi } from "@/lib/useApi";
 import { useHirerJobs } from "@/lib/jobs";
 import { useConversations } from "@/lib/messaging";
 import { useNotifications } from "@/lib/notifications";
+import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -20,12 +22,23 @@ function StatCard({ label, value }: { label: string; value: number }) {
 
 export default function Page() {
   const { data: session } = useSession();
+  const api = useApi();
   const name = (session as any)?.user?.name || "Hirer";
   const userId = (session as any)?.user?.id as string | undefined;
   const jobs = useHirerJobs(userId);
   const applications = useApplications();
   const conversations = useConversations(userId);
   const notifications = useNotifications();
+  const hirerProfile = useQuery({
+    queryKey: ["hirer-profile-dashboard"],
+    queryFn: async () => {
+      const res = await api<any>("/hirer/profile");
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    enabled: Boolean(userId)
+  });
+  const isRecruiter = Boolean(hirerProfile.data?.isRecruiter);
 
   return (
     <DashboardShell userName={name}>
@@ -42,6 +55,9 @@ export default function Page() {
             <Link href="/hirer/jobs/new" className="btn-secondary">Post a Job</Link>
             <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
             <Link href="/hirer/shortlist" className="btn-secondary">Envoy Shortlist</Link>
+            <Link href={isRecruiter ? "/hirer/recruitment" : "/hirer/become-recruiter"} className="btn-secondary">
+              {isRecruiter ? "Recruitment" : "Become a Recruiter"}
+            </Link>
           </div>
         </div>
       </PageShell>

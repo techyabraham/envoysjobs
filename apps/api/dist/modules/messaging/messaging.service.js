@@ -8,9 +8,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagingService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,12 +15,14 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const notifications_service_1 = require("../notifications/notifications.service");
 const utils_1 = require("@envoysjobs/utils");
 const memory_store_1 = require("../../common/memory.store");
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
+const messaging_gateway_1 = require("./messaging.gateway");
+const storage_service_1 = require("../../common/storage.service");
 let MessagingService = class MessagingService {
-    constructor(prisma, notifications) {
+    constructor(prisma, notifications, gateway, storage) {
         this.prisma = prisma;
         this.notifications = notifications;
+        this.gateway = gateway;
+        this.storage = storage;
     }
     listConversations(userId) {
         if (!(0, memory_store_1.useMemory)()) {
@@ -103,21 +102,33 @@ let MessagingService = class MessagingService {
             return conversation;
         });
     }
-    listMessages(conversationId) {
+    listMessages(conversationId, page = 0, limit = 50) {
         if (!(0, memory_store_1.useMemory)()) {
             return this.prisma.message.findMany({
                 where: { conversationId },
-                orderBy: { createdAt: "asc" },
+                orderBy: { createdAt: "desc" },
+                skip: page * limit,
+                take: limit,
                 include: { attachments: true }
-            });
+            }).then((items) => items.reverse());
         }
         (0, memory_store_1.seedMemory)();
         return this.prisma.message
-            .findMany({ where: { conversationId }, orderBy: { createdAt: "asc" }, include: { attachments: true } })
+            .findMany({
+            where: { conversationId },
+            orderBy: { createdAt: "desc" },
+            skip: page * limit,
+            take: limit,
+            include: { attachments: true }
+        })
+            .then((items) => items.reverse())
             .catch(() => {
-            return memory_store_1.memoryStore.messages
+            const items = memory_store_1.memoryStore.messages
                 .filter((m) => m.conversationId === conversationId)
-                .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+                .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+                .slice(page * limit, page * limit + limit)
+                .reverse();
+            return items;
         });
     }
     sendMessage(conversationId, senderId, text) {
@@ -130,6 +141,7 @@ let MessagingService = class MessagingService {
                 },
                 include: { attachments: true }
             }).then(async (message) => {
+                this.gateway.emitMessage(message);
                 const convo = await this.prisma.conversation.findUnique({
                     where: { id: conversationId },
                     include: { participants: true }
@@ -159,6 +171,7 @@ let MessagingService = class MessagingService {
                 createdAt: new Date()
             };
             memory_store_1.memoryStore.messages.push(message);
+            this.gateway.emitMessage(message);
             const convo = memory_store_1.memoryStore.conversations.find((c) => c.id === conversationId);
             if (convo) {
                 convo.participants
@@ -170,11 +183,7 @@ let MessagingService = class MessagingService {
     }
     async sendAttachment(conversationId, senderId, file, text) {
         const sanitizedText = text ? (0, utils_1.sanitizeMessage)(text) : "Sent an attachment";
-        const uploadsDir = path_1.default.join(process.cwd(), "apps/api/uploads");
-        await fs_1.promises.mkdir(uploadsDir, { recursive: true });
-        const filename = `${senderId}-${Date.now()}-${file.originalname}`.replace(/\\s+/g, "_");
-        const filePath = path_1.default.join(uploadsDir, filename);
-        await fs_1.promises.writeFile(filePath, file.buffer);
+        const stored = await this.storage.save(file, "attachments");
         if (!(0, memory_store_1.useMemory)()) {
             const message = await this.prisma.message.create({
                 data: {
@@ -183,13 +192,14 @@ let MessagingService = class MessagingService {
                     text: sanitizedText,
                     attachments: {
                         create: {
-                            url: `/uploads/${filename}`,
+                            url: stored.url,
                             type: file.mimetype
                         }
                     }
                 },
                 include: { attachments: true }
             });
+            this.gateway.emitMessage(message);
             const convo = await this.prisma.conversation.findUnique({
                 where: { id: conversationId },
                 include: { participants: true }
@@ -209,7 +219,7 @@ let MessagingService = class MessagingService {
                 text: sanitizedText,
                 attachments: {
                     create: {
-                        url: `/uploads/${filename}`,
+                        url: stored.url,
                         type: file.mimetype
                     }
                 }
@@ -225,8 +235,9 @@ let MessagingService = class MessagingService {
                 createdAt: new Date()
             };
             memory_store_1.memoryStore.messages.push(created);
-            return { ...created, attachments: [{ url: `/uploads/${filename}`, type: file.mimetype }] };
+            return { ...created, attachments: [{ url: stored.url, type: file.mimetype }] };
         });
+        this.gateway.emitMessage(message);
         const convo = memory_store_1.memoryStore.conversations.find((c) => c.id === conversationId);
         if (convo) {
             convo.participants
@@ -239,5 +250,8 @@ let MessagingService = class MessagingService {
 exports.MessagingService = MessagingService;
 exports.MessagingService = MessagingService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService, notifications_service_1.NotificationsService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        notifications_service_1.NotificationsService,
+        messaging_gateway_1.MessagingGateway,
+        storage_service_1.StorageService])
 ], MessagingService);

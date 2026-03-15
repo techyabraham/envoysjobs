@@ -1,12 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import fs from "fs/promises";
-import path from "path";
 import { PrismaService } from "../prisma/prisma.service";
 import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
+import { StorageService } from "../../common/storage.service";
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private storage: StorageService) {}
 
   getUser(userId: string) {
     if (!useMemory()) return this.prisma.user.findUnique({ where: { id: userId } });
@@ -29,13 +28,8 @@ export class UsersService {
 
   async uploadAvatar(userId: string, file: Express.Multer.File) {
     if (!file) return { error: "No file uploaded" };
-    const uploadsDir = path.join(process.cwd(), "apps/api/uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filename = `avatar-${userId}-${Date.now()}-${safeName}`;
-    const filePath = path.join(uploadsDir, filename);
-    await fs.writeFile(filePath, file.buffer);
-    const imageUrl = `/uploads/${filename}`;
+    const stored = await this.storage.save(file, "avatars");
+    const imageUrl = stored.url;
     await this.updateUser(userId, { imageUrl });
     return { imageUrl };
   }
@@ -90,6 +84,9 @@ export class UsersService {
         userId,
         type: "INDIVIDUAL",
         businessName: null,
+        isRecruiter: false,
+        recruiterIndustries: [],
+        recruiterSkills: [],
         rating: 4.5,
         user: memoryStore.users.find((u) => u.id === userId)
       } as any;

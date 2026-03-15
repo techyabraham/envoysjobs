@@ -5,7 +5,7 @@ import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { API_BASE_URL } from "@/lib/api";
+import { resolveAssetUrl } from "@/lib/api";
 
 export default function Page() {
   const api = useApi();
@@ -28,9 +28,9 @@ export default function Page() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-deep-blue text-white flex items-center justify-center text-lg font-semibold overflow-hidden">
-                  {data.user?.imageUrl ? (
+                  {resolveAssetUrl(data.user?.imageUrl) ? (
                     <img
-                      src={`${API_BASE_URL}${data.user.imageUrl}`}
+                      src={resolveAssetUrl(data.user?.imageUrl) as string}
                       alt={`${data.user?.firstName ?? "User"} profile`}
                       className="w-full h-full object-cover"
                     />

@@ -12,6 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AutoMessagesController = void 0;
 const common_1 = require("@nestjs/common");
 const auto_messages_service_1 = require("./auto-messages.service");
+const jwt_auth_guard_1 = require("../../common/jwt-auth.guard");
+const roles_guard_1 = require("../../common/roles.guard");
+const roles_decorator_1 = require("../../common/roles.decorator");
 let AutoMessagesController = class AutoMessagesController {
     constructor(autoMessagesService) {
         this.autoMessagesService = autoMessagesService;
@@ -32,6 +35,8 @@ __decorate([
 ], AutoMessagesController.prototype, "list", null);
 __decorate([
     (0, common_1.Post)("seed"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)

@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useJobs } from "@/lib/jobs";
 import { usePublicServices } from "@/lib/services";
 import { useAvailableGigs } from "@/lib/gigs";
-import { API_BASE_URL } from "@/lib/api";
+import { resolveAssetUrl } from "@/lib/api";
 
 export default function HomeClient() {
   const router = useRouter();
@@ -33,17 +33,59 @@ export default function HomeClient() {
       case "jobs":
         router.push("/jobs");
         break;
+      case "post-job":
+        if (!session) {
+          router.push("/auth/login");
+          break;
+        }
+        if (role === "HIRER") {
+          router.push("/hirer/jobs/new");
+          break;
+        }
+        router.push("/hirer/dashboard");
+        break;
+      case "jobs-search":
+        router.push(`/jobs?q=${encodeURIComponent(id || "")}&type=jobs`);
+        break;
       case "job":
         if (id) router.push(`/jobs/${id}`);
         break;
       case "services":
         router.push("/services");
         break;
+      case "post-service":
+        if (!session) {
+          router.push("/auth/login");
+          break;
+        }
+        if (role === "HIRER") {
+          router.push("/hirer/dashboard");
+          break;
+        }
+        router.push("/envoy/services/new");
+        break;
+      case "services-search":
+        router.push(`/services?q=${encodeURIComponent(id || "")}&type=services`);
+        break;
       case "service":
         if (id) router.push(`/services/${id}`);
         break;
       case "gigs":
         router.push("/gigs");
+        break;
+      case "post-gig":
+        if (!session) {
+          router.push("/auth/login");
+          break;
+        }
+        if (role === "HIRER") {
+          router.push("/hirer/dashboard");
+          break;
+        }
+        router.push("/envoy/gigs/new");
+        break;
+      case "gigs-search":
+        router.push(`/gigs?q=${encodeURIComponent(id || "")}&type=gigs`);
         break;
       case "gig":
         if (id) router.push(`/gigs/${id}`);
@@ -74,6 +116,19 @@ export default function HomeClient() {
     <div className="min-h-screen bg-background">
       <Homepage
         onNavigate={handleNavigate}
+        isAuthenticated={Boolean(session)}
+        onSearch={(filter, query) => {
+          if (filter === "services") {
+            router.push(`/services?q=${encodeURIComponent(query)}&type=services`);
+            return;
+          }
+          if (filter === "gigs") {
+            router.push(`/gigs?q=${encodeURIComponent(query)}&type=gigs`);
+            return;
+          }
+          const type = filter === "all" ? "all" : "jobs";
+          router.push(`/jobs?q=${encodeURIComponent(query)}&type=${type}`);
+        }}
         jobsShared={jobsShared}
         servicesListed={servicesListed}
         webinars={[
@@ -99,7 +154,7 @@ export default function HomeClient() {
         featuredServices={services.data?.slice(0, 4).map((service) => ({
           id: service.id,
           name: service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy",
-          photo: service.imageUrl ? `${API_BASE_URL}${service.imageUrl}` : null,
+          photo: resolveAssetUrl(service.imageUrl),
           skill: service.title,
           tags: service.description.split(" ").slice(0, 3),
           rating: 4.8,

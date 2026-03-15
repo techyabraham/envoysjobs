@@ -8,19 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
 const prisma_service_1 = require("../prisma/prisma.service");
 const memory_store_1 = require("../../common/memory.store");
+const storage_service_1 = require("../../common/storage.service");
 let UsersService = class UsersService {
-    constructor(prisma) {
+    constructor(prisma, storage) {
         this.prisma = prisma;
+        this.storage = storage;
     }
     getUser(userId) {
         if (!(0, memory_store_1.useMemory)())
@@ -45,13 +42,8 @@ let UsersService = class UsersService {
     async uploadAvatar(userId, file) {
         if (!file)
             return { error: "No file uploaded" };
-        const uploadsDir = path_1.default.join(process.cwd(), "apps/api/uploads");
-        await promises_1.default.mkdir(uploadsDir, { recursive: true });
-        const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const filename = `avatar-${userId}-${Date.now()}-${safeName}`;
-        const filePath = path_1.default.join(uploadsDir, filename);
-        await promises_1.default.writeFile(filePath, file.buffer);
-        const imageUrl = `/uploads/${filename}`;
+        const stored = await this.storage.save(file, "avatars");
+        const imageUrl = stored.url;
         await this.updateUser(userId, { imageUrl });
         return { imageUrl };
     }
@@ -103,6 +95,9 @@ let UsersService = class UsersService {
                 userId,
                 type: "INDIVIDUAL",
                 businessName: null,
+                isRecruiter: false,
+                recruiterIndustries: [],
+                recruiterSkills: [],
                 rating: 4.5,
                 user: memory_store_1.memoryStore.users.find((u) => u.id === userId)
             };
@@ -128,5 +123,5 @@ let UsersService = class UsersService {
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, storage_service_1.StorageService])
 ], UsersService);

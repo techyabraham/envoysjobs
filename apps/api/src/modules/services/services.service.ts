@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
-import fs from "fs/promises";
-import path from "path";
 import { ContactMethod } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
+import { StorageService } from "../../common/storage.service";
 
 @Injectable()
 export class ServicesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private storage: StorageService) {}
 
   create(data: {
     title: string;
@@ -111,17 +110,11 @@ export class ServicesService {
     }
     if (!file) throw new NotFoundException("No file uploaded");
 
-    const uploadsDir = path.join(process.cwd(), "apps/api/uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filename = `service-${id}-${Date.now()}-${safeName}`;
-    const filePath = path.join(uploadsDir, filename);
-    await fs.writeFile(filePath, file.buffer);
-    const imageUrl = `/uploads/${filename}`;
+    const stored = await this.storage.save(file, "services");
 
     return this.prisma.service.update({
       where: { id },
-      data: { imageUrl }
+      data: { imageUrl: stored.url }
     });
   }
 

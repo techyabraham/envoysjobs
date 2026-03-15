@@ -8,7 +8,7 @@ import { useApi } from "@/lib/useApi";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { buildWhatsappUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
+import { buildWhatsappIntentUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 
 export default function Page() {
   const params = useParams();
@@ -23,7 +23,13 @@ export default function Page() {
   const handleApply = async () => {
     if (!jobId) return;
     if (methods.includes("WHATSAPP")) {
-      const url = buildWhatsappUrl(job?.contactWhatsapp);
+      const details = [
+        `Job: ${job?.title ?? ""}`,
+        `Location: ${job?.location ?? job?.locationType ?? "Not specified"}`,
+        `Salary: NGN ${job?.salaryMin ?? 0} - NGN ${job?.salaryMax ?? 0}`
+      ].join("\n");
+      const message = `Hello, I am interested in this job opportunity on EnvoysJobs.\n${details}`;
+      const url = buildWhatsappIntentUrl(job?.contactWhatsapp, message);
       if (url) {
         window.open(url, "_blank", "noopener,noreferrer");
         return;

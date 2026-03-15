@@ -21,3 +21,10 @@ export function buildWhatsappUrl(number?: string | null) {
   const normalized = normalizeWhatsappNumber(number);
   return normalized ? `https://wa.me/${normalized}` : "";
 }
+
+export function buildWhatsappIntentUrl(number?: string | null, message?: string) {
+  const base = buildWhatsappUrl(number);
+  if (!base) return "";
+  if (!message?.trim()) return base;
+  return `${base}?text=${encodeURIComponent(message.trim())}`;
+}

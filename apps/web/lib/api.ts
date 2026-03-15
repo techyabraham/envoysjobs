@@ -1,7 +1,13 @@
-﻿export const API_BASE_URL =
+export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 export type ApiResult<T> = { data: T; error?: string };
+
+export function resolveAssetUrl(path?: string | null) {
+  if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${API_BASE_URL}${path}`;
+}
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<ApiResult<T>> {
   const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;

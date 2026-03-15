@@ -31,7 +31,16 @@ export default function Page() {
       method: "PUT",
       body: JSON.stringify({
         type: data.hirerType === "business" ? "BUSINESS" : "INDIVIDUAL",
-        businessName: data.companyName || null
+        businessName: data.companyName || null,
+        isRecruiter: data.isRecruiter === "yes",
+        recruiterIndustries: data.isRecruiter === "yes" ? data.recruiterIndustries ?? [] : [],
+        recruiterSkills:
+          data.isRecruiter === "yes"
+            ? String(data.recruiterSkillsInput || "")
+                .split(",")
+                .map((item: string) => item.trim())
+                .filter(Boolean)
+            : []
       })
     });
 

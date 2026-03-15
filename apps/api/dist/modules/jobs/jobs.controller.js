@@ -91,7 +91,8 @@ let JobsController = class JobsController {
 exports.JobsController = JobsController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("HIRER", "ADMIN"),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(jobCreateSchema))),
     __metadata("design:type", Function),
@@ -114,7 +115,8 @@ __decorate([
 ], JobsController.prototype, "get", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("HIRER", "ADMIN"),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(jobUpdateSchema))),
     __metadata("design:type", Function),
@@ -123,7 +125,8 @@ __decorate([
 ], JobsController.prototype, "update", null);
 __decorate([
     (0, common_1.Post)(":id/publish"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("HIRER", "ADMIN"),
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -131,7 +134,8 @@ __decorate([
 ], JobsController.prototype, "publish", null);
 __decorate([
     (0, common_1.Post)(":id/close"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("HIRER", "ADMIN"),
     __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

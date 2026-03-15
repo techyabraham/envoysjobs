@@ -85,34 +85,42 @@ export class AdminController {
     return this.adminService.verifications();
   }
 
+  @Get("audit-logs")
+  auditLogs() {
+    return this.adminService.auditLogs();
+  }
+
   @Patch("verifications/:id")
   updateVerification(
+    @Req() req: any,
     @Param("id") id: string,
     @Body(new ZodValidationPipe(verificationSchema))
     body: z.infer<typeof verificationSchema>
   ) {
-    return this.adminService.updateVerification(id, body.status);
+    return this.adminService.updateVerification(req.user?.id || "system", id, body.status);
   }
 
   @Patch("stewards/:userId")
   updateSteward(
+    @Req() req: any,
     @Param("userId") userId: string,
     @Body(new ZodValidationPipe(stewardSchema)) body: z.infer<typeof stewardSchema>
   ) {
-    return this.adminService.updateSteward(userId, body.status);
+    return this.adminService.updateSteward(req.user?.id || "system", userId, body.status);
   }
 
   @Patch("jobs/:id/status")
   updateJobStatus(
+    @Req() req: any,
     @Param("id") id: string,
     @Body(new ZodValidationPipe(jobStatusSchema)) body: z.infer<typeof jobStatusSchema>
   ) {
-    return this.adminService.updateJobStatus(id, body.status);
+    return this.adminService.updateJobStatus(req.user?.id || "system", id, body.status);
   }
 
   @Delete("reports/:id")
-  resolveReport(@Param("id") id: string) {
-    return this.adminService.resolveReport(id);
+  resolveReport(@Req() req: any, @Param("id") id: string) {
+    return this.adminService.resolveReport(req.user?.id || "system", id);
   }
 
   @Post("jobs")

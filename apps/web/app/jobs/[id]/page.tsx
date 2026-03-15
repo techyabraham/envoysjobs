@@ -8,7 +8,7 @@ import { useSavedJobs, useSaveJob, useUnsaveJob } from "@/lib/savedJobs";
 import { useApi } from "@/lib/useApi";
 import { useCreateConversation } from "@/lib/messaging";
 import { useSession } from "next-auth/react";
-import { buildWhatsappUrl, type ContactMethod } from "@/lib/contact";
+import { buildWhatsappIntentUrl, type ContactMethod } from "@/lib/contact";
 
 function formatSalary(min?: number | null, max?: number | null) {
   if (min == null && max == null) return "Negotiable";
@@ -119,7 +119,13 @@ export default function Page() {
       onApply={async () => {
         if (!jobId) return;
         if (methods.includes("WHATSAPP")) {
-          const url = buildWhatsappUrl(job?.contactWhatsapp);
+          const details = [
+            `Job: ${job?.title ?? ""}`,
+            `Location: ${job?.location ?? job?.locationType ?? "Not specified"}`,
+            `Salary: ${formatSalary(job?.salaryMin, job?.salaryMax)}`
+          ].join("\n");
+          const message = `Hello, I am interested in this job opportunity on EnvoysJobs.\n${details}`;
+          const url = buildWhatsappIntentUrl(job?.contactWhatsapp, message);
           if (url) {
             window.open(url, "_blank", "noopener,noreferrer");
             return;

@@ -82,17 +82,20 @@ let AdminController = class AdminController {
     verifications() {
         return this.adminService.verifications();
     }
-    updateVerification(id, body) {
-        return this.adminService.updateVerification(id, body.status);
+    auditLogs() {
+        return this.adminService.auditLogs();
     }
-    updateSteward(userId, body) {
-        return this.adminService.updateSteward(userId, body.status);
+    updateVerification(req, id, body) {
+        return this.adminService.updateVerification(req.user?.id || "system", id, body.status);
     }
-    updateJobStatus(id, body) {
-        return this.adminService.updateJobStatus(id, body.status);
+    updateSteward(req, userId, body) {
+        return this.adminService.updateSteward(req.user?.id || "system", userId, body.status);
     }
-    resolveReport(id) {
-        return this.adminService.resolveReport(id);
+    updateJobStatus(req, id, body) {
+        return this.adminService.updateJobStatus(req.user?.id || "system", id, body.status);
+    }
+    resolveReport(req, id) {
+        return this.adminService.resolveReport(req.user?.id || "system", id);
     }
     createJob(req, body) {
         return this.adminService.createJob(req.user?.id || "", body);
@@ -130,34 +133,44 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "verifications", null);
 __decorate([
-    (0, common_1.Patch)("verifications/:id"),
-    __param(0, (0, common_1.Param)("id")),
-    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(verificationSchema))),
+    (0, common_1.Get)("audit-logs"),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, void 0]),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "auditLogs", null);
+__decorate([
+    (0, common_1.Patch)("verifications/:id"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(verificationSchema))),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, void 0]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateVerification", null);
 __decorate([
     (0, common_1.Patch)("stewards/:userId"),
-    __param(0, (0, common_1.Param)("userId")),
-    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(stewardSchema))),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("userId")),
+    __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(stewardSchema))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, void 0]),
+    __metadata("design:paramtypes", [Object, String, void 0]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateSteward", null);
 __decorate([
     (0, common_1.Patch)("jobs/:id/status"),
-    __param(0, (0, common_1.Param)("id")),
-    __param(1, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(jobStatusSchema))),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.Body)(new zod_validation_pipe_1.ZodValidationPipe(jobStatusSchema))),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, void 0]),
+    __metadata("design:paramtypes", [Object, String, void 0]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateJobStatus", null);
 __decorate([
     (0, common_1.Delete)("reports/:id"),
-    __param(0, (0, common_1.Param)("id")),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "resolveReport", null);
 __decorate([

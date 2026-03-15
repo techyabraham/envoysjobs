@@ -13,17 +13,24 @@ exports.NotificationsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const memory_store_1 = require("../../common/memory.store");
+const mailer_service_1 = require("../../common/mailer.service");
 let NotificationsService = class NotificationsService {
-    constructor(prisma) {
+    constructor(prisma, mailer) {
         this.prisma = prisma;
+        this.mailer = mailer;
     }
-    create(userId, title, body) {
+    async create(userId, title, body) {
         if (!userId)
             return null;
         if (!(0, memory_store_1.useMemory)()) {
-            return this.prisma.notification.create({
+            const notification = await this.prisma.notification.create({
                 data: { userId, title, body }
             });
+            const user = await this.prisma.user.findUnique({ where: { id: userId } });
+            if (user?.email) {
+                await this.mailer.send({ to: user.email, subject: title, text: body });
+            }
+            return notification;
         }
         (0, memory_store_1.seedMemory)();
         const notification = {
@@ -35,6 +42,10 @@ let NotificationsService = class NotificationsService {
             createdAt: new Date()
         };
         memory_store_1.memoryStore.notifications.push(notification);
+        const user = memory_store_1.memoryStore.users.find((u) => u.id === userId);
+        if (user?.email) {
+            await this.mailer.send({ to: user.email, subject: title, text: body });
+        }
         return notification;
     }
     list(userId) {
@@ -74,5 +85,5 @@ let NotificationsService = class NotificationsService {
 exports.NotificationsService = NotificationsService;
 exports.NotificationsService = NotificationsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, mailer_service_1.MailerService])
 ], NotificationsService);

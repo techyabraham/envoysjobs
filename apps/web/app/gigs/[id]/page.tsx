@@ -3,7 +3,7 @@
 import PageShell from "@/components/PageShell";
 import { useGig, useApplyToGig } from "@/lib/gigs";
 import { useParams, useRouter } from "next/navigation";
-import { buildWhatsappUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
+import { buildWhatsappIntentUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 import { useState } from "react";
 
 export default function Page() {
@@ -52,7 +52,15 @@ export default function Page() {
           <div className="flex flex-wrap gap-3">
             {methods.map((method) => {
               if (method === "WHATSAPP") {
-                const url = buildWhatsappUrl(data.contactWhatsapp);
+                const details = [
+                  `Gig: ${data.title}`,
+                  `Amount: ${data.amount}`,
+                  `Location: ${data.location}`,
+                  `Duration: ${data.duration}`
+                ].join("\n");
+                const extra = counterBudget.trim() ? `\nProposed budget: ${counterBudget.trim()}` : "";
+                const message = `Hello, I am interested in this gig on EnvoysJobs.\n${details}${extra}`;
+                const url = buildWhatsappIntentUrl(data.contactWhatsapp, message);
                 if (!url) return null;
                 return (
                   <button key={method} className="cta" onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>

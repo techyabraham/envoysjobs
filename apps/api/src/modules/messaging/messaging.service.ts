@@ -3,12 +3,17 @@ import { PrismaService } from "../prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { sanitizeMessage } from "@envoysjobs/utils";
 import { createId, memoryStore, seedMemory, useMemory } from "../../common/memory.store";
-import { promises as fs } from "fs";
-import path from "path";
+import { MessagingGateway } from "./messaging.gateway";
+import { StorageService } from "../../common/storage.service";
 
 @Injectable()
 export class MessagingService {
-  constructor(private prisma: PrismaService, private notifications: NotificationsService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+    private gateway: MessagingGateway,
+    private storage: StorageService
+  ) {}
 
   listConversations(userId: string) {
     if (!useMemory()) {
@@ -91,21 +96,33 @@ export class MessagingService {
       });
   }
 
-  listMessages(conversationId: string) {
+  listMessages(conversationId: string, page = 0, limit = 50) {
     if (!useMemory()) {
       return this.prisma.message.findMany({
         where: { conversationId },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "desc" },
+        skip: page * limit,
+        take: limit,
         include: { attachments: true }
-      });
+      }).then((items) => items.reverse());
     }
     seedMemory();
     return this.prisma.message
-      .findMany({ where: { conversationId }, orderBy: { createdAt: "asc" }, include: { attachments: true } })
+      .findMany({
+        where: { conversationId },
+        orderBy: { createdAt: "desc" },
+        skip: page * limit,
+        take: limit,
+        include: { attachments: true }
+      })
+      .then((items) => items.reverse())
       .catch(() => {
-        return memoryStore.messages
+        const items = memoryStore.messages
           .filter((m) => m.conversationId === conversationId)
-          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+          .slice(page * limit, page * limit + limit)
+          .reverse();
+        return items;
       });
   }
 
@@ -119,6 +136,7 @@ export class MessagingService {
         },
         include: { attachments: true }
       }).then(async (message) => {
+        this.gateway.emitMessage(message);
         const convo = await this.prisma.conversation.findUnique({
           where: { id: conversationId },
           include: { participants: true }
@@ -152,6 +170,7 @@ export class MessagingService {
           createdAt: new Date()
         };
         memoryStore.messages.push(message);
+        this.gateway.emitMessage(message);
         const convo = memoryStore.conversations.find((c) => c.id === conversationId);
         if (convo) {
           convo.participants
@@ -164,11 +183,7 @@ export class MessagingService {
 
   async sendAttachment(conversationId: string, senderId: string, file: Express.Multer.File, text?: string) {
     const sanitizedText = text ? sanitizeMessage(text) : "Sent an attachment";
-    const uploadsDir = path.join(process.cwd(), "apps/api/uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
-    const filename = `${senderId}-${Date.now()}-${file.originalname}`.replace(/\\s+/g, "_");
-    const filePath = path.join(uploadsDir, filename);
-    await fs.writeFile(filePath, file.buffer);
+    const stored = await this.storage.save(file, "attachments");
 
     if (!useMemory()) {
       const message = await this.prisma.message.create({
@@ -178,13 +193,14 @@ export class MessagingService {
           text: sanitizedText,
           attachments: {
             create: {
-              url: `/uploads/${filename}`,
+              url: stored.url,
               type: file.mimetype
             }
           }
         },
         include: { attachments: true }
       });
+      this.gateway.emitMessage(message);
       const convo = await this.prisma.conversation.findUnique({
         where: { id: conversationId },
         include: { participants: true }
@@ -209,7 +225,7 @@ export class MessagingService {
           text: sanitizedText,
           attachments: {
             create: {
-              url: `/uploads/${filename}`,
+              url: stored.url,
               type: file.mimetype
             }
           }
@@ -225,8 +241,9 @@ export class MessagingService {
           createdAt: new Date()
         };
         memoryStore.messages.push(created);
-        return { ...created, attachments: [{ url: `/uploads/${filename}`, type: file.mimetype }] } as any;
+        return { ...created, attachments: [{ url: stored.url, type: file.mimetype }] } as any;
       });
+    this.gateway.emitMessage(message);
     const convo = memoryStore.conversations.find((c) => c.id === conversationId);
     if (convo) {
       convo.participants

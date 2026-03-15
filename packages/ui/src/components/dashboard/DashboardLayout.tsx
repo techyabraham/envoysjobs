@@ -5,19 +5,34 @@ import {
   Home, Briefcase, Wrench, Zap, MessageCircle, User,
   Bell, Search, Menu, X, Settings, LogOut, Video
 } from 'lucide-react';
+import type { LucideIcon } from "lucide-react";
+
+export type DashboardNavItem = {
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  badge?: number;
+};
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   activePage: string;
   onNavigate: (page: string) => void;
   userName?: string;
+  navigationItems?: DashboardNavItem[];
 }
 
-export function DashboardLayout({ children, activePage, onNavigate, userName = 'Friend' }: DashboardLayoutProps) {
+export function DashboardLayout({
+  children,
+  activePage,
+  onNavigate,
+  userName = 'Friend',
+  navigationItems
+}: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
-  const navigation = [
+  const defaultNavigation: DashboardNavItem[] = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
     { id: 'jobs', name: 'Jobs', icon: Briefcase },
     { id: 'services', name: 'Services', icon: Wrench },
@@ -26,6 +41,7 @@ export function DashboardLayout({ children, activePage, onNavigate, userName = '
     { id: 'messages', name: 'Messages', icon: MessageCircle, badge: 3 },
     { id: 'profile', name: 'Profile', icon: User }
   ];
+  const navigation = navigationItems ?? defaultNavigation;
 
   const mockNotifications = [
     { id: 1, text: 'New job match: Senior Developer', time: '5m ago', unread: true },

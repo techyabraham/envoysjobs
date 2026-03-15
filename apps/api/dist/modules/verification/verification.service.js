@@ -8,44 +8,37 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VerificationService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const memory_store_1 = require("../../common/memory.store");
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
+const storage_service_1 = require("../../common/storage.service");
 let VerificationService = class VerificationService {
-    constructor(prisma) {
+    constructor(prisma, storage) {
         this.prisma = prisma;
+        this.storage = storage;
     }
     async upload(userId, file) {
         if (!userId)
             return { status: "missing-user" };
         if (!(0, memory_store_1.useMemory)()) {
-            const uploadsDir = path_1.default.join(process.cwd(), "apps/api/uploads");
-            await fs_1.promises.mkdir(uploadsDir, { recursive: true });
-            const filename = `${userId}-${Date.now()}-${file.originalname}`.replace(/\\s+/g, "_");
-            const filePath = path_1.default.join(uploadsDir, filename);
-            await fs_1.promises.writeFile(filePath, file.buffer);
             const user = await this.prisma.user.findUnique({ where: { id: userId } });
             const phone = user?.phone || userId;
+            const stored = await this.storage.save(file, "verification");
             return this.prisma.verification.upsert({
                 where: { phone },
                 update: {
                     status: "PENDING",
                     userId,
-                    documentUrl: `/uploads/${filename}`,
+                    documentUrl: stored.url,
                     documentType: file.mimetype
                 },
                 create: {
                     phone,
                     status: "PENDING",
                     userId,
-                    documentUrl: `/uploads/${filename}`,
+                    documentUrl: stored.url,
                     documentType: file.mimetype
                 }
             });
@@ -74,5 +67,5 @@ let VerificationService = class VerificationService {
 exports.VerificationService = VerificationService;
 exports.VerificationService = VerificationService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService, storage_service_1.StorageService])
 ], VerificationService);

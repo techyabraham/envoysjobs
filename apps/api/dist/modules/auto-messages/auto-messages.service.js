@@ -23,7 +23,7 @@ const templates = [
     },
     {
         key: "interest",
-        text: "Hello, I’m interested in this opportunity",
+        text: "Hello, I'm interested in this opportunity",
         audience: "BOTH",
         quickReplies: ["May we discuss the details?"],
         triggerRules: {}
@@ -32,12 +32,12 @@ const templates = [
         key: "thanks",
         text: "Thank you for reaching out",
         audience: "BOTH",
-        quickReplies: ["I’m available to proceed"],
+        quickReplies: ["I'm available to proceed"],
         triggerRules: {}
     },
     {
         key: "available",
-        text: "I’m available to proceed",
+        text: "I'm available to proceed",
         audience: "BOTH",
         quickReplies: ["Looking forward to working together"],
         triggerRules: {}

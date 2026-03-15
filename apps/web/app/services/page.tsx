@@ -3,18 +3,26 @@
 import PageShell from "@/components/PageShell";
 import { ServiceCard } from "@envoysjobs/ui";
 import { useMyServicesAny, usePublicServices } from "@/lib/services";
-import { API_BASE_URL } from "@/lib/api";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { resolveAssetUrl } from "@/lib/api";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import ServiceCardServiceFirst from "@/components/services/ServiceCardServiceFirst";
+
+const CARD_VARIANT: "service-first" | "provider-first" = "service-first";
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const { data, isLoading, error } = usePublicServices(query);
   const mine = useMyServicesAny(Boolean(session));
   const myServices = session ? mine.data ?? [] : [];
+
+  useEffect(() => {
+    setQuery(searchParams.get("q") || "");
+  }, [searchParams]);
 
   return (
     <PageShell title="Services Directory" description="Find trusted Envoys offering professional services.">
@@ -37,16 +45,35 @@ export default function Page() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {myServices.slice(0, 4).map((service) => (
-              <ServiceCard
-                key={`mine-${service.id}`}
-                name="You"
-                photo={service.imageUrl ? `${API_BASE_URL}${service.imageUrl}` : null}
-                skill={service.title}
-                tags={service.description.split(" ").slice(0, 3)}
-                rating={4.8}
-                reviewCount={12}
-                onAction={() => router.push(`/services/${service.id}`)}
-              />
+              CARD_VARIANT === "service-first" ? (
+                <ServiceCardServiceFirst
+                  key={`mine-${service.id}`}
+                  serviceId={service.id}
+                  title={service.title}
+                  shortDescription={service.description}
+                  fullDescription={service.description}
+                  rating={4.8}
+                  reviewCount={12}
+                  tags={service.description.split(" ").slice(0, 3)}
+                  provider={{
+                    name: "You",
+                    avatarUrl: resolveAssetUrl(service.imageUrl) ?? undefined
+                  }}
+                  onOpenDetails={(id) => router.push(`/services/${id}`)}
+                  onRequestService={(id) => router.push(`/services/${id}`)}
+                />
+              ) : (
+                <ServiceCard
+                  key={`mine-${service.id}`}
+                  name="You"
+                  photo={resolveAssetUrl(service.imageUrl)}
+                  skill={service.title}
+                  tags={service.description.split(" ").slice(0, 3)}
+                  rating={4.8}
+                  reviewCount={12}
+                  onAction={() => router.push(`/services/${service.id}`)}
+                />
+              )
             ))}
           </div>
         </div>
@@ -65,16 +92,35 @@ export default function Page() {
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {data?.map((service) => (
-          <ServiceCard
-            key={service.id}
-            name={service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy"}
-            photo={service.imageUrl ? `${API_BASE_URL}${service.imageUrl}` : null}
-            skill={service.title}
-            tags={service.description.split(" ").slice(0, 3)}
-            rating={4.8}
-            reviewCount={12}
-            onAction={() => router.push(`/services/${service.id}`)}
-          />
+          CARD_VARIANT === "service-first" ? (
+            <ServiceCardServiceFirst
+              key={service.id}
+              serviceId={service.id}
+              title={service.title}
+              shortDescription={service.description}
+              fullDescription={service.description}
+              rating={4.8}
+              reviewCount={12}
+              tags={service.description.split(" ").slice(0, 3)}
+              provider={{
+                name: service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy",
+                avatarUrl: resolveAssetUrl(service.imageUrl) ?? undefined
+              }}
+              onOpenDetails={(id) => router.push(`/services/${id}`)}
+              onRequestService={(id) => router.push(`/services/${id}`)}
+            />
+          ) : (
+            <ServiceCard
+              key={service.id}
+              name={service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy"}
+              photo={resolveAssetUrl(service.imageUrl)}
+              skill={service.title}
+              tags={service.description.split(" ").slice(0, 3)}
+              rating={4.8}
+              reviewCount={12}
+              onAction={() => router.push(`/services/${service.id}`)}
+            />
+          )
         ))}
       </div>
     </PageShell>

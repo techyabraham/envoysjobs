@@ -132,6 +132,9 @@ model HirerProfile {
   type       HirerType @default(INDIVIDUAL)
   businessName String?
   rating     Float @default(0)
+  isRecruiter Boolean @default(false)
+  recruiterIndustries String[] @default([])
+  recruiterSkills String[] @default([])
 
   user User @relation(fields: [userId], references: [id])
 }

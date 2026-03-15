@@ -6,6 +6,7 @@ import { ServiceCard } from './ServiceCard';
 import { GigCard } from './GigCard';
 import { StatsSection } from './StatsSection';
 import { Button } from '../Button';
+type SearchFilter = "all" | "jobs" | "services" | "gigs";
 
 interface FeaturedJob {
   id?: string;
@@ -40,6 +41,8 @@ interface FeaturedGig {
 
 interface HomepageProps {
   onNavigate?: (page: string, id?: string) => void;
+  onSearch?: (filter: SearchFilter, query: string) => void;
+  isAuthenticated?: boolean;
   jobsShared?: string;
   servicesListed?: string;
   featuredJobs?: FeaturedJob[];
@@ -160,6 +163,8 @@ const fallbackGigs: FeaturedGig[] = [
 
 export function Homepage({
   onNavigate,
+  onSearch,
+  isAuthenticated,
   jobsShared,
   servicesListed,
   featuredJobs,
@@ -173,7 +178,7 @@ export function Homepage({
   const webinarList = webinars ?? [];
   return (
     <div className="min-h-screen bg-background">
-      <HeroSection />
+      <HeroSection onNavigate={onNavigate} onSearch={onSearch} isAuthenticated={isAuthenticated} />
 
       {/* Highlighted Member Jobs */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">

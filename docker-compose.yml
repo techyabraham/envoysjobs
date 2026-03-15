@@ -37,6 +37,7 @@ services:
       S3_BUCKET: envoysjobs
       S3_ACCESS_KEY: minio
       S3_SECRET_KEY: minio123
+      S3_PUBLIC_URL: http://localhost:9000
       MAIL_PROVIDER: console
     ports:
       - "4000:4000"

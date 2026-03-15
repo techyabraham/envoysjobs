@@ -3,33 +3,34 @@
 import { useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { defaultQuickReplies, isHonourMessage } from "@/lib/autoMessages";
-import { useConversationMessages, useSendAttachment, useSendMessage } from "@/lib/messaging";
-import { API_BASE_URL } from "@/lib/api";
+import { buildSuggestedReplies } from "@/lib/autoMessages";
+import { useAutoMessageTemplates, useConversationMessages, useConversations, useSendAttachment, useSendMessage } from "@/lib/messaging";
+import { resolveAssetUrl } from "@/lib/api";
 
 export default function ConversationView() {
   const params = useParams();
   const conversationId = params?.conversationId as string;
   const { data: session } = useSession();
   const userId = (session as any)?.user?.id as string | undefined;
+  const role = (session as any)?.user?.role as "ENVOY" | "HIRER" | "ADMIN" | undefined;
+  const { data: conversations } = useConversations(userId);
   const { data: messages, isLoading } = useConversationMessages(conversationId);
+  const { data: templates } = useAutoMessageTemplates();
   const sendMessage = useSendMessage();
   const sendAttachment = useSendAttachment();
   const [text, setText] = useState("");
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const lastReceived = messages?.slice().reverse().find((m) => m.senderId !== userId);
+  const conversation = conversations?.find((item) => item.id === conversationId);
+  const contextTitle = conversation?.job?.title || "Job inquiry";
 
   const quickReplies = useMemo(() => {
-    if (lastReceived && isHonourMessage(lastReceived.text)) {
-      return ["you are amazing", ...defaultQuickReplies];
-    }
-    return [
-      "Hello, I'm interested in this opportunity",
-      "Thank you for reaching out",
-      "I'm available to proceed"
-    ];
-  }, [lastReceived]);
+    const relevantTemplates = (templates ?? []).filter(
+      (template) => template.audience === "BOTH" || template.audience === role
+    );
+    return buildSuggestedReplies(lastReceived?.text, relevantTemplates);
+  }, [lastReceived?.text, role, templates]);
 
   const handleSend = async (value: string) => {
     if (!conversationId || !userId || !value.trim()) return;
@@ -48,7 +49,7 @@ export default function ConversationView() {
     <div className="bg-white rounded-2xl border border-border flex flex-col h-[600px]">
       <div className="px-4 py-3 border-b border-border">
         <h3 className="font-semibold">Conversation</h3>
-        <p className="text-sm text-foreground-secondary">Context: Job inquiry</p>
+        <p className="text-sm text-foreground-secondary">Context: {contextTitle}</p>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {isLoading && <p className="text-foreground-secondary">Loading messages...</p>}
@@ -67,7 +68,7 @@ export default function ConversationView() {
                   {message.attachments.map((attachment) => (
                     <a
                       key={attachment.url}
-                      href={`${API_BASE_URL}${attachment.url}`}
+                      href={resolveAssetUrl(attachment.url) as string}
                       target="_blank"
                       rel="noreferrer"
                       className="underline"

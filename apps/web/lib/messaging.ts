@@ -20,6 +20,15 @@ export type Message = {
   attachments?: { url: string; type: string }[];
 };
 
+export type AutoMessageTemplate = {
+  id: string;
+  key: string;
+  text: string;
+  audience: "ENVOY" | "HIRER" | "BOTH";
+  quickReplies: string[];
+  triggerRules?: { exactMatch?: string } | Record<string, unknown>;
+};
+
 export function useConversations(userId?: string) {
   const api = useApi();
   return useQuery({
@@ -33,13 +42,25 @@ export function useConversations(userId?: string) {
   });
 }
 
-export function useConversationMessages(conversationId?: string) {
+export function useAutoMessageTemplates() {
   const api = useApi();
   return useQuery({
-    queryKey: ["messages", conversationId],
+    queryKey: ["auto-message-templates"],
+    queryFn: async () => {
+      const res = await api<AutoMessageTemplate[]>("/auto-messages/templates");
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
+}
+
+export function useConversationMessages(conversationId?: string, limit = 50) {
+  const api = useApi();
+  return useQuery({
+    queryKey: ["messages", conversationId, limit],
     enabled: Boolean(conversationId),
     queryFn: async () => {
-      const res = await api<Message[]>(`/conversations/${conversationId}/messages`);
+      const res = await api<Message[]>(`/conversations/${conversationId}/messages?limit=${limit}`);
       if (res.error) throw new Error(res.error);
       return res.data;
     }

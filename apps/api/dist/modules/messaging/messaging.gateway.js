@@ -8,11 +8,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessagingGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let MessagingGateway = class MessagingGateway {
+    handleConnection(client) {
+        client.emit("connection.ready", { ok: true });
+    }
+    handleDisconnect() { }
+    handleTyping(payload) {
+        this.server.emit("typing", payload);
+        return { ok: true };
+    }
+    handleReadReceipt(payload) {
+        this.server.emit("read.receipt", payload);
+        return { ok: true };
+    }
     emitMessage(payload) {
         this.server.emit("message.new", payload);
     }
@@ -22,6 +37,26 @@ __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], MessagingGateway.prototype, "server", void 0);
+__decorate([
+    __param(0, (0, websockets_1.ConnectedSocket)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], MessagingGateway.prototype, "handleConnection", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)("typing"),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], MessagingGateway.prototype, "handleTyping", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)("read.receipt"),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], MessagingGateway.prototype, "handleReadReceipt", null);
 exports.MessagingGateway = MessagingGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ cors: true })
 ], MessagingGateway);

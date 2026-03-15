@@ -47,7 +47,8 @@ export class JobsController {
   constructor(private jobsService: JobsService, private jobsImport: JobsImportService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("HIRER", "ADMIN")
   create(@Req() req: any, @Body(new ZodValidationPipe(jobCreateSchema)) body: z.infer<typeof jobCreateSchema>) {
     return this.jobsService.create({ ...body, hirerId: req.user?.id || "" });
   }
@@ -63,7 +64,8 @@ export class JobsController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("HIRER", "ADMIN")
   update(
     @Param("id") id: string,
     @Body(new ZodValidationPipe(jobUpdateSchema)) body: z.infer<typeof jobUpdateSchema>
@@ -72,13 +74,15 @@ export class JobsController {
   }
 
   @Post(":id/publish")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("HIRER", "ADMIN")
   publish(@Param("id") id: string) {
     return this.jobsService.publish(id);
   }
 
   @Post(":id/close")
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("HIRER", "ADMIN")
   close(@Param("id") id: string) {
     return this.jobsService.close(id);
   }

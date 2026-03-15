@@ -32,6 +32,13 @@ export type AdminVerification = {
   status: "PENDING" | "VERIFIED" | "REJECTED";
 };
 
+export type AdminAuditLog = {
+  id: string;
+  adminId: string;
+  action: string;
+  createdAt?: string;
+};
+
 export function useAdminUsers() {
   const api = useApi();
   return useQuery({
@@ -82,6 +89,7 @@ export function useUpdateAdminJobStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-audit-logs"] });
     }
   });
 }
@@ -97,6 +105,7 @@ export function useResolveReport() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-audit-logs"] });
     }
   });
 }
@@ -107,6 +116,18 @@ export function useAdminVerifications() {
     queryKey: ["admin-verifications"],
     queryFn: async () => {
       const res = await api<AdminVerification[]>("/admin/verifications");
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
+}
+
+export function useAdminAuditLogs() {
+  const api = useApi();
+  return useQuery({
+    queryKey: ["admin-audit-logs"],
+    queryFn: async () => {
+      const res = await api<AdminAuditLog[]>("/admin/audit-logs");
       if (res.error) throw new Error(res.error);
       return res.data;
     }
@@ -127,6 +148,7 @@ export function useUpdateStewardStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-audit-logs"] });
     }
   });
 }
@@ -145,6 +167,7 @@ export function useUpdateVerificationStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-verifications"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-audit-logs"] });
     }
   });
 }

@@ -39,6 +39,9 @@ export type HirerProfileDTO = {
   type: HirerType;
   businessName?: string | null;
   rating: number;
+  isRecruiter?: boolean;
+  recruiterIndustries?: string[];
+  recruiterSkills?: string[];
   stewardStatus?: StewardStatus | null;
   stewardDepartment?: string | null;
   stewardMatricNumber?: string | null;

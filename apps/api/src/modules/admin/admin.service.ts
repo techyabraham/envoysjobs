@@ -29,12 +29,17 @@ export class AdminService {
     return this.prisma.verification.findMany().catch(() => []);
   }
 
-  updateVerification(id: string, status: VerificationStatus) {
+  auditLogs() {
+    if (!useMemory()) return this.prisma.adminAuditLog.findMany({ orderBy: { createdAt: "desc" }, take: 100 });
+    return this.prisma.adminAuditLog.findMany({ orderBy: { createdAt: "desc" }, take: 100 }).catch(() => []);
+  }
+
+  updateVerification(adminId: string, id: string, status: VerificationStatus) {
     if (!useMemory()) {
       return this.prisma.$transaction([
         this.prisma.verification.update({ where: { id }, data: { status } }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Verification ${id} -> ${status}` }
+          data: { adminId, action: `Verification ${id} -> ${status}` }
         })
       ]);
     }
@@ -42,13 +47,13 @@ export class AdminService {
       .$transaction([
         this.prisma.verification.update({ where: { id }, data: { status } }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Verification ${id} -> ${status}` }
+          data: { adminId: adminId || "system", action: `Verification ${id} -> ${status}` }
         })
       ])
       .catch(() => [{ id, status }, { id: "audit", action: `Verification ${id} -> ${status}` }]);
   }
 
-  updateSteward(userId: string, status: StewardStatus) {
+  updateSteward(adminId: string, userId: string, status: StewardStatus) {
     if (!useMemory()) {
       return this.prisma.$transaction([
         this.prisma.user.update({
@@ -56,7 +61,7 @@ export class AdminService {
           data: { stewardStatus: status }
         }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Steward ${userId} -> ${status}` }
+          data: { adminId, action: `Steward ${userId} -> ${status}` }
         })
       ]);
     }
@@ -68,7 +73,7 @@ export class AdminService {
           data: { stewardStatus: status }
         }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Steward ${userId} -> ${status}` }
+          data: { adminId: adminId || "system", action: `Steward ${userId} -> ${status}` }
         })
       ])
       .catch(() => {
@@ -78,12 +83,12 @@ export class AdminService {
       });
   }
 
-  updateJobStatus(id: string, status: JobStatus) {
+  updateJobStatus(adminId: string, id: string, status: JobStatus) {
     if (!useMemory()) {
       return this.prisma.$transaction([
         this.prisma.job.update({ where: { id }, data: { status } }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Job ${id} -> ${status}` }
+          data: { adminId, action: `Job ${id} -> ${status}` }
         })
       ]);
     }
@@ -92,7 +97,7 @@ export class AdminService {
       .$transaction([
         this.prisma.job.update({ where: { id }, data: { status } }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Job ${id} -> ${status}` }
+          data: { adminId: adminId || "system", action: `Job ${id} -> ${status}` }
         })
       ])
       .catch(() => {
@@ -102,12 +107,12 @@ export class AdminService {
       });
   }
 
-  resolveReport(id: string) {
+  resolveReport(adminId: string, id: string) {
     if (!useMemory()) {
       return this.prisma.$transaction([
         this.prisma.report.delete({ where: { id } }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Report ${id} resolved` }
+          data: { adminId, action: `Report ${id} resolved` }
         })
       ]);
     }
@@ -116,7 +121,7 @@ export class AdminService {
       .$transaction([
         this.prisma.report.delete({ where: { id } }),
         this.prisma.adminAuditLog.create({
-          data: { adminId: "system", action: `Report ${id} resolved` }
+          data: { adminId: adminId || "system", action: `Report ${id} resolved` }
         })
       ])
       .catch(() => {

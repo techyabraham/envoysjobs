@@ -1,17 +1,23 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
+import { MailerService } from "../../common/mailer.service";
 
 @Injectable()
 export class NotificationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private mailer: MailerService) {}
 
-  create(userId: string, title: string, body: string) {
+  async create(userId: string, title: string, body: string) {
     if (!userId) return null;
     if (!useMemory()) {
-      return this.prisma.notification.create({
+      const notification = await this.prisma.notification.create({
         data: { userId, title, body }
       });
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (user?.email) {
+        await this.mailer.send({ to: user.email, subject: title, text: body });
+      }
+      return notification;
     }
     seedMemory();
     const notification = {
@@ -23,6 +29,10 @@ export class NotificationsService {
       createdAt: new Date()
     };
     memoryStore.notifications.push(notification);
+    const user = memoryStore.users.find((u) => u.id === userId);
+    if (user?.email) {
+      await this.mailer.send({ to: user.email, subject: title, text: body });
+    }
     return notification as any;
   }
 

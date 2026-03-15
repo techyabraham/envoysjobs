@@ -6,6 +6,7 @@ import { AlertTriangle, Users as UsersIcon, Briefcase, Wrench } from "lucide-rea
 import { signOut } from "next-auth/react";
 import AdminGate from "@/components/admin/AdminGate";
 import {
+  useAdminAuditLogs,
   useAdminCreateGig,
   useAdminCreateJob,
   useAdminCreateService,
@@ -22,6 +23,7 @@ export default function Page() {
   const users = useAdminUsers();
   const jobs = useAdminJobs();
   const reports = useAdminReports();
+  const auditLogs = useAdminAuditLogs();
   const verifications = useAdminVerifications();
   const services = usePublicServices();
   const updateSteward = useUpdateStewardStatus();
@@ -211,6 +213,25 @@ export default function Page() {
             </form>
           </div>
           {adminError && <p className="text-sm text-destructive mt-3">{adminError}</p>}
+        </div>
+
+        <div className="bg-white border border-border rounded-2xl p-5">
+          <h2 className="text-xl font-semibold mb-4">Recent Admin Audit Logs</h2>
+          {auditLogs.isLoading ? <p className="text-foreground-secondary">Loading logs...</p> : null}
+          {auditLogs.isError ? <p className="text-destructive">Failed to load audit logs.</p> : null}
+          <div className="space-y-2">
+            {(auditLogs.data ?? []).slice(0, 10).map((log) => (
+              <div key={log.id} className="rounded-lg border border-border px-3 py-2 text-sm">
+                <p className="text-foreground">{log.action}</p>
+                <p className="text-foreground-tertiary text-xs mt-1">
+                  {log.createdAt ? new Date(log.createdAt).toLocaleString() : "Now"}
+                </p>
+              </div>
+            ))}
+            {(auditLogs.data ?? []).length === 0 && !auditLogs.isLoading ? (
+              <p className="text-foreground-tertiary text-sm">No audit logs yet.</p>
+            ) : null}
+          </div>
         </div>
       </div>
     </AdminGate>

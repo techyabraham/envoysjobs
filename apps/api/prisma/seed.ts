@@ -78,11 +78,18 @@ async function main() {
 
   await prisma.hirerProfile.upsert({
     where: { userId: hirer.id },
-    update: {},
+    update: {
+      isRecruiter: true,
+      recruiterIndustries: ["Technology", "Finance"],
+      recruiterSkills: ["Software Engineering", "Data Analysis"]
+    },
     create: {
       userId: hirer.id,
       type: "BUSINESS",
-      businessName: "Tech Solutions Ltd"
+      businessName: "Tech Solutions Ltd",
+      isRecruiter: true,
+      recruiterIndustries: ["Technology", "Finance"],
+      recruiterSkills: ["Software Engineering", "Data Analysis"]
     }
   });
 

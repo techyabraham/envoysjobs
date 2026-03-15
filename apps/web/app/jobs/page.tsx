@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { JobDiscoveryPage } from "@envoysjobs/ui";
 import { useJobs } from "@/lib/jobs";
 import { mapJobToCard } from "@/lib/jobCards";
@@ -9,17 +9,25 @@ import { useSavedJobs, useSaveJob, useUnsaveJob } from "@/lib/savedJobs";
 
 export default function Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const query = (searchParams.get("q") || "").trim().toLowerCase();
   const { data: jobs, isLoading, error } = useJobs();
   const { data: savedJobs } = useSavedJobs();
   const saveJob = useSaveJob();
   const unsaveJob = useUnsaveJob();
 
   const savedIds = useMemo(() => (savedJobs ?? []).map((job) => job.id), [savedJobs]);
-  const mappedJobs = useMemo(
-    () =>
-      (jobs ?? []).map(mapJobToCard),
-    [jobs]
-  );
+  const mappedJobs = useMemo(() => {
+    const base = (jobs ?? []).map(mapJobToCard);
+    if (!query) return base;
+    return base.filter((job) => {
+      const haystack = [job.title, job.company, job.location, job.pay, job.type]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [jobs, query]);
 
   if (isLoading && mappedJobs.length === 0) {
     return (

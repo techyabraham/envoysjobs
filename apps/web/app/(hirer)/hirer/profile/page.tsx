@@ -5,7 +5,7 @@ import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { API_BASE_URL } from "@/lib/api";
+import { resolveAssetUrl } from "@/lib/api";
 
 export default function Page() {
   const api = useApi();
@@ -47,9 +47,9 @@ export default function Page() {
           <div className="bg-white border border-border rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-deep-blue text-white flex items-center justify-center text-lg font-semibold overflow-hidden">
-                {data.user?.imageUrl ? (
+                {resolveAssetUrl(data.user?.imageUrl) ? (
                   <img
-                    src={`${API_BASE_URL}${data.user.imageUrl}`}
+                    src={resolveAssetUrl(data.user?.imageUrl) as string}
                     alt={`${data.user?.firstName ?? "User"} profile`}
                     className="w-full h-full object-cover"
                   />
@@ -60,6 +60,11 @@ export default function Page() {
               <div>
                 <h3 className="text-xl">{data.user?.firstName} {data.user?.lastName}</h3>
                 <p className="text-foreground-secondary">{data.type}</p>
+                {data.user?.stewardStatus ? (
+                  <span className="inline-flex mt-2 items-center px-3 py-1 rounded-full bg-soft-gold/20 text-soft-gold text-xs">
+                    Steward ({data.user?.stewardStatus === "VERIFIED" ? "Verified" : "Pending Verification"})
+                  </span>
+                ) : null}
               </div>
             </div>
             <div>
@@ -76,6 +81,29 @@ export default function Page() {
               {uploadError && <p className="text-sm text-destructive mt-2">{uploadError}</p>}
             </div>
             {data.businessName && <p className="text-foreground-secondary">{data.businessName}</p>}
+            <div className="pt-2">
+              <p className="text-sm text-foreground-secondary">
+                Recruiter: {data.isRecruiter ? "Yes" : "No"}
+              </p>
+              {data.isRecruiter ? (
+                <div className="mt-2 space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    {(data.recruiterIndustries ?? []).map((industry: string) => (
+                      <span key={industry} className="px-3 py-1 rounded-full bg-background-secondary text-xs">
+                        {industry}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(data.recruiterSkills ?? []).map((skill: string) => (
+                      <span key={skill} className="px-3 py-1 rounded-full bg-background-secondary text-xs">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </PageShell>

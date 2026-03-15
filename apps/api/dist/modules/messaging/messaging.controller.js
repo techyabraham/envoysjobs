@@ -41,8 +41,10 @@ let MessagingController = class MessagingController {
     getOrCreate(body) {
         return this.messagingService.getOrCreateConversation(body);
     }
-    listMessages(id) {
-        return this.messagingService.listMessages(id);
+    listMessages(id, page, limit) {
+        const pageNum = Math.max(0, Number(page || 0));
+        const limitNum = Math.min(100, Math.max(1, Number(limit || 50)));
+        return this.messagingService.listMessages(id, pageNum, limitNum);
     }
     sendMessage(id, req, body) {
         return this.messagingService.sendMessage(id, req.user?.id || "", body.text);
@@ -70,8 +72,10 @@ __decorate([
 __decorate([
     (0, common_1.Get)("conversations/:id/messages"),
     __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Query)("page")),
+    __param(2, (0, common_1.Query)("limit")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", void 0)
 ], MessagingController.prototype, "listMessages", null);
 __decorate([

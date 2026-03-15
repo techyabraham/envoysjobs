@@ -10,12 +10,13 @@ exports.VerificationModule = void 0;
 const common_1 = require("@nestjs/common");
 const verification_controller_1 = require("./verification.controller");
 const verification_service_1 = require("./verification.service");
+const storage_service_1 = require("../../common/storage.service");
 let VerificationModule = class VerificationModule {
 };
 exports.VerificationModule = VerificationModule;
 exports.VerificationModule = VerificationModule = __decorate([
     (0, common_1.Module)({
         controllers: [verification_controller_1.VerificationController],
-        providers: [verification_service_1.VerificationService]
+        providers: [verification_service_1.VerificationService, storage_service_1.StorageService]
     })
 ], VerificationModule);

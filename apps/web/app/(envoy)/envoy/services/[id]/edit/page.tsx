@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useService, useUpdateService } from "@/lib/services";
 import { useApi } from "@/lib/useApi";
-import { API_BASE_URL } from "@/lib/api";
+import { resolveAssetUrl } from "@/lib/api";
 import { CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 
 interface PageProps {
@@ -34,7 +34,7 @@ export default function Page({ params }: PageProps) {
       setTitle(service.title);
       setDescription(service.description);
       setRate(service.rate);
-      setPreviewUrl(service.imageUrl ? `${API_BASE_URL}${service.imageUrl}` : null);
+      setPreviewUrl(resolveAssetUrl(service.imageUrl) as string | null);
       setContactMethods(service.contactMethods?.length ? service.contactMethods : ["PLATFORM"]);
       setContactEmail(service.contactEmail ?? "");
       setContactWebsite(service.contactWebsite ?? "");
