@@ -5,6 +5,7 @@ import { JwtService } from "@nestjs/jwt";
 
 const prismaMock = {
   user: {
+    findUnique: jest.fn(),
     create: jest.fn()
   },
   refreshToken: {
@@ -17,6 +18,11 @@ const jwtMock = {
 };
 
 describe("AuthService", () => {
+  beforeEach(() => {
+    process.env.USE_MEMORY = "false";
+    jest.clearAllMocks();
+  });
+
   it("issues tokens on signup", async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -27,6 +33,7 @@ describe("AuthService", () => {
     }).compile();
 
     const service = moduleRef.get(AuthService);
+    prismaMock.user.findUnique.mockResolvedValue(null);
     prismaMock.user.create.mockResolvedValue({ id: "user-1", role: "ENVOY" });
     prismaMock.refreshToken.create.mockResolvedValue({ token: "refresh" });
 

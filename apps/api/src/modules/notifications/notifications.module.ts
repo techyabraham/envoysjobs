@@ -5,6 +5,7 @@ import { MailerService } from "../../common/mailer.service";
 
 @Module({
   controllers: [NotificationsController],
-  providers: [NotificationsService, MailerService]
+  providers: [NotificationsService, MailerService],
+  exports: [NotificationsService]
 })
 export class NotificationsModule {}

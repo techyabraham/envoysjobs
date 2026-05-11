@@ -2,6 +2,7 @@
 
 import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
+import Image from "next/image";
 import { useApi } from "@/lib/useApi";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -48,9 +49,12 @@ export default function Page() {
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-deep-blue text-white flex items-center justify-center text-lg font-semibold overflow-hidden">
                 {resolveAssetUrl(data.user?.imageUrl) ? (
-                  <img
+                  <Image
                     src={resolveAssetUrl(data.user?.imageUrl) as string}
                     alt={`${data.user?.firstName ?? "User"} profile`}
+                    width={64}
+                    height={64}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (

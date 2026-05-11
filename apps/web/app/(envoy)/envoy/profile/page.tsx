@@ -5,6 +5,7 @@ import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import Image from "next/image";
 import { resolveAssetUrl } from "@/lib/api";
 
 export default function Page() {
@@ -29,9 +30,12 @@ export default function Page() {
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-deep-blue text-white flex items-center justify-center text-lg font-semibold overflow-hidden">
                   {resolveAssetUrl(data.user?.imageUrl) ? (
-                    <img
+                    <Image
                       src={resolveAssetUrl(data.user?.imageUrl) as string}
                       alt={`${data.user?.firstName ?? "User"} profile`}
+                      width={64}
+                      height={64}
+                      unoptimized
                       className="w-full h-full object-cover"
                     />
                   ) : (

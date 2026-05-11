@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { resolveAssetUrl } from "@/lib/api";
 import { buildWhatsappIntentUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
 
@@ -40,9 +41,12 @@ export default function ServiceDetailsPage({ service, onBack, onPlatformRequest,
       <div className="flex items-center gap-4">
         <div className="w-24 h-24 rounded-xl bg-background-secondary border border-border flex items-center justify-center overflow-hidden">
           {resolveAssetUrl(service.imageUrl) ? (
-            <img
+            <Image
               src={resolveAssetUrl(service.imageUrl) as string}
               alt={service.title}
+              width={96}
+              height={96}
+              unoptimized
               className="w-full h-full object-cover"
             />
           ) : (

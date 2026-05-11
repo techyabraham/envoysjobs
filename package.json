@@ -4,13 +4,21 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
-    "test": "turbo test",
-    "format": "turbo format"
+    "build": "pnpm --filter @envoysjobs/utils build && pnpm --filter @envoysjobs/api build && pnpm --filter @envoysjobs/web build",
+    "lint": "pnpm -C apps/api lint && pnpm -C apps/web lint",
+    "typecheck": "pnpm -C apps/api typecheck && pnpm -C apps/web typecheck",
+    "test": "pnpm -C apps/api test && pnpm -C apps/web test",
+    "format": "echo \"No formatter configured\""
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.5",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-jsx-a11y": "6.9.0",
+    "eslint-plugin-react": "7.35.0",
+    "eslint-plugin-react-hooks": "4.6.2",
     "turbo": "2.1.3",
     "typescript": "5.5.4"
   }

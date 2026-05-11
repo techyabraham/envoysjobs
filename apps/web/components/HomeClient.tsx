@@ -15,6 +15,37 @@ export default function HomeClient() {
   const services = usePublicServices();
   const gigs = useAvailableGigs();
   const role = (session as any)?.user?.role as string | undefined;
+  const featuredJobs =
+    jobs.data?.slice(0, 4).map((job) => ({
+      id: job.id,
+      title: job.title,
+      company: "EnvoysJobs",
+      location: job.location ?? "Nigeria",
+      pay: job.salaryMin && job.salaryMax ? `NGN ${job.salaryMin} - ${job.salaryMax}` : "Negotiable",
+      type: job.locationType,
+      postedTime: "Recently",
+      fromMember: true
+    })) ?? [];
+  const featuredServices =
+    services.data?.slice(0, 4).map((service) => ({
+      id: service.id,
+      name: service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy",
+      photo: resolveAssetUrl(service.imageUrl),
+      skill: service.title,
+      tags: service.description.split(" ").slice(0, 3),
+      rating: 4.8,
+      reviewCount: 12
+    })) ?? [];
+  const featuredGigs =
+    gigs.data?.slice(0, 4).map((gig) => ({
+      id: gig.id,
+      title: gig.title,
+      amount: gig.amount,
+      location: gig.location,
+      duration: gig.duration,
+      urgent: gig.urgent,
+      postedBy: gig.postedBy ? `${gig.postedBy.firstName} ${gig.postedBy.lastName}` : "Hirer"
+    })) ?? [];
 
   const jobsShared = jobs.data ? jobs.data.length.toLocaleString() : "—";
   const servicesListed = services.data ? services.data.length.toLocaleString() : "—";
@@ -141,34 +172,9 @@ export default function HomeClient() {
             embedUrl: "https://www.youtube.com/embed/LMhkLnHNwRA"
           }
         ]}
-        featuredJobs={jobs.data?.slice(0, 4).map((job) => ({
-          id: job.id,
-          title: job.title,
-          company: "EnvoysJobs",
-          location: job.location ?? "Nigeria",
-          pay: job.salaryMin && job.salaryMax ? `NGN ${job.salaryMin} - ${job.salaryMax}` : "Negotiable",
-          type: job.locationType,
-          postedTime: "Recently",
-          fromMember: true
-        }))}
-        featuredServices={services.data?.slice(0, 4).map((service) => ({
-          id: service.id,
-          name: service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy",
-          photo: resolveAssetUrl(service.imageUrl),
-          skill: service.title,
-          tags: service.description.split(" ").slice(0, 3),
-          rating: 4.8,
-          reviewCount: 12
-        }))}
-        featuredGigs={gigs.data?.slice(0, 4).map((gig) => ({
-          id: gig.id,
-          title: gig.title,
-          amount: gig.amount,
-          location: gig.location,
-          duration: gig.duration,
-          urgent: gig.urgent,
-          postedBy: gig.postedBy ? `${gig.postedBy.firstName} ${gig.postedBy.lastName}` : "Hirer"
-        }))}
+        featuredJobs={featuredJobs}
+        featuredServices={featuredServices}
+        featuredGigs={featuredGigs}
       />
       <Footer />
     </div>

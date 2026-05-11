@@ -172,9 +172,9 @@ export function Homepage({
   featuredGigs,
   webinars
 }: HomepageProps) {
-  const jobs = featuredJobs?.length ? featuredJobs : fallbackJobs;
-  const services = featuredServices?.length ? featuredServices : fallbackServices;
-  const gigs = featuredGigs?.length ? featuredGigs : fallbackGigs;
+  const jobs = featuredJobs ?? fallbackJobs;
+  const services = featuredServices ?? fallbackServices;
+  const gigs = featuredGigs ?? fallbackGigs;
   const webinarList = webinars ?? [];
   return (
     <div className="min-h-screen bg-background">
@@ -203,6 +203,12 @@ export function Homepage({
               />
             ))}
           </div>
+
+          {jobs.length === 0 && (
+            <div className="bg-white border border-border rounded-2xl p-6 text-foreground-secondary">
+              No jobs available yet.
+            </div>
+          )}
 
           <div className="mt-8 sm:hidden">
             <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('jobs')}>
@@ -237,6 +243,12 @@ export function Homepage({
             ))}
           </div>
 
+          {services.length === 0 && (
+            <div className="bg-white border border-border rounded-2xl p-6 text-foreground-secondary">
+              No services available yet.
+            </div>
+          )}
+
           <div className="mt-8 sm:hidden">
             <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('services')}>
               Browse All Services
@@ -269,6 +281,12 @@ export function Homepage({
               />
             ))}
           </div>
+
+          {gigs.length === 0 && (
+            <div className="bg-white border border-border rounded-2xl p-6 text-foreground-secondary">
+              No gigs available yet.
+            </div>
+          )}
 
           <div className="mt-8 sm:hidden">
             <Button variant="ghost" className="w-full" onClick={() => onNavigate?.('gigs')}>

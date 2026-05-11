@@ -46,7 +46,7 @@ export class StorageService {
         })
       );
       const base = this.publicUrl.replace(/\/$/, "");
-      const url = `${base}/${this.bucket}/${key}`;
+      const url = `${base}/${key}`;
       return { url, key };
     }
 

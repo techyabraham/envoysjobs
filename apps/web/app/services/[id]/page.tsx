@@ -39,6 +39,10 @@ export default function Page() {
             }
           }}
         />
+      ) : !isLoading && !error ? (
+        <div className="bg-white border border-border rounded-2xl p-6">
+          <p className="text-foreground-secondary">Service not found.</p>
+        </div>
       ) : null}
     </PageShell>
   );

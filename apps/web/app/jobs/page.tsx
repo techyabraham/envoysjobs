@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { JobDiscoveryPage } from "@envoysjobs/ui";
 import { useJobs } from "@/lib/jobs";
 import { mapJobToCard } from "@/lib/jobCards";
 import { useSavedJobs, useSaveJob, useUnsaveJob } from "@/lib/savedJobs";
 
-export default function Page() {
+function JobsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = (searchParams.get("q") || "").trim().toLowerCase();
@@ -58,5 +58,19 @@ export default function Page() {
         }
       }}
     />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background-secondary flex items-center justify-center text-foreground-secondary">
+          Loading jobs...
+        </div>
+      }
+    >
+      <JobsPageContent />
+    </Suspense>
   );
 }

@@ -4,9 +4,9 @@ import PageShell from "@/components/PageShell";
 import { GigCard } from "@envoysjobs/ui";
 import { useAvailableGigs } from "@/lib/gigs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 
-export default function Page() {
+function GigsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = (searchParams.get("q") || "").trim().toLowerCase();
@@ -46,5 +46,19 @@ export default function Page() {
         ))}
       </div>
     </PageShell>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <PageShell title="Gigs" description="Quick opportunities for immediate work.">
+          <p className="text-foreground-secondary">Loading gigs...</p>
+        </PageShell>
+      }
+    >
+      <GigsPageContent />
+    </Suspense>
   );
 }

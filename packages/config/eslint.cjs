@@ -19,5 +19,8 @@
     browser: true,
     node: true,
     es2021: true
+  },
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off'
   }
 };

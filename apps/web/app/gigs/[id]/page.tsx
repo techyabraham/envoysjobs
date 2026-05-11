@@ -110,6 +110,10 @@ export default function Page() {
             <button className="btn-secondary" onClick={() => router.push("/gigs")}>Back to Gigs</button>
           </div>
         </div>
+      ) : !isLoading && !error ? (
+        <div className="bg-white border border-border rounded-2xl p-6">
+          <p className="text-foreground-secondary">Gig not found.</p>
+        </div>
       ) : null}
     </PageShell>
   );

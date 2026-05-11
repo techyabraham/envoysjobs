@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useApi } from "@/lib/useApi";
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 const stewardDepartments = ["CHOIR", "MEDIA", "PROTOCOL", "USHERING", "CHILDREN", "OTHER"];
@@ -31,7 +30,6 @@ type EnvoyValues = z.infer<typeof envoySchema>;
 export default function EnvoyOnboardingForm() {
   const router = useRouter();
   const api = useApi();
-  const { data: session } = useSession();
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
 

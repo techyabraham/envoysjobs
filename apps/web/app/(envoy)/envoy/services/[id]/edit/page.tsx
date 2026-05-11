@@ -2,6 +2,7 @@
 
 import DashboardShell from "@/components/DashboardShell";
 import PageShell from "@/components/PageShell";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useService, useUpdateService } from "@/lib/services";
@@ -77,7 +78,14 @@ export default function Page({ params }: PageProps) {
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-xl bg-background-secondary border border-border flex items-center justify-center overflow-hidden">
               {previewUrl ? (
-                <img src={previewUrl} alt="Service preview" className="w-full h-full object-cover" />
+                <Image
+                  src={previewUrl}
+                  alt="Service preview"
+                  width={80}
+                  height={80}
+                  unoptimized
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <span className="text-foreground-tertiary text-sm">No image</span>
               )}

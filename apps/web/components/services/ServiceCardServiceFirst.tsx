@@ -1,6 +1,7 @@
 "use client";
 
 import { Star } from "lucide-react";
+import Image from "next/image";
 
 type ServiceCardServiceFirstProps = {
   serviceId: string;
@@ -87,7 +88,14 @@ export default function ServiceCardServiceFirst({
       >
         <div className="w-14 h-14 md:w-16 md:h-16 rounded-full overflow-hidden bg-background-secondary border border-border flex items-center justify-center text-sm md:text-base font-semibold text-foreground">
           {provider.avatarUrl ? (
-            <img src={provider.avatarUrl} alt={provider.name} className="w-full h-full object-cover" />
+            <Image
+              src={provider.avatarUrl}
+              alt={provider.name}
+              width={64}
+              height={64}
+              unoptimized
+              className="w-full h-full object-cover"
+            />
           ) : (
             <span>{initials}</span>
           )}

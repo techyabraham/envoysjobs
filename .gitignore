@@ -1,6 +1,11 @@
 ﻿node_modules
 .next
-.dist
+.next-buildcheck
+dist
+*.tsbuildinfo
 .env
 .env.local
 .DS_Store
+.turbo
+apps/web/public/sw.js
+apps/web/public/workbox-*.js

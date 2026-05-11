@@ -5,13 +5,13 @@ import { ServiceCard } from "@envoysjobs/ui";
 import { useMyServicesAny, usePublicServices } from "@/lib/services";
 import { resolveAssetUrl } from "@/lib/api";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import ServiceCardServiceFirst from "@/components/services/ServiceCardServiceFirst";
 
 const CARD_VARIANT: "service-first" | "provider-first" = "service-first";
 
-export default function Page() {
+function ServicesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
@@ -124,5 +124,19 @@ export default function Page() {
         ))}
       </div>
     </PageShell>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <PageShell title="Services Directory" description="Find trusted Envoys offering professional services.">
+          <p className="text-foreground-secondary">Loading services...</p>
+        </PageShell>
+      }
+    >
+      <ServicesPageContent />
+    </Suspense>
   );
 }

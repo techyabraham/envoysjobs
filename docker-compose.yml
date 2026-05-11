@@ -4,61 +4,62 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: envoysjobs
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/envoysjobs
-      JWT_SECRET: dev-secret
-      REFRESH_SECRET: dev-refresh
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/envoysjobs
+      JWT_SECRET: ${JWT_SECRET}
+      REFRESH_SECRET: ${REFRESH_SECRET}
       PORT: 4000
-      S3_ENDPOINT: http://minio:9000
-      S3_REGION: us-east-1
-      S3_BUCKET: envoysjobs
-      S3_ACCESS_KEY: minio
-      S3_SECRET_KEY: minio123
-      S3_PUBLIC_URL: http://localhost:9000
-      MAIL_PROVIDER: console
+      CORS_ORIGIN: ${WEB_URL}
+      S3_ENDPOINT: ${STORAGE_ENDPOINT}
+      S3_REGION: ${STORAGE_REGION:-auto}
+      S3_BUCKET: ${STORAGE_BUCKET:-envoysjobs}
+      S3_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      S3_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      S3_PUBLIC_URL: ${STORAGE_PUBLIC_URL}
+      MAIL_PROVIDER: ${MAIL_PROVIDER:-console}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      JOBS_IMPORT_ENABLED: ${JOBS_IMPORT_ENABLED:-false}
+      JSEARCH_API_KEY: ${JSEARCH_API_KEY:-}
+      JSEARCH_RAPIDAPI: ${JSEARCH_RAPIDAPI:-false}
+      JSEARCH_RAPIDAPI_HOST: jsearch.p.rapidapi.com
+      USE_MEMORY: "false"
     ports:
       - "4000:4000"
     depends_on:
-      - postgres
-      - minio
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${API_URL}
+        NEXT_PUBLIC_ENABLE_BILLING: "false"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000
-      NEXTAUTH_SECRET: changeme
-      NEXTAUTH_URL: http://localhost:3000
-      NEXT_PUBLIC_ENABLE_BILLING: "false"
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${WEB_URL}
     ports:
       - "3000:3000"
     depends_on:
       - api
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-  minio_data:
