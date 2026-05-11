@@ -7,6 +7,7 @@ COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml package.json turbo.json ./
 COPY packages ./packages
 COPY apps/web ./apps/web
+COPY apps/api/package.json ./apps/api/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
@@ -16,7 +17,7 @@ ARG NEXT_PUBLIC_ENABLE_BILLING=false
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_ENABLE_BILLING=$NEXT_PUBLIC_ENABLE_BILLING
 WORKDIR /app
-RUN pnpm --filter @envoysjobs/utils build
+RUN node_modules/.bin/tsc -p packages/utils/tsconfig.json
 WORKDIR /app/apps/web
 RUN pnpm build
 

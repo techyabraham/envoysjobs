@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(git -C c:/src/envoysjobs check-ignore -v apps/api/.env apps/api/.env.local apps/web/.env.local)",
-      "Bash(git -C c:/src/envoysjobs rm -r --cached apps/api/dist apps/web/tsconfig.tsbuildinfo apps/web/public/sw.js .turbo)"
+      "Bash(git -C c:/src/envoysjobs rm -r --cached apps/api/dist apps/web/tsconfig.tsbuildinfo apps/web/public/sw.js .turbo)",
+      "Bash(node -e ' *)",
+      "Bash(git -C c:/src/envoysjobs ls-files tsconfig.base.json)"
     ]
   }
 }

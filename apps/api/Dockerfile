@@ -7,12 +7,13 @@ COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml package.json turbo.json ./
 COPY packages ./packages
 COPY apps/api ./apps/api
+COPY apps/web/package.json ./apps/web/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 COPY --from=deps /app /app
 WORKDIR /app
-RUN pnpm --filter @envoysjobs/utils build
+RUN node_modules/.bin/tsc -p packages/utils/tsconfig.json
 WORKDIR /app/apps/api
 RUN pnpm build
 
