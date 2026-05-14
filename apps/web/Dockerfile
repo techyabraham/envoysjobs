@@ -8,7 +8,7 @@ COPY pnpm-workspace.yaml package.json turbo.json ./
 COPY packages ./packages
 COPY apps/web ./apps/web
 COPY apps/api/package.json ./apps/api/package.json
-RUN pnpm install
+RUN pnpm install --ignore-scripts
 
 FROM base AS builder
 COPY --from=deps /app /app
