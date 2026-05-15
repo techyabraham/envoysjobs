@@ -5,6 +5,7 @@ node_modules
 **/.next
 **/.next-buildcheck
 **/dist
+!packages/utils/dist
 apps/api/uploads
 .turbo
 **/coverage

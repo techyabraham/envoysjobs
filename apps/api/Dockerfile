@@ -12,8 +12,6 @@ RUN pnpm install
 
 FROM base AS builder
 COPY --from=deps /app /app
-WORKDIR /app
-RUN node_modules/.bin/tsc -p packages/utils/tsconfig.json
 WORKDIR /app/apps/api
 RUN pnpm build
 
