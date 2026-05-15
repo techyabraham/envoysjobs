@@ -7,8 +7,8 @@ COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml package.json turbo.json ./
 COPY packages ./packages
 COPY apps/web ./apps/web
-COPY apps/api/package.json ./apps/api/package.json
-RUN pnpm install --ignore-scripts
+RUN mkdir -p apps/api && printf '{"name":"@envoysjobs/api","version":"0.1.0","private":true}' > apps/api/package.json
+RUN pnpm install
 
 FROM base AS builder
 COPY --from=deps /app /app

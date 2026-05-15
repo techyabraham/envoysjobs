@@ -7,7 +7,7 @@ COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml package.json turbo.json ./
 COPY packages ./packages
 COPY apps/api ./apps/api
-COPY apps/web/package.json ./apps/web/package.json
+RUN mkdir -p apps/web && printf '{"name":"@envoysjobs/web","version":"0.1.0","private":true}' > apps/web/package.json
 RUN pnpm install
 
 FROM base AS builder
