@@ -2,6 +2,7 @@ FROM node:20-slim AS base
 WORKDIR /app
 RUN corepack enable
 
+# deps: full api + minimal web stub (web has no postinstall scripts)
 FROM base AS deps
 COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml package.json turbo.json ./

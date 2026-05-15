@@ -2,12 +2,13 @@ FROM node:20-slim AS base
 WORKDIR /app
 RUN corepack enable
 
+# deps: full workspace so pnpm install is clean and prisma generate succeeds
 FROM base AS deps
 COPY pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml package.json turbo.json ./
 COPY packages ./packages
+COPY apps/api ./apps/api
 COPY apps/web ./apps/web
-RUN mkdir -p apps/api && printf '{"name":"@envoysjobs/api","version":"0.1.0","private":true}' > apps/api/package.json
 RUN pnpm install
 
 FROM base AS builder
@@ -18,6 +19,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_ENABLE_BILLING=$NEXT_PUBLIC_ENABLE_BILLING
 ENV SKIP_NEXT_LINT=true
 ENV SKIP_NEXT_TYPECHECK=true
+ENV DISABLE_PWA=true
 ENV NODE_OPTIONS=--max-old-space-size=2048
 WORKDIR /app/apps/web
 RUN pnpm build
