@@ -1,19 +1,31 @@
-import withPWA from "next-pwa";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  distDir: process.env.NEXT_DIST_DIR || ".next",
   eslint: {
-    ignoreDuringBuilds: process.env.SKIP_NEXT_LINT === "true"
+    ignoreDuringBuilds: true
   },
   typescript: {
-    ignoreBuildErrors: process.env.SKIP_NEXT_TYPECHECK === "true"
+    ignoreBuildErrors: true
   },
-  transpilePackages: ["@envoysjobs/ui", "@envoysjobs/types", "@envoysjobs/utils"]
+  transpilePackages: ["@envoysjobs/ui", "@envoysjobs/types", "@envoysjobs/utils"],
+  ...(process.env.NEXT_STANDALONE === "1" && {
+    output: "standalone",
+    outputFileTracingRoot: path.resolve(__dirname, "../..")
+  })
 };
 
-export default withPWA({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development" || process.env.DISABLE_PWA === "true"
-})(nextConfig);
+const isPWA =
+  process.env.DISABLE_PWA !== "true" && process.env.NODE_ENV !== "development";
+
+let finalConfig = nextConfig;
+if (isPWA) {
+  const { default: withPWA } = await import("next-pwa");
+  finalConfig = withPWA({ dest: "public" })(nextConfig);
+}
+
+export default finalConfig;
