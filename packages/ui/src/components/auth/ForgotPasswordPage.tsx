@@ -5,15 +5,16 @@ import { Input } from '../Input';
 
 interface ForgotPasswordPageProps {
   onNavigate?: (page: string) => void;
-  onResetRequest?: (email: string) => void;
+  onResetRequest?: (email: string) => void | Promise<void>;
 }
 
 export function ForgotPasswordPage({ onNavigate, onResetRequest }: ForgotPasswordPageProps) {
   const [step, setStep] = useState<'email' | 'success'>('email');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
@@ -26,9 +27,16 @@ export function ForgotPasswordPage({ onNavigate, onResetRequest }: ForgotPasswor
       return;
     }
 
-    // Mock password reset request
-    onResetRequest?.(email);
-    setStep('success');
+    setSubmitting(true);
+    setError('');
+    try {
+      await onResetRequest?.(email);
+      setStep('success');
+    } catch {
+      setError('We could not send reset instructions. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (step === 'success') {
@@ -52,8 +60,7 @@ export function ForgotPasswordPage({ onNavigate, onResetRequest }: ForgotPasswor
             
             <h1 className="text-3xl mb-4">Check Your Email</h1>
             <p className="text-foreground-secondary mb-8">
-              We've sent password reset instructions to<br />
-              <span className="font-medium text-foreground">{email}</span>
+              If an account exists for <span className="font-medium text-foreground">{email}</span>, password reset instructions will be sent to it.
             </p>
 
             <div className="bg-white rounded-2xl p-8 shadow-lg mb-6">
@@ -140,8 +147,8 @@ export function ForgotPasswordPage({ onNavigate, onResetRequest }: ForgotPasswor
                 error={error}
               />
 
-              <Button type="submit" variant="primary" size="lg" className="w-full">
-                Send Reset Link
+              <Button type="submit" variant="primary" size="lg" className="w-full" disabled={submitting}>
+                {submitting ? 'Sending…' : 'Send Reset Link'}
               </Button>
             </form>
           </div>

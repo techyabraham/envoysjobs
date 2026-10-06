@@ -50,10 +50,13 @@ export class StorageService {
       return { url, key };
     }
 
-    const uploadsDir = path.join(process.cwd(), "apps/api/uploads", prefix);
-    await fs.mkdir(uploadsDir, { recursive: true });
-    const filePath = path.join(uploadsDir, safeName);
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Persistent S3-compatible storage is required for uploads in production");
+    }
+
+    const filePath = path.join(process.cwd(), "apps/api/uploads", key);
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, file.buffer);
-    return { url: `/uploads/${prefix}/${safeName}`, key };
+    return { url: `/uploads/${key}`, key };
   }
 }

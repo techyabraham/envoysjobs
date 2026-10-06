@@ -36,6 +36,9 @@ export default function SiteHeader() {
       case "gigs":
         router.push("/gigs");
         break;
+      case "deals":
+        router.push("/deals");
+        break;
       case "gig":
         if (id) router.push(`/gigs/${id}`);
         break;

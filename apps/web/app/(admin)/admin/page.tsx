@@ -11,6 +11,7 @@ import {
   useAdminCreateJob,
   useAdminCreateService,
   useAdminJobs,
+  useAdminDeals,
   useAdminReports,
   useAdminUsers,
   useAdminVerifications,
@@ -22,6 +23,7 @@ import { usePublicServices } from "@/lib/services";
 export default function Page() {
   const users = useAdminUsers();
   const jobs = useAdminJobs();
+  const deals = useAdminDeals();
   const reports = useAdminReports();
   const auditLogs = useAdminAuditLogs();
   const verifications = useAdminVerifications();
@@ -41,7 +43,8 @@ export default function Page() {
     const activeJobs = jobs.data?.filter((job) => job.status === "PUBLISHED").length ?? 0;
     const pendingReviews =
       (reports.data?.length ?? 0) +
-      (verifications.data?.filter((v) => v.status === "PENDING").length ?? 0);
+      (verifications.data?.filter((v) => v.status === "PENDING").length ?? 0) +
+      (deals.data?.filter((deal) => deal.status === "PENDING").length ?? 0);
     const activeServices = services.data?.length ?? 0;
     return [
       { label: "Pending Reviews", value: String(pendingReviews), icon: AlertTriangle, color: "text-soft-gold" },
@@ -49,7 +52,7 @@ export default function Page() {
       { label: "Active Jobs", value: String(activeJobs), icon: Briefcase, color: "text-emerald-green" },
       { label: "Active Services", value: String(activeServices), icon: Wrench, color: "text-deep-blue" }
     ];
-  }, [users.data, jobs.data, reports.data, verifications.data, services.data]);
+  }, [users.data, jobs.data, reports.data, verifications.data, services.data, deals.data]);
 
   const pendingItems = useMemo<PendingItem[]>(() => {
     const pendingVerifications = (verifications.data ?? [])
@@ -119,6 +122,7 @@ export default function Page() {
     <AdminGate>
       <div className="space-y-6">
         <div className="flex justify-end">
+          <a className="btn-secondary mr-auto" href="/admin/deals">Review member deals</a>
           <button
             className="btn-secondary"
             onClick={() => signOut({ callbackUrl: "/admin/login" })}

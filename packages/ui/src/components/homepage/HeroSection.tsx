@@ -72,7 +72,7 @@ export function HeroSection({ onNavigate, onSearch, isAuthenticated = false }: H
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl mb-6">Where Envoys Hire, Serve, and Get Hired.</h1>
 
-          <p className="text-xl sm:text-2xl mb-12 text-white/90">Connecting Envoys in need to Envoys who deliver.</p>
+          <p className="text-xl sm:text-2xl mb-12 text-white/90">Connecting Envoys to jobs, services, gigs, and member-shared deals.</p>
 
           <div className="bg-white rounded-2xl p-2 shadow-2xl mb-8">
             <div className="flex flex-col lg:flex-row gap-2">
@@ -145,6 +145,14 @@ export function HeroSection({ onNavigate, onSearch, isAuthenticated = false }: H
               onClick={() => runProtectedAction("post-gig")}
             >
               Post a Gig
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto bg-white/10 border-white text-white hover:bg-white hover:text-deep-blue"
+              onClick={() => onNavigate?.("deals")}
+            >
+              Explore Member Deals
             </Button>
           </div>
         </div>

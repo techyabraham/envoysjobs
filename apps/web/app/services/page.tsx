@@ -43,7 +43,7 @@ function ServicesPageContent() {
               Manage
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {myServices.slice(0, 4).map((service) => (
               CARD_VARIANT === "service-first" ? (
                 <ServiceCardServiceFirst
@@ -52,9 +52,6 @@ function ServicesPageContent() {
                   title={service.title}
                   shortDescription={service.description}
                   fullDescription={service.description}
-                  rating={4.8}
-                  reviewCount={12}
-                  tags={service.description.split(" ").slice(0, 3)}
                   provider={{
                     name: "You",
                     avatarUrl: resolveAssetUrl(service.imageUrl) ?? undefined
@@ -68,9 +65,7 @@ function ServicesPageContent() {
                   name="You"
                   photo={resolveAssetUrl(service.imageUrl)}
                   skill={service.title}
-                  tags={service.description.split(" ").slice(0, 3)}
-                  rating={4.8}
-                  reviewCount={12}
+                  description={service.description}
                   onAction={() => router.push(`/services/${service.id}`)}
                 />
               )
@@ -90,7 +85,7 @@ function ServicesPageContent() {
           <p className="text-foreground-secondary">No services available yet.</p>
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {data?.map((service) => (
           CARD_VARIANT === "service-first" ? (
             <ServiceCardServiceFirst
@@ -99,9 +94,6 @@ function ServicesPageContent() {
               title={service.title}
               shortDescription={service.description}
               fullDescription={service.description}
-              rating={4.8}
-              reviewCount={12}
-              tags={service.description.split(" ").slice(0, 3)}
               provider={{
                 name: service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy",
                 avatarUrl: resolveAssetUrl(service.imageUrl) ?? undefined
@@ -115,9 +107,7 @@ function ServicesPageContent() {
               name={service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy"}
               photo={resolveAssetUrl(service.imageUrl)}
               skill={service.title}
-              tags={service.description.split(" ").slice(0, 3)}
-              rating={4.8}
-              reviewCount={12}
+              description={service.description}
               onAction={() => router.push(`/services/${service.id}`)}
             />
           )

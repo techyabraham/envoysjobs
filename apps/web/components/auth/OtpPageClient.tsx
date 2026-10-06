@@ -17,6 +17,8 @@ export default function OtpPageClient() {
     api("/auth/request-otp", {
       method: "POST",
       body: JSON.stringify({ phone })
+    }).then((res) => {
+      if (res.error) setError("Unable to send OTP.");
     }).catch(() => {
       setError("Unable to send OTP.");
     });
@@ -40,10 +42,11 @@ export default function OtpPageClient() {
 
   const handleResend = async () => {
     if (!phone) return;
-    await api("/auth/request-otp", {
+    const res = await api("/auth/request-otp", {
       method: "POST",
       body: JSON.stringify({ phone })
     });
+    setError(res.error ? "Unable to send OTP." : null);
   };
 
   return (

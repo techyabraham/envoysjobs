@@ -24,6 +24,7 @@ export type Job = {
   contactEmail?: string | null;
   contactWebsite?: string | null;
   contactWhatsapp?: string | null;
+  createdAt?: string;
 };
 
 export function useJobs() {

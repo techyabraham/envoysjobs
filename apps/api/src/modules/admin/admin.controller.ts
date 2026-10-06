@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Patch, Param, Post, Req, UseGuards } from "@nestjs/common";
-import { ContactMethod, JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
+import { ContactMethod, DealStatus, JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
 import { z } from "zod";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
 import { JwtAuthGuard } from "../../common/jwt-auth.guard";
@@ -18,6 +18,8 @@ const stewardSchema = z.object({
 const jobStatusSchema = z.object({
   status: z.nativeEnum(JobStatus)
 });
+
+const dealStatusSchema = z.object({ status: z.nativeEnum(DealStatus) });
 
 const contactMethodEnum = z.nativeEnum(ContactMethod);
 const contactInfoSchema = z.object({
@@ -73,6 +75,16 @@ export class AdminController {
   @Get("jobs")
   jobs() {
     return this.adminService.jobs();
+  }
+
+  @Get("deals")
+  deals() {
+    return this.adminService.deals();
+  }
+
+  @Patch("deals/:id/status")
+  updateDealStatus(@Req() req: any, @Param("id") id: string, @Body(new ZodValidationPipe(dealStatusSchema)) body: z.infer<typeof dealStatusSchema>) {
+    return this.adminService.updateDealStatus(req.user?.id || "system", id, body.status);
   }
 
   @Get("reports")

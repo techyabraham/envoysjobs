@@ -20,9 +20,9 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     environment:
+      NODE_ENV: ${API_NODE_ENV:-development}
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/envoysjobs
       JWT_SECRET: ${JWT_SECRET}
-      REFRESH_SECRET: ${REFRESH_SECRET}
       PORT: 4000
       CORS_ORIGIN: ${WEB_URL}
       S3_ENDPOINT: ${STORAGE_ENDPOINT}
@@ -32,6 +32,11 @@ services:
       S3_SECRET_KEY: ${STORAGE_SECRET_KEY}
       S3_PUBLIC_URL: ${STORAGE_PUBLIC_URL}
       MAIL_PROVIDER: ${MAIL_PROVIDER:-console}
+      MAIL_FROM: ${MAIL_FROM:-EnvoysJobs <no-reply@envoysjobs.com>}
+      SMS_PROVIDER: ${SMS_PROVIDER:-console}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       JOBS_IMPORT_ENABLED: ${JOBS_IMPORT_ENABLED:-false}
       JSEARCH_API_KEY: ${JSEARCH_API_KEY:-}
@@ -44,7 +49,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:4000', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:4000/health/ready', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -62,6 +67,8 @@ services:
       NODE_ENV: production
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       NEXTAUTH_URL: ${WEB_URL}
+      API_INTERNAL_HOST: api
+      API_INTERNAL_PORT: 4000
     ports:
       - "3000:3000"
     depends_on:

@@ -9,11 +9,11 @@ export default function Page() {
   const api = useApi();
 
   const handleReset = async (email: string) => {
-    await api("/auth/forgot-password", {
+    const result = await api("/auth/forgot-password", {
       method: "POST",
       body: JSON.stringify({ email })
     });
-    router.push("/auth/login");
+    if (result.error) throw new Error("Unable to send reset instructions");
   };
 
   return (

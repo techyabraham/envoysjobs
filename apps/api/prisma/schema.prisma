@@ -78,6 +78,13 @@ enum GigApplicationStatus {
   COMPLETED
 }
 
+enum DealStatus {
+  PENDING
+  ACTIVE
+  PAUSED
+  REJECTED
+}
+
 model User {
   id                 String   @id @default(cuid())
   email              String   @unique
@@ -100,6 +107,7 @@ model User {
   applications Application[] @relation("EnvoyApplications")
   messages     Message[]
   refreshTokens RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
   notifications Notification[]
   reports      Report[]
   auditLogs    AdminAuditLog[]
@@ -110,6 +118,7 @@ model User {
   gigs        Gig[]     @relation("UserGigs")
   gigApplications GigApplication[] @relation("GigApplicant")
   serviceInquiries ServiceInquiry[]
+  deals        Deal[] @relation("MemberDeals")
 }
 
 model EnvoyProfile {
@@ -274,6 +283,8 @@ model Verification {
   phone   String @unique
   status  VerificationStatus @default(PENDING)
   otpCode String?
+  otpExpiresAt DateTime?
+  otpAttempts Int @default(0)
   userId  String? @unique
   documentUrl  String?
   documentType String?
@@ -327,8 +338,23 @@ model RefreshToken {
   userId  String
   role    String
   createdAt DateTime @default(now())
+  expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Service {
@@ -395,4 +421,30 @@ model ServiceInquiry {
 
   service  Service @relation(fields: [serviceId], references: [id])
   customer User    @relation(fields: [customerId], references: [id])
+}
+
+model Deal {
+  id                     String     @id @default(cuid())
+  ownerId                String
+  title                  String
+  description            String
+  offer                  String
+  category               String
+  promoCode              String?
+  redemptionInstructions String
+  location               String?
+  startsAt               DateTime?
+  endsAt                 DateTime?
+  contactMethods         ContactMethod[] @default([])
+  contactEmail           String?
+  contactWebsite         String?
+  contactWhatsapp        String?
+  status                 DealStatus @default(PENDING)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+
+  owner User @relation("MemberDeals", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([status, endsAt])
+  @@index([ownerId, createdAt])
 }

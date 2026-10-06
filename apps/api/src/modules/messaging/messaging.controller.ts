@@ -26,20 +26,20 @@ export class MessagingController {
   constructor(private messagingService: MessagingService) {}
 
   @Get("conversations")
-  listConversations(@Req() req: any, @Query("userId") userId?: string) {
-    return this.messagingService.listConversations(userId || req.user?.id || "");
+  listConversations(@Req() req: any) {
+    return this.messagingService.listConversations(req.user?.id || "");
   }
 
   @Post("conversations")
-  getOrCreate(@Body(new ZodValidationPipe(conversationSchema)) body: z.infer<typeof conversationSchema>) {
-    return this.messagingService.getOrCreateConversation(body);
+  getOrCreate(@Req() req: any, @Body(new ZodValidationPipe(conversationSchema)) body: z.infer<typeof conversationSchema>) {
+    return this.messagingService.getOrCreateConversation(body, req.user?.id || "");
   }
 
   @Get("conversations/:id/messages")
-  listMessages(@Param("id") id: string, @Query("page") page?: string, @Query("limit") limit?: string) {
+  listMessages(@Param("id") id: string, @Req() req: any, @Query("page") page?: string, @Query("limit") limit?: string) {
     const pageNum = Math.max(0, Number(page || 0));
     const limitNum = Math.min(100, Math.max(1, Number(limit || 50)));
-    return this.messagingService.listMessages(id, pageNum, limitNum);
+    return this.messagingService.listMessages(id, req.user?.id || "", pageNum, limitNum);
   }
 
   @Throttle({ default: { limit: 20, ttl: 60000 } })

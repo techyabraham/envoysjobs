@@ -11,6 +11,7 @@
         "test": "jest --runInBand --detectOpenHandles",
         "prisma": "prisma",
         "seed": "ts-node prisma/seed.ts",
+        "bootstrap-admin": "ts-node prisma/bootstrap-admin.ts",
         "postinstall": "prisma generate"
     },
     "dependencies": {

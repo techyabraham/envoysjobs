@@ -1,13 +1,14 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useCallback } from "react";
 import { apiFetch } from "@/lib/api";
 
 export function useApi() {
   const { data } = useSession();
   const accessToken = (data as any)?.accessToken;
 
-  return async function authedFetch<T>(path: string, init?: RequestInit) {
+  return useCallback(async function authedFetch<T>(path: string, init?: RequestInit) {
     const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;
     const headers: Record<string, string> = {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
@@ -19,5 +20,5 @@ export function useApi() {
     }
 
     return apiFetch<T>(path, { ...init, headers });
-  };
+  }, [accessToken]);
 }

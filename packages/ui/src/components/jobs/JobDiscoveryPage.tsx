@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Search, MapPin, DollarSign, Briefcase, Clock, Bookmark, Filter, X, SlidersHorizontal } from 'lucide-react';
 import { Button } from '../Button';
 import { Badge } from '../Badge';
-import { JobCard } from '../homepage/JobCard';
 
 interface JobDiscoveryPageProps {
   onJobClick?: (jobId: string) => void;
@@ -18,12 +17,11 @@ const mockJobs = [
     company: 'Tech Innovations Ltd',
     location: 'Lagos, Nigeria',
     pay: '₦800,000 - ₦1,200,000/month',
-    type: 'Full-time',
+    type: 'Remote',
     postedTime: '2 hours ago',
     fromMember: true,
     remote: true,
     skills: ['React', 'Node.js', 'TypeScript'],
-    applicants: 12
   },
   {
     id: '2',
@@ -31,12 +29,11 @@ const mockJobs = [
     company: 'Creative Agency',
     location: 'Abuja, Nigeria',
     pay: '₦400,000 - ₦600,000/month',
-    type: 'Full-time',
+    type: 'On-site',
     postedTime: '5 hours ago',
     fromMember: true,
     remote: false,
     skills: ['Figma', 'Adobe XD', 'User Research'],
-    applicants: 8
   },
   {
     id: '3',
@@ -44,12 +41,11 @@ const mockJobs = [
     company: 'Digital Marketing Co',
     location: 'Remote',
     pay: '₦250,000 - ₦400,000/month',
-    type: 'Part-time',
+    type: 'Remote',
     postedTime: '1 day ago',
     fromMember: false,
     remote: true,
     skills: ['SEO', 'Copywriting', 'Content Strategy'],
-    applicants: 24
   },
   {
     id: '4',
@@ -57,12 +53,11 @@ const mockJobs = [
     company: 'Construction Experts',
     location: 'Port Harcourt, Nigeria',
     pay: '₦600,000 - ₦900,000/month',
-    type: 'Full-time',
+    type: 'Hybrid',
     postedTime: '2 days ago',
     fromMember: true,
     remote: false,
     skills: ['Agile', 'Leadership', 'Budget Management'],
-    applicants: 15
   },
   {
     id: '5',
@@ -70,12 +65,11 @@ const mockJobs = [
     company: 'StartUp Hub',
     location: 'Lagos, Nigeria',
     pay: '₦500,000 - ₦800,000/month',
-    type: 'Contract',
+    type: 'Remote',
     postedTime: '3 days ago',
     fromMember: true,
     remote: true,
     skills: ['React Native', 'iOS', 'Android'],
-    applicants: 19
   },
   {
     id: '6',
@@ -83,12 +77,11 @@ const mockJobs = [
     company: 'Finance Solutions',
     location: 'Ibadan, Nigeria',
     pay: '₦300,000 - ₦500,000/month',
-    type: 'Full-time',
+    type: 'On-site',
     postedTime: '4 days ago',
     fromMember: false,
     remote: false,
     skills: ['QuickBooks', 'Tax Planning', 'Financial Analysis'],
-    applicants: 31
   }
 ];
 
@@ -291,11 +284,11 @@ export function JobDiscoveryPage({ onJobClick, jobs, savedJobIds, onToggleSave }
                 </div>
               </div>
 
-              {/* Job Type */}
+              {/* Work setup */}
               <div>
-                <label className="block text-sm font-medium mb-2">Job Type</label>
+                <label className="block text-sm font-medium mb-2">Work setup</label>
                 <div className="flex flex-wrap gap-2">
-                  {['Full-time', 'Part-time', 'Contract', 'Freelance'].map(type => (
+                  {['On-site', 'Hybrid', 'Remote'].map(type => (
                     <button
                       key={type}
                       onClick={() => toggleJobType(type)}
@@ -304,6 +297,7 @@ export function JobDiscoveryPage({ onJobClick, jobs, savedJobIds, onToggleSave }
                           ? 'bg-deep-blue text-white'
                           : 'bg-background-secondary hover:bg-background-tertiary'
                       }`}
+                      style={{ minHeight: 44 }}
                     >
                       {type}
                     </button>
@@ -380,41 +374,38 @@ export function JobDiscoveryPage({ onJobClick, jobs, savedJobIds, onToggleSave }
         {filteredJobs.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredJobs.map((job) => (
-              <div key={job.id} className="relative group">
-                <div
-                  onClick={() => onJobClick?.(job.id)}
-                  className="cursor-pointer"
-                >
-                  <div className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+              <article key={job.id} className="relative group h-full rounded-2xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <button type="button" onClick={() => onJobClick?.(job.id)} className="flex h-full w-full flex-col rounded-2xl p-4 pb-5 pr-16 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-deep-blue sm:p-5 sm:pr-16">
                     {/* Member Badge */}
                     {job.fromMember && (
                       <div className="inline-flex items-center gap-1 px-2 py-1 bg-soft-gold/10 text-soft-gold rounded-lg text-xs mb-3">
-                        ⭐ From An Envoy
+                        <span aria-hidden="true">⭐</span> From a member
                       </div>
                     )}
 
                     {/* Company & Title */}
-                    <h3 className="font-semibold mb-1 line-clamp-2">{job.title}</h3>
-                    <p className="text-sm text-foreground-secondary mb-4">{job.company}</p>
+                    <h3 className="mb-1 line-clamp-2 text-lg font-semibold leading-snug">{job.title}</h3>
+                    <p className="mb-4 line-clamp-1 text-sm text-foreground-secondary">{job.company}</p>
 
                     {/* Details */}
                     <div className="space-y-2 text-sm text-foreground-secondary mb-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex min-w-0 items-center gap-2">
                         <MapPin className="w-4 h-4 flex-shrink-0" />
-                        <span>{job.location}</span>
+                        <span className="truncate">{job.location}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 flex-shrink-0" />
-                        <span className="font-medium text-foreground">{job.pay}</span>
+                        <span className="truncate font-semibold text-foreground">{job.pay}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 flex-shrink-0" />
-                        <span>{job.type} • {job.postedTime}</span>
+                        <span className="truncate">{job.type} · {job.postedTime}</span>
                       </div>
                     </div>
 
                     {/* Skills */}
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    {job.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-4">
                       {job.skills.slice(0, 3).map(skill => (
                         <span
                           key={skill}
@@ -423,19 +414,14 @@ export function JobDiscoveryPage({ onJobClick, jobs, savedJobIds, onToggleSave }
                           {skill}
                         </span>
                       ))}
-                    </div>
+                      </div>
+                    )}
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <span className="text-xs text-foreground-tertiary">
-                        {job.applicants} applicants
-                      </span>
-                      {job.remote && (
-                        <Badge variant="success" className="text-xs">Remote</Badge>
-                      )}
+                    <div className="mt-auto flex items-center justify-between gap-2 border-t border-border pt-4">
+                      <span className="text-xs text-foreground-tertiary">View job details</span>
                     </div>
-                  </div>
-                </div>
+                  </button>
 
                 {/* Save Button */}
                 <button
@@ -443,15 +429,17 @@ export function JobDiscoveryPage({ onJobClick, jobs, savedJobIds, onToggleSave }
                     e.stopPropagation();
                     toggleSaveJob(job.id);
                   }}
-                  className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  className={`absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                     effectiveSaved.includes(job.id)
                       ? 'bg-soft-gold text-white'
                       : 'bg-white/90 text-foreground-secondary hover:bg-white hover:text-soft-gold'
-                  } shadow-sm`}
+                  } shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-deep-blue focus-visible:ring-offset-2`}
+                  aria-label={`${effectiveSaved.includes(job.id) ? "Remove" : "Save"} ${job.title} ${effectiveSaved.includes(job.id) ? "from" : "to"} saved jobs`}
+                  aria-pressed={effectiveSaved.includes(job.id)}
                 >
                   <Bookmark className={`w-5 h-5 ${effectiveSaved.includes(job.id) ? 'fill-current' : ''}`} />
                 </button>
-              </div>
+              </article>
             ))}
           </div>
         ) : (

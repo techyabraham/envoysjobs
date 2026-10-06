@@ -32,15 +32,14 @@ export default function HomeClient() {
       name: service.envoy ? `${service.envoy.firstName} ${service.envoy.lastName}` : "Envoy",
       photo: resolveAssetUrl(service.imageUrl),
       skill: service.title,
-      tags: service.description.split(" ").slice(0, 3),
-      rating: 4.8,
-      reviewCount: 12
+      description: service.description
     })) ?? [];
   const featuredGigs =
     gigs.data?.slice(0, 4).map((gig) => ({
       id: gig.id,
       title: gig.title,
       amount: gig.amount,
+      description: gig.description,
       location: gig.location,
       duration: gig.duration,
       urgent: gig.urgent,
@@ -103,6 +102,9 @@ export default function HomeClient() {
         break;
       case "gigs":
         router.push("/gigs");
+        break;
+      case "deals":
+        router.push(session ? "/deals" : "/auth/login?callbackUrl=/deals");
         break;
       case "post-gig":
         if (!session) {

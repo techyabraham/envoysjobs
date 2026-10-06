@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { sanitizeMessage } from "@envoysjobs/utils";
@@ -46,8 +46,11 @@ export class MessagingService {
       });
   }
 
-  async getOrCreateConversation(data: { jobId: string; envoyId: string; hirerId: string }) {
+  async getOrCreateConversation(data: { jobId: string; envoyId: string; hirerId: string }, requesterId: string) {
+    if (![data.envoyId, data.hirerId].includes(requesterId)) throw new ForbiddenException();
     if (!useMemory()) {
+      const job = await this.prisma.job.findUnique({ where: { id: data.jobId }, select: { hirerId: true } });
+      if (!job || job.hirerId !== data.hirerId) throw new ForbiddenException();
       const existing = await this.prisma.conversation.findFirst({
         where: { jobId: data.jobId, participants: { every: { userId: { in: [data.envoyId, data.hirerId] } } } }
       });
@@ -62,6 +65,8 @@ export class MessagingService {
       });
     }
     seedMemory();
+    const memoryJob = memoryStore.jobs.find((job) => job.id === data.jobId);
+    if (!memoryJob || memoryJob.hirerId !== data.hirerId) throw new ForbiddenException();
     const existing = await this.prisma.conversation
       .findFirst({
         where: { jobId: data.jobId, participants: { every: { userId: { in: [data.envoyId, data.hirerId] } } } }
@@ -96,7 +101,21 @@ export class MessagingService {
       });
   }
 
-  listMessages(conversationId: string, page = 0, limit = 50) {
+  private async assertParticipant(conversationId: string, userId: string) {
+    if (!useMemory()) {
+      const participant = await this.prisma.conversationParticipant.findFirst({
+        where: { conversationId, userId },
+        select: { id: true }
+      });
+      if (!participant) throw new ForbiddenException();
+      return;
+    }
+    const conversation = memoryStore.conversations.find((item) => item.id === conversationId);
+    if (!conversation?.participants.includes(userId)) throw new ForbiddenException();
+  }
+
+  async listMessages(conversationId: string, userId: string, page = 0, limit = 50) {
+    await this.assertParticipant(conversationId, userId);
     if (!useMemory()) {
       return this.prisma.message.findMany({
         where: { conversationId },
@@ -126,7 +145,8 @@ export class MessagingService {
       });
   }
 
-  sendMessage(conversationId: string, senderId: string, text: string) {
+  async sendMessage(conversationId: string, senderId: string, text: string) {
+    await this.assertParticipant(conversationId, senderId);
     if (!useMemory()) {
       return this.prisma.message.create({
         data: {
@@ -182,6 +202,8 @@ export class MessagingService {
   }
 
   async sendAttachment(conversationId: string, senderId: string, file: Express.Multer.File, text?: string) {
+    await this.assertParticipant(conversationId, senderId);
+    if (!file) throw new ForbiddenException("An attachment is required");
     const sanitizedText = text ? sanitizeMessage(text) : "Sent an attachment";
     const stored = await this.storage.save(file, "attachments");
 

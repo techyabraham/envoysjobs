@@ -17,6 +17,7 @@ export function Header({ onNavigate, isAuthenticated, userName }: HeaderProps) {
     { name: 'Jobs', href: 'jobs' },
     { name: 'Services', href: 'services' },
     { name: 'Gigs', href: 'gigs' },
+    { name: 'Deals', href: 'deals' },
     { name: 'About', href: 'about' }
   ];
 

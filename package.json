@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "pnpm --filter @envoysjobs/utils build && turbo dev",
     "build": "pnpm --filter @envoysjobs/utils build && pnpm --filter @envoysjobs/api build && pnpm --filter @envoysjobs/web build",
     "lint": "pnpm -C apps/api lint && pnpm -C apps/web lint",
     "typecheck": "pnpm -C apps/api typecheck && pnpm -C apps/web typecheck",

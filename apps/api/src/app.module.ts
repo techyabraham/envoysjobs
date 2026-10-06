@@ -18,6 +18,7 @@ import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { ReportsModule } from "./modules/reports/reports.module";
 import { ServicesModule } from "./modules/services/services.module";
 import { GigsModule } from "./modules/gigs/gigs.module";
+import { DealsModule } from "./modules/deals/deals.module";
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { GigsModule } from "./modules/gigs/gigs.module";
     ReviewsModule,
     ReportsModule,
     ServicesModule,
-    GigsModule
+    GigsModule,
+    DealsModule
   ],
   controllers: [AppController],
   providers: [AppService]

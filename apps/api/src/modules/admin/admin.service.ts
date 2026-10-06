@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ContactMethod, JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
+import { ContactMethod, DealStatus, JobStatus, StewardStatus, VerificationStatus } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { memoryStore, seedMemory, useMemory } from "../../common/memory.store";
 
@@ -17,6 +17,20 @@ export class AdminService {
     if (!useMemory()) return this.prisma.job.findMany();
     seedMemory();
     return this.prisma.job.findMany().catch(() => memoryStore.jobs);
+  }
+
+  deals() {
+    return this.prisma.deal.findMany({
+      orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+      include: { owner: { select: { id: true, firstName: true, lastName: true, email: true } } }
+    });
+  }
+
+  updateDealStatus(adminId: string, id: string, status: DealStatus) {
+    return this.prisma.$transaction([
+      this.prisma.deal.update({ where: { id }, data: { status } }),
+      this.prisma.adminAuditLog.create({ data: { adminId, action: `Deal ${id} -> ${status}` } })
+    ]);
   }
 
   reports() {

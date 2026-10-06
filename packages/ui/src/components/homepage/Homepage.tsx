@@ -24,15 +24,17 @@ interface FeaturedService {
   name: string;
   photo?: string | null;
   skill: string;
-  tags: string[];
-  rating: number;
-  reviewCount: number;
+  description?: string;
+  tags?: string[];
+  rating?: number;
+  reviewCount?: number;
 }
 
 interface FeaturedGig {
   id?: string;
   title: string;
   amount: string;
+  description?: string;
   location: string;
   duration: string;
   urgent?: boolean;
@@ -96,33 +98,25 @@ const fallbackServices: FeaturedService[] = [
     name: 'Sarah Adeyemi',
     photo: 'https://images.unsplash.com/photo-1739300293504-234817eead52?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwcHJvZmVzc2lvbmFsJTIwd29tYW4lMjBvZmZpY2V8ZW58MXx8fHwxNzY5OTAwMTM3fDA&ixlib=rb-4.1.0&q=80&w=1080',
     skill: 'Web Developer',
-    tags: ['React', 'Node.js', 'UI/UX'],
-    rating: 4.9,
-    reviewCount: 24
+    tags: ['React', 'Node.js', 'UI/UX']
   },
   {
     name: 'Emmanuel Okafor',
     photo: 'https://images.unsplash.com/photo-1616804827035-f4aa814c14ac?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwcHJvZmVzc2lvbmFsJTIwbWFuJTIwYnVzaW5lc3N8ZW58MXx8fHwxNzY5OTAwMTM3fDA&ixlib=rb-4.1.0&q=80&w=1080',
     skill: 'Photographer',
-    tags: ['Events', 'Portraits', 'Commercial'],
-    rating: 5.0,
-    reviewCount: 18
+    tags: ['Events', 'Portraits', 'Commercial']
   },
   {
     name: 'Grace Nwosu',
     photo: 'https://images.unsplash.com/photo-1764169689207-e23fb66e1fcf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhZnJpY2FuJTIwZW50cmVwcmVuZXVyJTIwc21pbGluZ3xlbnwxfHx8fDE3Njk5MDAxMzd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     skill: 'Content Writer',
-    tags: ['Copywriting', 'SEO', 'Blogs'],
-    rating: 4.8,
-    reviewCount: 31
+    tags: ['Copywriting', 'SEO', 'Blogs']
   },
   {
     name: 'David Eze',
     photo: 'https://images.unsplash.com/photo-1556745753-b2904692b3cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBzZXJ2aWNlJTIwd29ya2VyfGVufDF8fHx8MTc2OTkwMDEzOHww&ixlib=rb-4.1.0&q=80&w=1080',
     skill: 'Electrician',
-    tags: ['Installation', 'Repairs', 'Maintenance'],
-    rating: 4.7,
-    reviewCount: 15
+    tags: ['Installation', 'Repairs', 'Maintenance']
   }
 ];
 
@@ -194,7 +188,7 @@ export function Homepage({
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {jobs.map((job, index) => (
               <JobCard
                 key={index}
@@ -233,7 +227,7 @@ export function Homepage({
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {services.map((service, index) => (
               <ServiceCard
                 key={index}
@@ -272,7 +266,7 @@ export function Homepage({
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {gigs.map((gig, index) => (
               <GigCard
                 key={index}

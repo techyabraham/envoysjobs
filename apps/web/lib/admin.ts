@@ -39,6 +39,46 @@ export type AdminAuditLog = {
   createdAt?: string;
 };
 
+export type AdminDeal = {
+  id: string;
+  title: string;
+  offer: string;
+  description: string;
+  category: string;
+  status: "PENDING" | "ACTIVE" | "PAUSED" | "REJECTED";
+  createdAt: string;
+  owner?: { firstName: string; lastName: string; email: string };
+};
+
+export function useAdminDeals() {
+  const api = useApi();
+  return useQuery({
+    queryKey: ["admin-deals"],
+    queryFn: async () => {
+      const res = await api<AdminDeal[]>("/admin/deals");
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
+}
+
+export function useUpdateAdminDealStatus() {
+  const api = useApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: { id: string; status: AdminDeal["status"] }) => {
+      const res = await api(`/admin/deals/${params.id}/status`, { method: "PATCH", body: JSON.stringify({ status: params.status }) });
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-deals"] });
+      queryClient.invalidateQueries({ queryKey: ["deals"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-audit-logs"] });
+    }
+  });
+}
+
 export function useAdminUsers() {
   const api = useApi();
   return useQuery({

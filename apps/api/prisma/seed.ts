@@ -4,6 +4,9 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("The demo seed is disabled in production.");
+  }
   const adminPassword = await bcrypt.hash("admin1234", 10);
   const envoyPassword = await bcrypt.hash("envoy1234", 10);
   const hirerPassword = await bcrypt.hash("hirer1234", 10);
@@ -11,7 +14,6 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: "admin@envoysjobs.com" },
     update: {
-      passwordHash: adminPassword,
       firstName: "Super",
       lastName: "Admin",
       role: "ADMIN",
