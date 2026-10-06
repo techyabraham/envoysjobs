@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { resolveAssetUrl } from "@/lib/api";
-import { buildWhatsappIntentUrl, CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
+import { buildWhatsappIntentUrl, type ContactMethod } from "@/lib/contact";
 
 type ServiceDetailsPageProps = {
   service: {
@@ -75,30 +75,30 @@ export default function ServiceDetailsPage({ service, onBack, onPlatformRequest,
             if (!url) return null;
             return (
               <button key={method} className="cta" onClick={() => window.open(url, "_blank", "noopener,noreferrer")}>
-                {CONTACT_LABELS[method]}
+                Message on WhatsApp
               </button>
             );
           }
           if (method === "EMAIL" && service.contactEmail) {
-            const subject = encodeURIComponent(`Service Request: ${service.title}`);
-            const body = encodeURIComponent(`Hello, I am interested in this service on EnvoysJobs.\n\n${whatsappDetails}`);
+            const subject = encodeURIComponent(`Service enquiry: ${service.title}`);
+            const body = encodeURIComponent(`Hello ${providerName}, I’m interested in your ${service.title} service. Please let me know your availability.\n\n${whatsappDetails}`);
             return (
               <button key={method} className="cta" onClick={() => (window.location.href = `mailto:${service.contactEmail}?subject=${subject}&body=${body}`)}>
-                {CONTACT_LABELS[method]}
+                Email this provider
               </button>
             );
           }
           if (method === "WEBSITE" && service.contactWebsite) {
             return (
               <button key={method} className="cta" onClick={() => window.open(service.contactWebsite!, "_blank", "noopener,noreferrer")}>
-                {CONTACT_LABELS[method]}
+                Visit provider website
               </button>
             );
           }
           if (method === "PLATFORM") {
             return (
               <button key={method} className="cta" onClick={onPlatformRequest} disabled={requesting}>
-                {requesting ? "Sending..." : "Request Service"}
+                {requesting ? "Sending enquiry…" : "Request this service"}
               </button>
             );
           }

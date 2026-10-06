@@ -1,0 +1,2 @@
+ALTER TABLE "EnvoyProfile"
+  ADD COLUMN "memberGoals" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];

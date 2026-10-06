@@ -2,28 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { EnvoyOnboarding } from "@envoysjobs/ui";
+import { EnvoyOnboarding, type EnvoyOnboardingData } from "@envoysjobs/ui";
 import { useApi } from "@/lib/useApi";
 
 export default function Page() {
   const router = useRouter();
   const api = useApi();
-  const [initialData, setInitialData] = useState<{
-    firstName?: string;
-    lastName?: string;
-    phone?: string;
-  }>({});
+  const [initialData, setInitialData] = useState<{ phone?: string }>({});
 
   useEffect(() => {
     let cancelled = false;
     const loadMe = async () => {
-      const res = await api<{ firstName?: string; lastName?: string; phone?: string }>("/me");
+      const res = await api<{ phone?: string }>("/me");
       if (!cancelled && !res.error && res.data) {
-        setInitialData({
-          firstName: res.data.firstName || "",
-          lastName: res.data.lastName || "",
-          phone: res.data.phone || ""
-        });
+        setInitialData({ phone: res.data.phone || "" });
       }
     };
     loadMe();
@@ -32,9 +24,8 @@ export default function Page() {
     };
   }, [api]);
 
-  const handleComplete = async (data: any) => {
+  const handleComplete = async (data: EnvoyOnboardingData) => {
     const location = [data.city, data.state].filter(Boolean).join(", ");
-    const skills = Array.isArray(data.selectedSkills) ? data.selectedSkills.join(", ") : "";
     const stewardDept =
       data.stewardDepartment === "OTHER" ? data.stewardDepartmentOther : data.stewardDepartment;
     const stewardEnabled = data.steward === "yes";
@@ -42,8 +33,6 @@ export default function Page() {
     const resMe = await api("/me", {
       method: "PUT",
       body: JSON.stringify({
-        firstName: data.firstName,
-        lastName: data.lastName,
         phone: data.phone,
         stewardStatus: stewardEnabled ? "PENDING" : null,
         stewardDepartment: stewardEnabled ? stewardDept || null : null,
@@ -60,9 +49,8 @@ export default function Page() {
       body: JSON.stringify({
         location,
         availability: data.availabilityType,
-        bio: data.bio,
-        portfolioLinks: data.portfolio,
-        skills
+        skills: data.selectedSkills.join(", "),
+        memberGoals: data.memberGoals
       })
     });
 
@@ -79,7 +67,6 @@ export default function Page() {
       onNavigate={() => router.push("/")}
       onComplete={handleComplete}
       initialData={initialData}
-      lockName
     />
   );
 }

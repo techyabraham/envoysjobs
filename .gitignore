@@ -9,3 +9,6 @@ dist
 .turbo
 apps/web/public/sw.js
 apps/web/public/workbox-*.js
+
+# Local PostgreSQL development data
+apps/api/.local/

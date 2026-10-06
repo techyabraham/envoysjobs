@@ -15,7 +15,7 @@ export default function Page() {
   const inquiry = useServiceInquiry(id);
 
   return (
-    <PageShell title="Service" description="Service details and envoy profile.">
+    <PageShell title="Service details" description="Contact a member provider about their service.">
       {isLoading && <p className="text-foreground-secondary">Loading service...</p>}
       {error && <p className="text-destructive">Failed to load service.</p>}
       {data ? (
@@ -33,7 +33,7 @@ export default function Page() {
                 method: "PLATFORM",
                 message: `I am interested in this service: ${data.title}. Rate: ${data.rate}.`
               });
-              alert("Interest sent to envoy.");
+              alert("Your service enquiry was sent to the provider.");
             } catch {
               alert("Unable to send interest.");
             }

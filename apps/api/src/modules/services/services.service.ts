@@ -37,8 +37,10 @@ export class ServicesService {
   listAll(q?: string) {
     const query = q?.trim();
     return this.prisma.service.findMany({
-      where: query
-        ? {
+      where: {
+        status: "ACTIVE",
+        ...(query
+          ? {
             OR: [
               { title: { contains: query, mode: "insensitive" } },
               { description: { contains: query, mode: "insensitive" } },
@@ -53,16 +55,45 @@ export class ServicesService {
               }
             ]
           }
-        : undefined,
+          : {})
+      },
       orderBy: { createdAt: "desc" },
-      include: { envoy: true }
+      include: {
+        envoy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            imageUrl: true,
+            services: {
+              where: { status: "ACTIVE" },
+              orderBy: { createdAt: "desc" },
+              select: { id: true, title: true, description: true, rate: true }
+            }
+          }
+        }
+      }
     });
   }
 
   get(id: string) {
     return this.prisma.service.findUnique({
-      where: { id },
-      include: { envoy: true }
+      where: { id, status: "ACTIVE" },
+      include: {
+        envoy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            imageUrl: true,
+            services: {
+              where: { status: "ACTIVE" },
+              orderBy: { createdAt: "desc" },
+              select: { id: true, title: true, description: true, rate: true }
+            }
+          }
+        }
+      }
     });
   }
 

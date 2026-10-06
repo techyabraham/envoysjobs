@@ -7,20 +7,32 @@ import { useRouter } from "next/navigation";
 import { useJobs } from "@/lib/jobs";
 import { useApplications } from "@/lib/applications";
 import { useConversations } from "@/lib/messaging";
-import { Briefcase, Eye, MessageCircle, TrendingUp } from "lucide-react";
+import { useMyServices } from "@/lib/services";
+import { useMyGigs } from "@/lib/gigs";
+import { useApi } from "@/lib/useApi";
+import { useQuery } from "@tanstack/react-query";
+import { Briefcase, ClipboardList, MessageCircle, Wrench } from "lucide-react";
 
 export default function Page() {
   const { data: session } = useSession();
   const name = (session as any)?.user?.name || "Envoy";
   const userId = (session as any)?.user?.id as string | undefined;
   const router = useRouter();
-  const { data: jobs } = useJobs();
-  const { data: applications } = useApplications();
-  const { data: conversations } = useConversations(userId);
-
-  const applicationsCount = applications?.length ?? 0;
-  const hiredCount = applications?.filter((item) => item.status === "HIRED").length ?? 0;
-  const successRate = applicationsCount > 0 ? Math.round((hiredCount / applicationsCount) * 100) : 0;
+  const api = useApi();
+  const { data: jobs, error: jobsError } = useJobs();
+  const { data: applications, error: applicationsError } = useApplications();
+  const { data: conversations, error: conversationsError } = useConversations(userId);
+  const { data: services, error: servicesError } = useMyServices();
+  const { data: gigs, error: gigsError } = useMyGigs();
+  const profile = useQuery({
+    queryKey: ["envoy-profile-dashboard"],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const res = await api<any>("/envoy/profile");
+      if (res.error) throw new Error(res.error);
+      return res.data;
+    }
+  });
 
   const unreadMessages = (conversations ?? []).filter((conv) => {
     const last = conv.messages?.[0];
@@ -28,44 +40,57 @@ export default function Page() {
     return last.senderId && last.senderId !== userId;
   }).length;
 
-  const recommended = (jobs ?? []).slice(0, 2).map((job, idx) => ({
-    type: "job" as const,
+  const recommended = (jobs ?? []).slice(0, 3).map((job) => ({
+    id: job.id,
     title: job.title,
-    company: "EnvoysJobs",
-    match: idx === 0 ? "92%" : "86%",
-    badge: "From An Envoy"
+    company: job.company || "Shared by a community member",
+    location: job.location
   }));
 
   const stats = [
-    { label: "Applications Sent", value: String(applicationsCount), icon: Briefcase, change: "+0 this week" },
-    { label: "Profile Views", value: "0", icon: Eye, change: "No data" },
-    { label: "New Messages", value: String(unreadMessages), icon: MessageCircle, change: unreadMessages > 0 ? "Unread" : "All read" },
-    { label: "Success Rate", value: `${successRate}%`, icon: TrendingUp, change: "Based on hires" }
+    { label: "Job applications", value: String(applications?.length ?? 0), icon: Briefcase },
+    { label: "Services listed", value: String(services?.length ?? 0), icon: Wrench },
+    { label: "Gigs shared", value: String(gigs?.length ?? 0), icon: ClipboardList },
+    { label: "Unread conversations", value: String(unreadMessages), icon: MessageCircle }
   ];
+
+  const queryErrors = [jobsError, applicationsError, conversationsError, servicesError, gigsError, profile.error].filter(Boolean) as Error[];
 
   return (
     <DashboardShell userName={name}>
-      <DashboardOverview
-        userName={name}
-        stats={stats}
-        recommendations={recommended.length ? recommended : undefined}
-        onNavigate={(page) => {
+      <>
+        {queryErrors.map((error, index) => <p key={index} role="alert" className="mx-4 mt-4 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{error.message}</p>)}
+        <DashboardOverview
+          userName={name}
+          stats={stats}
+          memberGoals={profile.data?.memberGoals ?? []}
+          profileNeedsDetails={!profile.isLoading && !profile.error && (!profile.data?.bio?.trim() || !profile.data?.portfolioLinks?.trim())}
+          recommendations={recommended}
+          onNavigate={(page) => {
           switch (page) {
-            case "post-job":
-              router.push("/hirer/jobs/new");
+            case "find-work":
+              router.push("/envoy/jobs");
               break;
             case "offer-service":
-              router.push("/envoy/services");
+              router.push("/envoy/services/new");
               break;
-            case "post-gig":
+            case "find-gigs":
               router.push("/envoy/gigs");
               break;
+            case "deals":
+              router.push("/deals");
+              break;
+            case "edit-profile":
+              router.push("/envoy/profile/edit");
+              break;
             default:
-              router.push("/envoy/dashboard");
+              if (page.startsWith("job:")) router.push(`/envoy/jobs/${page.slice(4)}`);
+              else router.push("/envoy/dashboard");
               break;
           }
         }}
       />
+      </>
     </DashboardShell>
   );
 }

@@ -5,7 +5,8 @@ import PageShell from "@/components/PageShell";
 import { useApi } from "@/lib/useApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const INDUSTRIES = [
   "Technology",
@@ -27,19 +28,25 @@ export default function Page() {
   const api = useApi();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { data: session } = useSession();
+  const userName = (session as any)?.user?.name || "Member";
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [skillsInput, setSkillsInput] = useState("");
 
-  const { isLoading, error } = useQuery({
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ["hirer-profile-become-recruiter"],
     queryFn: async () => {
       const res = await api<any>("/hirer/profile");
       if (res.error) throw new Error(res.error);
-      setSelectedIndustries(Array.isArray(res.data?.recruiterIndustries) ? res.data.recruiterIndustries : []);
-      setSkillsInput(Array.isArray(res.data?.recruiterSkills) ? res.data.recruiterSkills.join(", ") : "");
       return res.data;
     }
   });
+
+  useEffect(() => {
+    if (!profile) return;
+    setSelectedIndustries(Array.isArray(profile.recruiterIndustries) ? profile.recruiterIndustries : []);
+    setSkillsInput(Array.isArray(profile.recruiterSkills) ? profile.recruiterSkills.join(", ") : "");
+  }, [profile]);
 
   const skills = useMemo(
     () =>
@@ -78,9 +85,9 @@ export default function Page() {
 
   return (
     <DashboardShell userName="Hirer">
-      <PageShell title="Become a Recruiter" description="Set what industries and skills you want to recruit from.">
+      <PageShell title="Recruiter profile" description="Choose the industries and skills you recruit for.">
         {isLoading && <p className="text-foreground-secondary">Loading profile...</p>}
-        {error && <p className="text-destructive">Failed to load profile.</p>}
+        {error && <p role="alert" className="text-destructive">Failed to load your profile: {(error as Error).message}</p>}
 
         <div className="bg-white border border-border rounded-2xl p-6 space-y-6">
           <div>
@@ -113,14 +120,14 @@ export default function Page() {
             />
           </div>
 
-          {save.isError ? <p className="text-sm text-destructive">Failed to save recruitment profile.</p> : null}
+          {save.isError ? <p role="alert" className="text-sm text-destructive">Could not save recruiter preferences: {(save.error as Error)?.message || "Please try again."}</p> : null}
 
           <button
             className="btn-primary"
-            disabled={selectedIndustries.length === 0 || save.isPending}
+            disabled={isLoading || Boolean(error) || selectedIndustries.length === 0 || save.isPending}
             onClick={() => save.mutate()}
           >
-            {save.isPending ? "Saving..." : "Save Recruitment Profile"}
+            {save.isPending ? "Saving…" : "Save recruiter profile"}
           </button>
         </div>
       </PageShell>

@@ -36,10 +36,9 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
       <div className="flex-1 flex items-center justify-center px-4 pb-8">
         <div className="w-full max-w-2xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl mb-3">How Will You Use EnvoysJobs?</h1>
+            <h1 className="text-3xl sm:text-4xl mb-3">How will you use EnvoysJobs?</h1>
             <p className="text-foreground-secondary text-lg">
-              Choose your primary role to get started<br />
-              <span className="text-sm">(You can do both later!)</span>
+              Choose the path that best describes what you need today.
             </p>
           </div>
 
@@ -60,9 +59,9 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
                 <UserCheck className={`w-8 h-8 ${selectedRole === 'envoy' ? 'text-white' : 'text-deep-blue'}`} />
               </div>
               
-              <h2 className="text-2xl mb-3">I'm an Envoy</h2>
+              <h2 className="text-2xl mb-3">I'm a member</h2>
               <p className="text-foreground-secondary mb-6">
-                Looking for job opportunities, offering services, or available for gigs
+                Find work, take gigs, offer a trade or professional service, and share community deals.
               </p>
 
               <div className="space-y-2 text-sm">
@@ -70,13 +69,13 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
                   <div className="w-5 h-5 rounded-full bg-emerald-green/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-emerald-green text-xs">✓</span>
                   </div>
-                  <span className="text-foreground-secondary">Apply to jobs</span>
+                  <span className="text-foreground-secondary">Find jobs and flexible work</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-green/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-emerald-green text-xs">✓</span>
                   </div>
-                  <span className="text-foreground-secondary">List your services</span>
+                  <span className="text-foreground-secondary">Offer practical or professional services</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-green/10 flex items-center justify-center flex-shrink-0">
@@ -88,7 +87,7 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
                   <div className="w-5 h-5 rounded-full bg-emerald-green/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-emerald-green text-xs">✓</span>
                   </div>
-                  <span className="text-foreground-secondary">Build your portfolio</span>
+                  <span className="text-foreground-secondary">Share local deals and promotions</span>
                 </div>
               </div>
 
@@ -116,9 +115,9 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
                 <Briefcase className={`w-8 h-8 ${selectedRole === 'hirer' ? 'text-white' : 'text-emerald-green'}`} />
               </div>
               
-              <h2 className="text-2xl mb-3">I'm a Hirer</h2>
+              <h2 className="text-2xl mb-3">I'm an employer or recruiter</h2>
               <p className="text-foreground-secondary mb-6">
-                Looking to hire talent, find service providers, or post gigs
+                Hire for a role or project, find trusted service providers, and recruit candidates.
               </p>
 
               <div className="space-y-2 text-sm">
@@ -138,7 +137,7 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
                   <div className="w-5 h-5 rounded-full bg-emerald-green/10 flex items-center justify-center flex-shrink-0">
                     <span className="text-emerald-green text-xs">✓</span>
                   </div>
-                  <span className="text-foreground-secondary">Post quick gigs</span>
+                  <span className="text-foreground-secondary">Browse services and community deals</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-green/10 flex items-center justify-center flex-shrink-0">
@@ -172,7 +171,7 @@ export function RoleSelectionPage({ onNavigate, onRoleSelect }: RoleSelectionPag
 
           {/* Help Text */}
           <p className="text-center text-sm text-foreground-secondary mt-6">
-            Don't worry! You can switch roles or do both anytime from your dashboard
+            Jobs, services, gigs, and deals are part of the same community marketplace.
           </p>
         </div>
       </div>

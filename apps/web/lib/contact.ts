@@ -1,5 +1,12 @@
 export type ContactMethod = "PLATFORM" | "EMAIL" | "WEBSITE" | "WHATSAPP";
 
+export const CONTACT_METHOD_NAMES: Record<ContactMethod, string> = {
+  PLATFORM: "EnvoysJobs messages",
+  EMAIL: "Email",
+  WEBSITE: "Website",
+  WHATSAPP: "WhatsApp"
+};
+
 export const CONTACT_LABELS: Record<ContactMethod, string> = {
   PLATFORM: "Apply on EnvoysJobs",
   EMAIL: "Apply via Email",

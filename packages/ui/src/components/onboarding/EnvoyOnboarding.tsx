@@ -1,557 +1,214 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, User, MapPin, Briefcase, Clock, CheckCircle } from 'lucide-react';
-import { Button } from '../Button';
-import { Input } from '../Input';
+"use client";
+
+import React, { useState } from "react";
+import { ArrowLeft, ArrowRight, Check, MapPin, Sparkles, User } from "lucide-react";
+import { Button } from "../Button";
+import { Input } from "../Input";
+
+export type MemberGoal = "FIND_WORK" | "FIND_GIGS" | "OFFER_SERVICES" | "SHARE_DEALS";
+
+export interface EnvoyOnboardingData {
+  phone: string;
+  steward: "yes" | "no";
+  stewardDepartment: string;
+  stewardDepartmentOther: string;
+  stewardMatricNumber: string;
+  memberGoals: MemberGoal[];
+  selectedSkills: string[];
+  state: string;
+  city: string;
+  availabilityType: "full-time" | "part-time" | "freelance" | "any";
+}
 
 interface EnvoyOnboardingProps {
   onNavigate?: (page: string) => void;
-  onComplete?: (data: any) => void;
-  userName?: string;
-  initialData?: Partial<{
-    firstName: string;
-    lastName: string;
-    phone: string;
-    dateOfBirth: string;
-  }>;
-  lockName?: boolean;
+  onComplete?: (data: EnvoyOnboardingData) => void;
+  initialData?: Partial<Pick<EnvoyOnboardingData, "phone">>;
 }
 
-type Step = 'personal' | 'skills' | 'location' | 'availability' | 'experience' | 'complete';
+type Step = "about" | "focus" | "location" | "review";
+
+const goals: { id: MemberGoal; title: string; description: string }[] = [
+  { id: "FIND_WORK", title: "Find jobs", description: "Explore full-time and part-time roles." },
+  { id: "FIND_GIGS", title: "Find gigs", description: "Take on short projects and flexible work." },
+  { id: "OFFER_SERVICES", title: "Offer services", description: "Show members the work you do." },
+  { id: "SHARE_DEALS", title: "Share deals", description: "Let the community know about your offers." }
+];
 
 const skills = [
-  'Web Development', 'Mobile Development', 'UI/UX Design', 'Graphic Design',
-  'Content Writing', 'Copywriting', 'Digital Marketing', 'Social Media Management',
-  'Photography', 'Videography', 'Video Editing', 'Animation',
-  'Accounting', 'Bookkeeping', 'Financial Planning', 'Legal Services',
-  'Project Management', 'Business Consulting', 'HR Consulting', 'Customer Service',
-  'Data Entry', 'Virtual Assistant', 'Administrative Support', 'Translation',
-  'Teaching/Tutoring', 'Music/Performance', 'Event Planning', 'Catering',
-  'Plumbing', 'Electrical Work', 'Carpentry', 'Painting',
-  'Cleaning Services', 'Landscaping', 'Driver', 'Logistics'
+  "Web Development", "Mobile Development", "UI/UX Design", "Graphic Design", "Content Writing",
+  "Digital Marketing", "Photography", "Videography", "Accounting", "Bookkeeping",
+  "Project Management", "Consulting", "Teaching & Tutoring", "Catering", "Event Planning",
+  "Tailoring & Fashion", "Barbering & Hair Styling", "Makeup Artistry", "Baking & Pastry",
+  "Plumbing", "Electrical Work", "Carpentry", "Painting", "Welding", "Masonry",
+  "Auto Repair", "Cleaning", "Laundry", "Landscaping", "Driving & Logistics", "Other"
 ];
 
-const nigerianStates = [
-  'Lagos', 'Abuja (FCT)', 'Kano', 'Kaduna', 'Port Harcourt', 'Ibadan',
-  'Benin City', 'Jos', 'Enugu', 'Abeokuta', 'Ilorin', 'Owerri', 'Onitsha',
-  'Warri', 'Akure', 'Calabar', 'Uyo', 'Sokoto', 'Maiduguri', 'Bauchi'
+const steps: { id: Step; label: string }[] = [
+  { id: "about", label: "About you" },
+  { id: "focus", label: "Your focus" },
+  { id: "location", label: "Your area" },
+  { id: "review", label: "Review" }
 ];
 
-export function EnvoyOnboarding({
-  onNavigate,
-  onComplete,
-  userName = 'Friend',
-  initialData,
-  lockName = false
-}: EnvoyOnboardingProps) {
-  const [currentStep, setCurrentStep] = useState<Step>('personal');
-  const [formData, setFormData] = useState(() => ({
-    // Personal
-    firstName: initialData?.firstName ?? '',
-    lastName: initialData?.lastName ?? '',
-    phone: initialData?.phone ?? '',
-    dateOfBirth: initialData?.dateOfBirth ?? '',
-    steward: 'no' as 'yes' | 'no',
-    stewardDepartment: '',
-    stewardDepartmentOther: '',
-    stewardMatricNumber: '',
-    
-    // Skills
-    selectedSkills: [] as string[],
-    
-    // Location
-    state: '',
-    city: '',
-    willingToRelocate: false,
-    openToRemote: false,
-    
-    // Availability
-    availabilityType: 'full-time' as 'full-time' | 'part-time' | 'freelance' | 'any',
-    startDate: 'immediately' as 'immediately' | '2-weeks' | '1-month' | 'flexible',
-    
-    // Experience
-    yearsOfExperience: '0-1' as '0-1' | '1-3' | '3-5' | '5-10' | '10+',
-    bio: '',
-    portfolio: ''
-  }));
-
-  useEffect(() => {
-    if (!initialData) return;
-    setFormData((prev) => ({
-      ...prev,
-      firstName: prev.firstName || initialData.firstName || '',
-      lastName: prev.lastName || initialData.lastName || '',
-      phone: prev.phone || initialData.phone || '',
-      dateOfBirth: prev.dateOfBirth || initialData.dateOfBirth || ''
-    }));
-  }, [initialData]);
-
-  const steps: Step[] = ['personal', 'skills', 'location', 'availability', 'experience', 'complete'];
-  const currentStepIndex = steps.indexOf(currentStep);
-  const progress = ((currentStepIndex + 1) / steps.length) * 100;
-
-  const handleNext = () => {
-    const nextIndex = currentStepIndex + 1;
-    if (nextIndex < steps.length) {
-      setCurrentStep(steps[nextIndex]);
-    }
-  };
-
-  const handleBack = () => {
-    const prevIndex = currentStepIndex - 1;
-    if (prevIndex >= 0) {
-      setCurrentStep(steps[prevIndex]);
-    }
-  };
-
-  const handleComplete = () => {
-    onComplete?.(formData);
-  };
-
-  const toggleSkill = (skill: string) => {
-    setFormData(prev => ({
-      ...prev,
-      selectedSkills: prev.selectedSkills.includes(skill)
-        ? prev.selectedSkills.filter(s => s !== skill)
-        : [...prev.selectedSkills, skill]
-    }));
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 'personal':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-deep-blue/10 rounded-full mb-4">
-                <User className="w-8 h-8 text-deep-blue" />
-              </div>
-              <h2 className="text-3xl mb-2">Personal Information</h2>
-              <p className="text-foreground-secondary">Let's start with the basics, {userName}</p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Input
-                label="First Name"
-                placeholder="John"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                disabled={lockName && Boolean(initialData?.firstName)}
-                className={lockName && initialData?.firstName ? 'bg-background-tertiary text-foreground-tertiary cursor-not-allowed' : ''}
-              />
-              <Input
-                label="Last Name"
-                placeholder="Doe"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                disabled={lockName && Boolean(initialData?.lastName)}
-                className={lockName && initialData?.lastName ? 'bg-background-tertiary text-foreground-tertiary cursor-not-allowed' : ''}
-              />
-            </div>
-
-            <Input
-              label="Phone Number"
-              type="tel"
-              placeholder="+234 XXX XXX XXXX"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-
-            <Input
-              label="Date of Birth"
-              type="date"
-              value={formData.dateOfBirth}
-              onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-            />
-
-            <div className="space-y-3">
-              <label className="block text-sm font-medium">Are you a Steward at RCCG The Envoys?</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm text-foreground-secondary">
-                  <input
-                    type="radio"
-                    checked={formData.steward === 'yes'}
-                    onChange={() => setFormData({ ...formData, steward: 'yes' })}
-                    className="h-4 w-4"
-                  />
-                  Yes
-                </label>
-                <label className="flex items-center gap-2 text-sm text-foreground-secondary">
-                  <input
-                    type="radio"
-                    checked={formData.steward === 'no'}
-                    onChange={() =>
-                      setFormData({
-                        ...formData,
-                        steward: 'no',
-                        stewardDepartment: '',
-                        stewardDepartmentOther: '',
-                        stewardMatricNumber: ''
-                      })
-                    }
-                    className="h-4 w-4"
-                  />
-                  No
-                </label>
-              </div>
-            </div>
-
-            {formData.steward === 'yes' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Steward Department</label>
-                  <select
-                    value={formData.stewardDepartment}
-                    onChange={(e) => setFormData({ ...formData, stewardDepartment: e.target.value })}
-                    className="w-full px-4 py-3 bg-input-background border border-input-border rounded-lg focus:border-deep-blue focus:outline-none"
-                  >
-                    <option value="">Select department</option>
-                    {["CHOIR", "MEDIA", "PROTOCOL", "USHERING", "CHILDREN", "OTHER"].map((dept) => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {formData.stewardDepartment === 'OTHER' && (
-                  <Input
-                    label="Other Department"
-                    placeholder="Enter department"
-                    value={formData.stewardDepartmentOther}
-                    onChange={(e) => setFormData({ ...formData, stewardDepartmentOther: e.target.value })}
-                  />
-                )}
-
-                <Input
-                  label="Steward Matric Number"
-                  placeholder="e.g., RCCG-001"
-                  value={formData.stewardMatricNumber}
-                  onChange={(e) => setFormData({ ...formData, stewardMatricNumber: e.target.value })}
-                />
-              </div>
-            )}
-          </div>
-        );
-
-      case 'skills':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-deep-blue/10 rounded-full mb-4">
-                <Briefcase className="w-8 h-8 text-deep-blue" />
-              </div>
-              <h2 className="text-3xl mb-2">Your Skills</h2>
-              <p className="text-foreground-secondary">
-                Select all that apply (choose at least 1, up to 10)
-              </p>
-              <p className="text-sm text-emerald-green mt-2">
-                Selected: {formData.selectedSkills.length}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-96 overflow-y-auto p-1">
-              {skills.map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() => toggleSkill(skill)}
-                  disabled={!formData.selectedSkills.includes(skill) && formData.selectedSkills.length >= 10}
-                  className={`p-3 rounded-lg text-sm transition-all ${
-                    formData.selectedSkills.includes(skill)
-                      ? 'bg-deep-blue text-white'
-                      : 'bg-background-secondary hover:bg-background-tertiary'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  {skill}
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'location':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-deep-blue/10 rounded-full mb-4">
-                <MapPin className="w-8 h-8 text-deep-blue" />
-              </div>
-              <h2 className="text-3xl mb-2">Location Preferences</h2>
-              <p className="text-foreground-secondary">Where are you based?</p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">State</label>
-                <select
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  className="w-full px-4 py-3 bg-input-background border border-input-border rounded-lg focus:border-deep-blue focus:outline-none"
-                >
-                  <option value="">Select state</option>
-                  {nigerianStates.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
-
-              <Input
-                label="City/Town"
-                placeholder="e.g., Ikeja"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg cursor-pointer hover:bg-background-tertiary transition-colors">
-                <input
-                  type="checkbox"
-                  checked={formData.openToRemote}
-                  onChange={(e) => setFormData({ ...formData, openToRemote: e.target.checked })}
-                  className="w-5 h-5 rounded border-input-border text-deep-blue focus:ring-deep-blue"
-                />
-                <div>
-                  <div className="font-medium">Open to Remote Work</div>
-                  <div className="text-sm text-foreground-secondary">Work from anywhere</div>
-                </div>
-              </label>
-
-              <label className="flex items-center gap-3 p-4 bg-background-secondary rounded-lg cursor-pointer hover:bg-background-tertiary transition-colors">
-                <input
-                  type="checkbox"
-                  checked={formData.willingToRelocate}
-                  onChange={(e) => setFormData({ ...formData, willingToRelocate: e.target.checked })}
-                  className="w-5 h-5 rounded border-input-border text-deep-blue focus:ring-deep-blue"
-                />
-                <div>
-                  <div className="font-medium">Willing to Relocate</div>
-                  <div className="text-sm text-foreground-secondary">Move for the right opportunity</div>
-                </div>
-              </label>
-            </div>
-          </div>
-        );
-
-      case 'availability':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-deep-blue/10 rounded-full mb-4">
-                <Clock className="w-8 h-8 text-deep-blue" />
-              </div>
-              <h2 className="text-3xl mb-2">Availability</h2>
-              <p className="text-foreground-secondary">When are you available?</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-3">Type of Work</label>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {[
-                  { value: 'full-time', label: 'Full-Time', desc: 'Permanent role' },
-                  { value: 'part-time', label: 'Part-Time', desc: 'Flexible hours' },
-                  { value: 'freelance', label: 'Freelance', desc: 'Project-based' },
-                  { value: 'any', label: 'Any', desc: 'Open to all' }
-                ].map((type) => (
-                  <button
-                    key={type.value}
-                    onClick={() => setFormData({ ...formData, availabilityType: type.value as any })}
-                    className={`p-4 rounded-lg text-left transition-all ${
-                      formData.availabilityType === type.value
-                        ? 'bg-deep-blue text-white'
-                        : 'bg-background-secondary hover:bg-background-tertiary'
-                    }`}
-                  >
-                    <div className="font-medium">{type.label}</div>
-                    <div className={`text-sm ${
-                      formData.availabilityType === type.value ? 'text-white/80' : 'text-foreground-secondary'
-                    }`}>
-                      {type.desc}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-3">When Can You Start?</label>
-              <div className="space-y-2">
-                {[
-                  { value: 'immediately', label: 'Immediately', desc: 'Ready to start now' },
-                  { value: '2-weeks', label: '2 Weeks Notice', desc: 'Standard notice period' },
-                  { value: '1-month', label: '1 Month Notice', desc: 'Need more time' },
-                  { value: 'flexible', label: 'Flexible', desc: 'Negotiable start date' }
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setFormData({ ...formData, startDate: option.value as any })}
-                    className={`w-full p-4 rounded-lg text-left transition-all ${
-                      formData.startDate === option.value
-                        ? 'bg-emerald-green text-white'
-                        : 'bg-background-secondary hover:bg-background-tertiary'
-                    }`}
-                  >
-                    <div className="font-medium">{option.label}</div>
-                    <div className={`text-sm ${
-                      formData.startDate === option.value ? 'text-white/80' : 'text-foreground-secondary'
-                    }`}>
-                      {option.desc}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'experience':
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-deep-blue/10 rounded-full mb-4">
-                <CheckCircle className="w-8 h-8 text-deep-blue" />
-              </div>
-              <h2 className="text-3xl mb-2">Experience & Bio</h2>
-              <p className="text-foreground-secondary">Tell us about yourself</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-3">Years of Experience</label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                {['0-1', '1-3', '3-5', '5-10', '10+'].map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setFormData({ ...formData, yearsOfExperience: range as any })}
-                    className={`p-3 rounded-lg transition-all ${
-                      formData.yearsOfExperience === range
-                        ? 'bg-deep-blue text-white'
-                        : 'bg-background-secondary hover:bg-background-tertiary'
-                    }`}
-                  >
-                    {range} years
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Bio <span className="text-foreground-tertiary font-normal">(Optional)</span>
-              </label>
-              <textarea
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                placeholder="Tell hirers about yourself, your experience, and what makes you unique..."
-                rows={5}
-                className="w-full px-4 py-3 bg-input-background border border-input-border rounded-lg focus:border-deep-blue focus:outline-none resize-none"
-                maxLength={500}
-              />
-              <p className="text-xs text-foreground-tertiary mt-1">{formData.bio.length}/500 characters</p>
-            </div>
-
-            <Input
-              label="Portfolio/Website (Optional)"
-              type="url"
-              placeholder="https://yourportfolio.com"
-              value={formData.portfolio}
-              onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
-            />
-          </div>
-        );
-
-      case 'complete':
-        return (
-          <div className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-emerald-green/10 rounded-full mb-6">
-              <CheckCircle className="w-12 h-12 text-emerald-green" />
-            </div>
-            <h2 className="text-4xl mb-4">You Are Amazing!</h2>
-            <p className="text-xl text-foreground-secondary mb-8">
-              Your profile is ready. Let's find you great opportunities!
-            </p>
-
-            <div className="bg-background-secondary rounded-2xl p-6 mb-8 text-left max-w-md mx-auto">
-              <h3 className="font-semibold mb-4">What's Next?</h3>
-              <div className="space-y-3">
-                <div className="flex gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-green flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground-secondary">Browse recommended jobs</span>
-                </div>
-                <div className="flex gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-green flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground-secondary">Complete your verification</span>
-                </div>
-                <div className="flex gap-3">
-                  <CheckCircle className="w-5 h-5 text-emerald-green flex-shrink-0 mt-0.5" />
-                  <span className="text-foreground-secondary">Connect with other Envoys</span>
-                </div>
-              </div>
-            </div>
-
-            <Button variant="success" size="lg" onClick={handleComplete}>
-              Go to Dashboard
-            </Button>
-          </div>
-        );
-    }
+export function EnvoyOnboarding({ onNavigate, onComplete, initialData }: EnvoyOnboardingProps) {
+  const [step, setStep] = useState<Step>("about");
+  const [form, setForm] = useState<EnvoyOnboardingData>({
+    phone: initialData?.phone ?? "",
+    steward: "no",
+    stewardDepartment: "",
+    stewardDepartmentOther: "",
+    stewardMatricNumber: "",
+    memberGoals: [],
+    selectedSkills: [],
+    state: "",
+    city: "",
+    availabilityType: "any"
+  });
+  const stepIndex = steps.findIndex((item) => item.id === step);
+  const update = <K extends keyof EnvoyOnboardingData>(key: K, value: EnvoyOnboardingData[K]) =>
+    setForm((current) => ({ ...current, [key]: value }));
+  const toggle = <T extends string>(key: "memberGoals" | "selectedSkills", value: T) => {
+    setForm((current) => {
+      const values = current[key] as T[];
+      const next = values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
+      return { ...current, [key]: next };
+    });
   };
 
   return (
-    <div className="min-h-screen bg-background-secondary">
-      {/* Progress Bar */}
-      <div className="sticky top-0 bg-white border-b border-border z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-3">
-            {currentStep !== 'complete' && (
-              <button
-                onClick={currentStepIndex === 0 ? () => onNavigate?.('home') : handleBack}
-                className="flex items-center gap-2 text-foreground-secondary hover:text-foreground transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Back
-              </button>
-            )}
-            <span className="text-sm text-foreground-secondary ml-auto">
-              Step {currentStepIndex + 1} of {steps.length}
-            </span>
-          </div>
-          <div className="h-2 bg-border rounded-full overflow-hidden">
-            <div
-              className="h-full bg-emerald-green transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+    <div className="mx-auto w-full max-w-3xl">
+      <div className="mb-8">
+        <div className="flex items-center justify-between gap-2" aria-label={`Step ${stepIndex + 1} of ${steps.length}`}>
+          {steps.map((item, index) => (
+            <div key={item.id} className="flex flex-1 flex-col gap-2">
+              <div className={`h-1.5 rounded-full ${index <= stepIndex ? "bg-deep-blue" : "bg-border"}`} />
+              <span className={`text-xs ${index === stepIndex ? "font-semibold text-foreground" : "text-foreground-tertiary"}`}>
+                {item.label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg">
-          {renderStepContent()}
-
-          {/* Navigation */}
-          {currentStep !== 'complete' && (
-            <div className="mt-8 flex gap-4">
-              <Button
-                variant="success"
-                size="lg"
-                className="flex-1"
-                onClick={handleNext}
-                disabled={
-                  (currentStep === 'personal' && !formData.firstName) ||
-                  (currentStep === 'personal' &&
-                    formData.steward === 'yes' &&
-                    (!formData.stewardDepartment ||
-                      !formData.stewardMatricNumber ||
-                      (formData.stewardDepartment === 'OTHER' && !formData.stewardDepartmentOther))) ||
-                  (currentStep === 'skills' && formData.selectedSkills.length === 0) ||
-                  (currentStep === 'location' && !formData.state)
-                }
-              >
-                Continue
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+      <section className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-8">
+        {step === "about" && (
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-deep-blue/10 text-deep-blue"><User /></span>
+              <div>
+                <h1 className="text-2xl font-semibold">A few details about you</h1>
+                <p className="mt-1 text-sm text-foreground-secondary">Your name and email are already saved. Add a phone number if you want members to reach you.</p>
+              </div>
             </div>
+            <Input label="Phone number (optional)" type="tel" placeholder="+234 800 000 0000" value={form.phone} onChange={(event) => update("phone", event.target.value)} />
+            <fieldset className="space-y-3">
+              <legend className="text-sm font-medium">Do you serve as a steward at RCCG The Envoys? <span className="font-normal text-foreground-tertiary">Optional</span></legend>
+              <div className="flex flex-wrap gap-3">
+                {(["no", "yes"] as const).map((answer) => (
+                  <label key={answer} className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-4 ${form.steward === answer ? "border-deep-blue bg-deep-blue/5" : "border-border"}`}>
+                    <input type="radio" name="steward" value={answer} checked={form.steward === answer} onChange={() => update("steward", answer)} />
+                    {answer === "yes" ? "Yes" : "No"}
+                  </label>
+                ))}
+              </div>
+              {form.steward === "yes" && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm font-medium">Department
+                    <select className="input" value={form.stewardDepartment} onChange={(event) => update("stewardDepartment", event.target.value)}>
+                      <option value="">Choose a department</option>
+                      {["CHOIR", "MEDIA", "PROTOCOL", "USHERING", "CHILDREN", "OTHER"].map((department) => <option key={department}>{department}</option>)}
+                    </select>
+                  </label>
+                  {form.stewardDepartment === "OTHER" && <Input label="Department name" value={form.stewardDepartmentOther} onChange={(event) => update("stewardDepartmentOther", event.target.value)} />}
+                  <Input label="Steward number" placeholder="e.g. RCCG-001" value={form.stewardMatricNumber} onChange={(event) => update("stewardMatricNumber", event.target.value)} />
+                </div>
+              )}
+            </fieldset>
+          </div>
+        )}
+
+        {step === "focus" && (
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-green/10 text-emerald-green"><Sparkles /></span>
+              <div>
+                <h2 className="text-2xl font-semibold">How would you like to take part?</h2>
+                <p className="mt-1 text-sm text-foreground-secondary">Choose any that fit. You can change these later from your profile.</p>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {goals.map((goal) => {
+                const selected = form.memberGoals.includes(goal.id);
+                return (
+                  <button key={goal.id} type="button" aria-pressed={selected} onClick={() => toggle("memberGoals", goal.id)} className={`min-h-24 rounded-xl border p-4 text-left transition-colors ${selected ? "border-deep-blue bg-deep-blue/5" : "border-border hover:border-deep-blue/50"}`}>
+                    <span className="flex items-center justify-between font-semibold">{goal.title}{selected && <Check className="h-4 w-4 text-deep-blue" />}</span>
+                    <span className="mt-1 block text-sm text-foreground-secondary">{goal.description}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium">Skills, trades, and services you offer <span className="font-normal text-foreground-tertiary">Optional, choose any</span></label>
+              <div className="flex max-h-64 flex-wrap gap-2 overflow-y-auto rounded-xl border border-border p-3">
+                {skills.map((skill) => {
+                  const selected = form.selectedSkills.includes(skill);
+                  return <button key={skill} type="button" aria-pressed={selected} onClick={() => toggle("selectedSkills", skill)} className={`min-h-9 rounded-full border px-3 py-1.5 text-sm ${selected ? "border-deep-blue bg-deep-blue text-white" : "border-border text-foreground-secondary hover:border-deep-blue"}`}>{skill}</button>;
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === "location" && (
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-soft-gold/15 text-soft-gold"><MapPin /></span>
+              <div>
+                <h2 className="text-2xl font-semibold">Where and when?</h2>
+                <p className="mt-1 text-sm text-foreground-secondary">Optional details help members find opportunities and services nearby.</p>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Input label="City (optional)" placeholder="e.g. Lagos" value={form.city} onChange={(event) => update("city", event.target.value)} />
+              <Input label="State or region (optional)" placeholder="e.g. Lagos State" value={form.state} onChange={(event) => update("state", event.target.value)} />
+            </div>
+            <label className="grid gap-2 text-sm font-medium">Availability
+              <select className="input" value={form.availabilityType} onChange={(event) => update("availabilityType", event.target.value as EnvoyOnboardingData["availabilityType"])}>
+                <option value="any">Flexible / not sure yet</option>
+                <option value="full-time">Full-time</option>
+                <option value="part-time">Part-time</option>
+                <option value="freelance">Freelance / project based</option>
+              </select>
+            </label>
+          </div>
+        )}
+
+        {step === "review" && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-semibold">You’re ready to go</h2>
+              <p className="mt-1 text-sm text-foreground-secondary">You can add a bio, work samples, and more from your dashboard whenever you’re ready.</p>
+            </div>
+            <div className="space-y-4 rounded-xl bg-background-secondary p-4">
+              <div><p className="text-xs font-semibold uppercase text-foreground-tertiary">Your focus</p><p className="mt-1">{form.memberGoals.length ? goals.filter((goal) => form.memberGoals.includes(goal.id)).map((goal) => goal.title).join(" · ") : "I’ll decide later"}</p></div>
+              <div><p className="text-xs font-semibold uppercase text-foreground-tertiary">Skills and services</p><p className="mt-1">{form.selectedSkills.length ? form.selectedSkills.join(" · ") : "Not added yet"}</p></div>
+              <div><p className="text-xs font-semibold uppercase text-foreground-tertiary">Location</p><p className="mt-1">{[form.city, form.state].filter(Boolean).join(", ") || "Not added yet"}</p></div>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-5">
+          <Button type="button" variant="ghost" onClick={stepIndex === 0 ? () => onNavigate?.("home") : () => setStep(steps[stepIndex - 1].id)}>
+            <ArrowLeft className="mr-2 h-4 w-4" />{stepIndex === 0 ? "Back" : "Previous"}
+          </Button>
+          {step === "review" ? (
+            <Button type="button" variant="success" onClick={() => onComplete?.(form)}>Go to dashboard<Check className="ml-2 h-4 w-4" /></Button>
+          ) : (
+            <Button type="button" variant="primary" onClick={() => setStep(steps[stepIndex + 1].id)}>Continue<ArrowRight className="ml-2 h-4 w-4" /></Button>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

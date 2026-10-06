@@ -17,6 +17,7 @@ type DealInput = {
   contactWebsite?: string;
   contactWhatsapp?: string;
 };
+type CreateDealInput = DealInput & Required<Pick<DealInput, "title" | "description" | "offer" | "category" | "redemptionInstructions">>;
 
 @Injectable()
 export class DealsService {
@@ -46,7 +47,7 @@ export class DealsService {
     return this.prisma.deal.findMany({ where: { ownerId }, orderBy: { createdAt: "desc" } });
   }
 
-  create(ownerId: string, data: DealInput) {
+  create(ownerId: string, data: CreateDealInput) {
     const contactMethods = data.contactMethods?.length
       ? data.contactMethods
       : [
@@ -57,6 +58,11 @@ export class DealsService {
     return this.prisma.deal.create({
       data: {
         ...this.toPrismaData(data),
+        title: data.title,
+        description: data.description,
+        offer: data.offer,
+        category: data.category,
+        redemptionInstructions: data.redemptionInstructions,
         ownerId,
         contactMethods,
         status: "PENDING"

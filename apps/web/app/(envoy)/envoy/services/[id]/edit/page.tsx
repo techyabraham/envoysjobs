@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { useService, useUpdateService } from "@/lib/services";
 import { useApi } from "@/lib/useApi";
 import { resolveAssetUrl } from "@/lib/api";
-import { CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
+import { CONTACT_METHOD_NAMES, type ContactMethod } from "@/lib/contact";
 
 interface PageProps {
   params: { id: string };
@@ -142,7 +142,7 @@ export default function Page({ params }: PageProps) {
                       )
                     }
                   />
-                  {CONTACT_LABELS[method]}
+                  {CONTACT_METHOD_NAMES[method]}
                 </label>
               ))}
             </div>

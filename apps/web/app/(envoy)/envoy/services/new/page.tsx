@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useCreateService } from "@/lib/services";
 import { useApi } from "@/lib/useApi";
 import { useSession } from "next-auth/react";
-import { CONTACT_LABELS, type ContactMethod } from "@/lib/contact";
+import { CONTACT_METHOD_NAMES, type ContactMethod } from "@/lib/contact";
 
 export default function Page() {
   const router = useRouter();
@@ -139,7 +139,7 @@ export default function Page() {
                       )
                     }
                   />
-                  {CONTACT_LABELS[method]}
+                  {CONTACT_METHOD_NAMES[method]}
                 </label>
               ))}
             </div>

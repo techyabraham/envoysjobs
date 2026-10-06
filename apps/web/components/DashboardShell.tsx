@@ -6,15 +6,17 @@ import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useApi } from "@/lib/useApi";
 import { useQuery } from "@tanstack/react-query";
-import { Briefcase, Bell, Home, MessageCircle, User, Video } from "lucide-react";
+import { Briefcase, Bell, Home, MessageCircle, User, Video, Store, Tag } from "lucide-react";
 
 const pageMap: Record<string, string> = {
   "/messages": "messages",
   "/envoy/dashboard": "dashboard",
   "/envoy/jobs": "jobs",
   "/envoy/services": "services",
-  "/envoy/services/new": "services",
   "/envoy/gigs": "gigs",
+  "/envoy/deals": "deals",
+  "/deals": "deals",
+  "/envoy/services/new": "services",
   "/envoy/gigs/new": "gigs",
   "/envoy/webinars": "webinars",
   "/envoy/notifications": "notifications",
@@ -28,6 +30,8 @@ const pageMap: Record<string, string> = {
   "/envoy/earnings": "dashboard",
   "/hirer/dashboard": "dashboard",
   "/hirer/jobs": "jobs",
+  "/hirer/services": "services",
+  "/hirer/gigs": "gigs",
   "/hirer/shortlist": "jobs",
   "/hirer/webinars": "webinars",
   "/hirer/notifications": "notifications",
@@ -49,6 +53,7 @@ export default function DashboardShell({
   const { data: session } = useSession();
   const api = useApi();
   const role = (session as any)?.user?.role as string | undefined;
+  const displayName = (session as any)?.user?.name || userName || "Member";
   const isHirerRoute = pathname.startsWith("/hirer");
   const hirerProfile = useQuery({
     queryKey: ["hirer-profile-nav"],
@@ -65,6 +70,9 @@ export default function DashboardShell({
   const envoyNavigation: DashboardNavItem[] = [
     { id: "dashboard", name: "Dashboard", icon: Home },
     { id: "jobs", name: "Jobs", icon: Briefcase },
+    { id: "gigs", name: "Gigs", icon: Briefcase },
+    { id: "services", name: "My services", icon: Store },
+    { id: "deals", name: "Deals", icon: Tag },
     { id: "webinars", name: "Webinars", icon: Video },
     { id: "messages", name: "Messages", icon: MessageCircle },
     { id: "notifications", name: "Notifications", icon: Bell },
@@ -79,6 +87,9 @@ export default function DashboardShell({
       name: isRecruiter ? "Recruitment" : "Become a Recruiter",
       icon: Briefcase
     },
+    { id: "services", name: "Browse services", icon: Store },
+    { id: "gigs", name: "Browse gigs", icon: Briefcase },
+    { id: "deals", name: "Deals", icon: Tag },
     { id: "webinars", name: "Webinars", icon: Video },
     { id: "messages", name: "Messages", icon: MessageCircle },
     { id: "notifications", name: "Notifications", icon: Bell },
@@ -88,7 +99,7 @@ export default function DashboardShell({
   return (
     <DashboardLayout
       activePage={activePage}
-      userName={userName}
+      userName={displayName}
       navigationItems={pathname.startsWith("/hirer") ? hirerNavigation : envoyNavigation}
       onNavigate={(page) => {
         if (page === "signout") {
@@ -101,6 +112,18 @@ export default function DashboardShell({
         }
         if (page === "messages") {
           router.push("/messages");
+          return;
+        }
+        if (page === "deals") {
+          router.push("/deals");
+          return;
+        }
+        if (page === "services") {
+          router.push(pathname.startsWith("/envoy") ? "/envoy/services" : "/services");
+          return;
+        }
+        if (page === "gigs") {
+          router.push(pathname.startsWith("/envoy") ? "/envoy/gigs" : "/gigs");
           return;
         }
         if (pathname.startsWith("/envoy")) {

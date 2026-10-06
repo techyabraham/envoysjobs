@@ -129,6 +129,7 @@ model EnvoyProfile {
   availability String?
   portfolioLinks String?
   skills     String?
+  memberGoals String[] @default([])
   rating     Float  @default(0)
   verified   Boolean @default(false)
 

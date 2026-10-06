@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/lib/useApi";
 import type { ContactMethod } from "@/lib/contact";
+import type { ProviderOffering } from "@/components/services/ProviderServicesCard";
 
 export type Service = {
   id: string;
@@ -18,7 +19,13 @@ export type Service = {
   createdAt: string;
   updatedAt: string;
   envoyId?: string;
-  envoy?: { firstName: string; lastName: string };
+  envoy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    imageUrl?: string | null;
+    services?: ProviderOffering[];
+  };
 };
 
 export function useMyServices() {

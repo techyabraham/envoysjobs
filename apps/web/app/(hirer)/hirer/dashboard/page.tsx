@@ -42,7 +42,10 @@ export default function Page() {
 
   return (
     <DashboardShell userName={name}>
-      <PageShell title="Dashboard" description="Overview of your hiring activity.">
+      <PageShell title="Dashboard" description="Manage hiring and connect with the member marketplace.">
+        {[jobs.error, applications.error, conversations.error, notifications.error, hirerProfile.error].filter(Boolean).map((error, index) => (
+          <p key={index} role="alert" className="mb-4 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{(error as Error).message || "Some dashboard information could not be loaded."}</p>
+        ))}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard label="Jobs Posted" value={jobs.data?.length ?? 0} />
           <StatCard label="Applications" value={applications.data?.length ?? 0} />
@@ -55,6 +58,9 @@ export default function Page() {
             <Link href="/hirer/jobs/new" className="btn-secondary">Post a Job</Link>
             <Link href="/hirer/jobs" className="btn-secondary">Manage Jobs</Link>
             <Link href="/hirer/shortlist" className="btn-secondary">Envoy Shortlist</Link>
+            <Link href="/services" className="btn-secondary">Browse Services</Link>
+            <Link href="/gigs" className="btn-secondary">Browse Gigs</Link>
+            <Link href="/deals" className="btn-secondary">Community Deals</Link>
             <Link href={isRecruiter ? "/hirer/recruitment" : "/hirer/become-recruiter"} className="btn-secondary">
               {isRecruiter ? "Recruitment" : "Become a Recruiter"}
             </Link>

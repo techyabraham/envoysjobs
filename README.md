@@ -4,20 +4,20 @@ EnvoysJobs is a community-first opportunity platform built for RCCG The Envoys. 
 
 ## Quick start (local)
 
-Requirements: Node.js 20, pnpm 9, and Docker Desktop (for PostgreSQL).
+Requirements: Node.js 20, pnpm 9, and PostgreSQL. Docker Desktop is optional if PostgreSQL is already installed locally.
 
 1. Install dependencies and create local environment files:
 
 ```powershell
 pnpm install
-Copy-Item .env.example .env
 Copy-Item apps/api/.env.example apps/api/.env
 Copy-Item apps/web/.env.example apps/web/.env.local
 ```
 
-2. Start PostgreSQL:
+2. Start PostgreSQL with Docker, or point `DATABASE_URL` in `apps/api/.env` at your local PostgreSQL instance. The default API example uses `postgres:postgres` on port 5432. With Docker:
 
 ```powershell
+Copy-Item .env.example .env
 docker compose up -d postgres
 ```
 
@@ -29,7 +29,7 @@ pnpm --filter @envoysjobs/api seed
 pnpm dev
 ```
 
-Open `http://localhost:3000`. The API and Swagger docs are at `http://localhost:4000` and `http://localhost:4000/docs`.
+Open `http://localhost:3000`. The API and Swagger docs are at `http://localhost:4000` and `http://localhost:4000/docs`. If another app already uses port 3000, change `CORS_ORIGIN` in `apps/api/.env` and `NEXTAUTH_URL` in `apps/web/.env.local` to `http://localhost:3001`, then run the API and web app in separate terminals with `pnpm --filter @envoysjobs/api dev` and `pnpm --filter @envoysjobs/web dev -- --port 3001`.
 
 The demo seed is for local use only. It creates `envoy@envoysjobs.com` / `envoy1234` and `hirer@envoysjobs.com` / `hirer1234` accounts. OTP codes and password-reset links are printed to the API terminal when local providers are set to `console`.
 

@@ -1,310 +1,114 @@
-﻿"use client";
+"use client";
 
-import React from 'react';
-import { 
-  Briefcase, Eye, MessageCircle, TrendingUp, 
-  Plus, Award, AlertCircle, CheckCircle 
-} from 'lucide-react';
-import { Card } from '../Card';
-import { Button } from '../Button';
-import { Badge } from '../Badge';
+import React from "react";
+import { ArrowRight, Briefcase, ClipboardList, Tag, Wrench } from "lucide-react";
+import { Card } from "../Card";
+import { Button } from "../Button";
 
 interface DashboardStat {
   label: string;
   value: string;
-  icon: typeof Briefcase;
-  change: string;
+  icon: React.ComponentType<{ className?: string }>;
+  change?: string;
 }
 
 interface Recommendation {
-  type: 'job' | 'gig';
+  id: string;
   title: string;
   company: string;
-  match: string;
-  badge: string;
-}
-
-interface ActivityItem {
-  title: string;
-  meta: string;
-  icon: typeof CheckCircle;
-  tone: 'success' | 'info' | 'accent';
+  location?: string | null;
 }
 
 interface DashboardOverviewProps {
   userName: string;
   onNavigate?: (page: string) => void;
-  profileCompletion?: number;
+  profileNeedsDetails?: boolean;
+  memberGoals?: string[];
   stats?: DashboardStat[];
   recommendations?: Recommendation[];
-  activity?: ActivityItem[];
 }
 
-export function DashboardOverview({
-  userName,
-  onNavigate,
-  profileCompletion = 75,
-  stats,
-  recommendations,
-  activity
-}: DashboardOverviewProps) {
-  
-  const statItems = stats ?? [
-    { label: 'Applications Sent', value: '12', icon: Briefcase, change: '+3 this week' },
-    { label: 'Profile Views', value: '48', icon: Eye, change: '+12 this week' },
-    { label: 'New Messages', value: '5', icon: MessageCircle, change: '2 unread' },
-    { label: 'Success Rate', value: '85%', icon: TrendingUp, change: '+5% this month' }
+export function DashboardOverview({ userName, onNavigate, profileNeedsDetails = false, memberGoals = [], stats = [], recommendations = [] }: DashboardOverviewProps) {
+  const actions = [
+    { label: "Find work", description: "Explore jobs from the community", icon: Briefcase, page: "find-work" },
+    { label: "Offer a service", description: "List a trade or professional service", icon: Wrench, page: "offer-service" },
+    { label: "Find a gig", description: "Browse flexible, short-term work", icon: ClipboardList, page: "find-gigs" },
+    { label: "Browse deals", description: "See offers shared by members", icon: Tag, page: "deals" }
   ];
-
-  const recommendedItems = recommendations ?? [
-    {
-      type: 'job',
-      title: 'Senior Developer Position',
-      company: 'Tech Solutions Ltd',
-      match: '95%',
-      badge: 'From An Envoy'
-    },
-    {
-      type: 'gig',
-      title: 'Website Design Project',
-      company: 'Sister Mary',
-      match: '88%',
-      badge: 'Urgent'
-    }
-  ];
-
-  const supportiveMessages = [
-    "Your dedication is making a difference",
-    "Keep shining your light",
-    "Excellence is your standard",
-    "Your community values your contribution"
-  ];
-
-  const randomMessage = supportiveMessages[Math.floor(Math.random() * supportiveMessages.length)];
+  const goalOrder = ["FIND_WORK", "OFFER_SERVICES", "FIND_GIGS", "SHARE_DEALS"];
+  const goalForPage: Record<string, string> = {
+    "find-work": "FIND_WORK",
+    "offer-service": "OFFER_SERVICES",
+    "find-gigs": "FIND_GIGS",
+    deals: "SHARE_DEALS"
+  };
+  const orderedActions = memberGoals.length
+    ? [...actions].sort((a, b) => {
+        const aIndex = goalOrder.indexOf(goalForPage[a.page]);
+        const bIndex = goalOrder.indexOf(goalForPage[b.page]);
+        return (memberGoals.indexOf(goalForPage[a.page]) < 0 ? 99 : memberGoals.indexOf(goalForPage[a.page])) - (memberGoals.indexOf(goalForPage[b.page]) < 0 ? 99 : memberGoals.indexOf(goalForPage[b.page])) || aIndex - bIndex;
+      })
+    : actions;
 
   return (
-    <div className="p-4 lg:p-8 pb-24 lg:pb-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Greeting */}
-        <div className="bg-gradient-to-br from-deep-blue via-deep-blue-dark to-deep-blue-light text-white rounded-2xl p-8">
-          <h1 className="text-3xl sm:text-4xl mb-2">
-            I honour you, {userName}
-          </h1>
-          <p className="text-xl text-white/90">
-            {randomMessage}
-          </p>
-        </div>
+    <div className="p-4 pb-24 lg:p-8 lg:pb-8">
+      <div className="mx-auto max-w-7xl space-y-7">
+        <header className="rounded-2xl bg-gradient-to-br from-deep-blue via-deep-blue-dark to-deep-blue-light p-6 text-white sm:p-8">
+          <p className="text-sm font-medium text-white/75">Member dashboard</p>
+          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Welcome, {userName}</h1>
+          <p className="mt-2 max-w-2xl text-base text-white/85">Find work, offer services, take gigs, and share in the community marketplace.</p>
+        </header>
 
-        {/* Profile Completion */}
-        {profileCompletion < 100 && (
-          <Card className="bg-soft-gold/10 border-soft-gold/30">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-soft-gold text-white flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
+        {profileNeedsDetails && (
+          <Card className="border-soft-gold/40 bg-soft-gold/10">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <h2 className="font-semibold text-foreground">Make your profile easier to trust</h2>
+                <p className="mt-1 max-w-2xl text-sm text-foreground-secondary">When you’re ready, add a short introduction and work samples from your profile. You can do this later without blocking your account.</p>
               </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-foreground">Complete Your Profile</h3>
-                  <span className="text-sm font-medium text-soft-gold-dark">{profileCompletion}%</span>
-                </div>
-                <div className="w-full h-2 bg-background-secondary rounded-full mb-3">
-                  <div 
-                    className="h-full bg-soft-gold rounded-full transition-all"
-                    style={{ width: `${profileCompletion}%` }}
-                  />
-                </div>
-                <p className="text-sm text-foreground-secondary mb-4">
-                  Add your professional photo and skills to get better matches
-                </p>
-                <Button variant="accent" size="sm">
-                  Complete Profile
-                </Button>
-              </div>
+              <Button variant="accent" size="sm" onClick={() => onNavigate?.("edit-profile")}>Complete profile<ArrowRight className="ml-2 h-4 w-4" /></Button>
             </div>
           </Card>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <button 
-            onClick={() => onNavigate?.('post-job')}
-            className="flex items-center gap-4 p-6 bg-white rounded-xl border-2 border-dashed border-border hover:border-deep-blue hover:bg-background-secondary transition-all group"
-          >
-            <div className="w-12 h-12 rounded-full bg-deep-blue/10 group-hover:bg-deep-blue flex items-center justify-center transition-colors">
-              <Plus className="w-6 h-6 text-deep-blue group-hover:text-white transition-colors" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-foreground mb-1">Post a Job</h3>
-              <p className="text-sm text-foreground-secondary">Find the right Envoy</p>
-            </div>
-          </button>
+        <section aria-label="Marketplace shortcuts" className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {orderedActions.map(({ label, description, icon: Icon, page }) => (
+            <button key={page} type="button" onClick={() => onNavigate?.(page)} className="group flex min-h-28 items-start gap-4 rounded-2xl border border-border bg-white p-5 text-left transition hover:border-deep-blue/40 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-deep-blue">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-deep-blue/10 text-deep-blue"><Icon className="h-5 w-5" /></span>
+              <span><span className="block font-semibold text-foreground">{label}</span><span className="mt-1 block text-sm leading-relaxed text-foreground-secondary">{description}</span></span>
+            </button>
+          ))}
+        </section>
 
-          <button 
-            onClick={() => onNavigate?.('offer-service')}
-            className="flex items-center gap-4 p-6 bg-white rounded-xl border-2 border-dashed border-border hover:border-emerald-green hover:bg-background-secondary transition-all group"
-          >
-            <div className="w-12 h-12 rounded-full bg-emerald-green/10 group-hover:bg-emerald-green flex items-center justify-center transition-colors">
-              <Plus className="w-6 h-6 text-emerald-green group-hover:text-white transition-colors" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-foreground mb-1">Offer Service</h3>
-              <p className="text-sm text-foreground-secondary">Share your skills</p>
-            </div>
-          </button>
-
-          <button 
-            onClick={() => onNavigate?.('post-gig')}
-            className="flex items-center gap-4 p-6 bg-white rounded-xl border-2 border-dashed border-border hover:border-soft-gold hover:bg-background-secondary transition-all group"
-          >
-            <div className="w-12 h-12 rounded-full bg-soft-gold/10 group-hover:bg-soft-gold flex items-center justify-center transition-colors">
-              <Plus className="w-6 h-6 text-soft-gold group-hover:text-white transition-colors" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-foreground mb-1">Post a Gig</h3>
-              <p className="text-sm text-foreground-secondary">Quick opportunities</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statItems.map((stat, index) => {
+        {stats.length > 0 && (
+          <section aria-label="Your activity" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {stats.map((stat) => {
               const Icon = stat.icon;
-              return (
-                <Card key={index}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-full bg-deep-blue/10 flex items-center justify-center">
-                    <Icon className="w-6 h-6 text-deep-blue" />
-                  </div>
-                </div>
-                <div className="text-3xl font-bold text-foreground mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-foreground-secondary mb-2">
-                  {stat.label}
-                </div>
-                <div className="text-xs text-emerald-green font-medium">
-                  {stat.change}
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Next Best Action */}
-        <Card className="bg-emerald-green/5 border-emerald-green/20">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-full bg-emerald-green text-white flex items-center justify-center shrink-0">
-              <CheckCircle className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-2">Next Best Action</h3>
-              <p className="text-foreground-secondary mb-4">
-                Based on your profile, we recommend applying for the Senior Developer position at Tech Solutions Ltd. It matches 95% of your skills!
-              </p>
-              <Button variant="success" size="sm">
-                View Opportunity
-              </Button>
-            </div>
-          </div>
-        </Card>
-
-        {/* Recommended for You */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground mb-1">Recommended for You</h2>
-              <p className="text-foreground-secondary">Opportunities that match your profile</p>
-            </div>
-            <Button variant="ghost" size="sm" className="hidden sm:flex">
-              View All
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {recommendedItems.map((rec, index) => (
-              <Card key={index} hover>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant={rec.badge === 'Urgent' ? 'urgent' : 'gold'}>
-                        {rec.badge}
-                      </Badge>
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-1">
-                      {rec.title}
-                    </h3>
-                    <p className="text-sm text-foreground-secondary mb-3">
-                      {rec.company}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-emerald-green mb-1">
-                      {rec.match}
-                    </div>
-                    <div className="text-xs text-foreground-tertiary">
-                      Match
-                    </div>
-                  </div>
-                </div>
-                <Button variant="primary" size="sm" className="w-full">
-                  View Details
-                </Button>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div>
-          <h2 className="text-2xl font-semibold text-foreground mb-6">Recent Activity</h2>
-          <div className="space-y-4">
-            {(activity ?? [
-              {
-                title: "Your application was viewed",
-                meta: "Marketing Manager at Creative Agency • 2 hours ago",
-                icon: CheckCircle,
-                tone: "success"
-              },
-              {
-                title: "New message from Sarah Adeyemi",
-                meta: "Regarding: Web Development Project • 5 hours ago",
-                icon: MessageCircle,
-                tone: "info"
-              },
-              {
-                title: "Profile completion increased to 75%",
-                meta: "You're almost there! • 1 day ago",
-                icon: Award,
-                tone: "accent"
-              }
-            ]).map((item, index) => {
-              const Icon = item.icon;
-              const toneClass =
-                item.tone === "success"
-                  ? "bg-emerald-green/10 text-emerald-green"
-                  : item.tone === "info"
-                  ? "bg-deep-blue/10 text-deep-blue"
-                  : "bg-soft-gold/10 text-soft-gold";
-              return (
-                <Card key={index}>
-                  <div className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${toneClass}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-foreground mb-1">{item.title}</p>
-                      <p className="text-sm text-foreground-tertiary">{item.meta}</p>
-                    </div>
-                  </div>
-                </Card>
-              );
+              return <Card key={stat.label}><div className="flex items-center justify-between"><span className="text-sm text-foreground-secondary">{stat.label}</span><Icon className="h-5 w-5 text-deep-blue" /></div><p className="mt-3 text-3xl font-semibold text-foreground">{stat.value}</p>{stat.change && <p className="mt-1 text-xs text-foreground-tertiary">{stat.change}</p>}</Card>;
             })}
+          </section>
+        )}
+
+        <section>
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div><h2 className="text-xl font-semibold text-foreground">Recent opportunities</h2><p className="mt-1 text-sm text-foreground-secondary">New work shared by the community.</p></div>
+            <Button variant="ghost" size="sm" onClick={() => onNavigate?.("find-work")}>Browse jobs<ArrowRight className="ml-1 h-4 w-4" /></Button>
           </div>
-        </div>
+          {recommendations.length ? (
+            <div className="grid gap-3 lg:grid-cols-2">
+              {recommendations.map((item) => <Card key={item.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0"><h3 className="font-semibold text-foreground">{item.title}</h3><p className="mt-1 text-sm text-foreground-secondary">{item.company}{item.location ? ` · ${item.location}` : ""}</p></div>
+                  <Briefcase className="h-5 w-5 shrink-0 text-deep-blue" />
+                </div>
+                <Button variant="primary" size="sm" className="mt-4" onClick={() => onNavigate?.(`job:${item.id}`)}>View job</Button>
+              </Card>)}
+            </div>
+          ) : (
+            <Card><div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"><div><p className="font-medium text-foreground">Nothing new to show yet</p><p className="mt-1 text-sm text-foreground-secondary">Browse the job board, or explore services and deals from members.</p></div><Button variant="outline" size="sm" onClick={() => onNavigate?.("find-work")}>Explore opportunities</Button></div></Card>
+          )}
+        </section>
       </div>
     </div>
   );
 }
-
-
